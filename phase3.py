@@ -4,7 +4,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import *
 import pymysql
-
+import calendar
 
 class Phase_three:
     def __init__(self,primaryWin):
@@ -33,9 +33,30 @@ class Phase_three:
  #       self.schoolInfo.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.findAvailWindow= Toplevel()
-        self.findAvailWindow.title("Search Rooms")
+        self.findAvailWindow.title("Search Train")
         self.findAvailWindow.withdraw()
  #       self.findAvailWindow.protocol("WM_DELETE_WINDOW", self.closeWindow)
+
+        self.departureWin = Toplevel()
+        self.departureWin.title("Select Deaprture")
+        self.departureWin.withdraw()
+
+        self.passengerInfoWin = Toplevel()
+        self.passengerInfoWin.title("Travel Extras & Passenger Info")
+        self.passengerInfoWin.withdraw()
+
+        self.reservationWin = Toplevel()
+        self.reservationWin.title("Make Reservation")
+        self.reservationWin.withdraw()
+
+
+    def Connect(self):
+        try:
+            db = pymysql.connect(host="academic-mysql.cc.gatech.edu", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
+            return db
+        except:
+            messagebox.showerror("Error", "Check Internet Connection")
+
 
     def Login(self):
         self.primaryWin.title("Login")
@@ -57,7 +78,7 @@ class Phase_three:
 
         b1=Button(frame2, text ="Login", command=self.loginCredentials)
         b1.pack(side=LEFT)
-        b2=Button(frame2, text ="Register", command= self.switchToRegister)
+        b2=Button(frame2, text ="Register", command=self.switchToRegister)
         b2.pack(side=LEFT)
 
     '''def loginCredentials(self):
@@ -196,8 +217,6 @@ class Phase_three:
         result2 = cursor.fetchall()
         self.switchToLogin()'''
 
-
-
     def schoolInfo(self):
         self.primaryWindow.withdraw()
         self.schoolInfoWin.deiconify()
@@ -259,22 +278,100 @@ class Phase_three:
         option=OptionMenu(frame, self.city, choices[0], *choices)
         option.pack(side=RIGHT)
 
-        arriveAt= Label(frame1,text ="Arrives At")
-        arriveAt.pack(side=LEFT)
-#        start_date= Label(frame,text ="Start Date (MM/DD/YYYY)")
-#       self.startDateEntry = Entry(frame1, textvariable = start_date, width = 30)
-#        self.endDateEntry = Entry(frame1, textvariable = end_date, width = 30)
 
-        depDate= Label(frame2,text ="Departure Date")
-        depDate.pack(side=LEFT)
+        arriveAt= Label(frame1,text ="Arrive At")
+        arriveAt.pack(side=LEFT)
         self.date = StringVar()
         choices = ["Atlanta", "Charlotte", "Savannah", "Orlando", "Miami"]
         self.date.set(choices[0])
-        option=OptionMenu(frame2, self.date, choices[0], *choices)
+        option=OptionMenu(frame1, self.date, choices[0], *choices)
         option.pack(side=RIGHT)
 
-        b=Button(frame3, text ="Find Trains")
+        depDate= Label(frame2,text ="Departure Date")
+        depDate.pack(side=LEFT)
+        start_date= Label(frame2,text ="Start Date (MM/DD/YYYY)")
+        self.startDateEntry = Entry(frame2, textvariable = start_date, width = 10)
+        self.startDateEntry.pack(side = RIGHT)
+# add calendar
+
+        b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
+
+    def departureInfo(self):
+        self.findAvailWindow.withdraw()
+        self.departureWin.deiconify()
+        self.departureWin.title("Select Departure")
+
+        frame = Frame(self.departureWin)
+        frame.pack(side=TOP)
+
+        b1=Button(frame, text ="Back")
+        b1.pack(side=LEFT)
+        b2=Button(frame, text ="Next", command = self.passengerInfo)
+        b2.pack(side=RIGHT)
+
+    def passengerInfo(self):
+        self.departureWin.withdraw()
+        self.passengerInfoWin.deiconify()
+        self.passengerInfoWin.title("Travel Extras & Passenger Info")
+
+        frame = Frame(self.passengerInfoWin)
+        frame.pack(side=TOP)
+        frame2 = Frame(self.passengerInfoWin)
+        frame2.pack(side=TOP)
+        frame3 = Frame(self.passengerInfoWin)
+        frame3.pack(side=TOP)
+        frame4 = Frame(self.passengerInfoWin)
+        frame4.pack(side=TOP)
+
+        baggage= Label(frame,text = "Number of Baggage")
+        baggage.pack(side=LEFT)
+        self.city = StringVar()
+        choices = ["1", "2", "3", "4"]
+        self.city.set(choices[0])
+        option=OptionMenu(frame, self.city, choices[0], *choices)
+        option.pack(side=RIGHT)
+        disclamer = Label(frame2,text = "Every passenger can bring upto 4 baggage. 2 free of charge, 2 for $30 per bag")
+        disclamer.pack()
+
+        passName= Label(frame3,text ="Passenger Name")
+        passName.pack(side=LEFT)
+        name = StringVar()
+        nameEnt = Entry(frame3, textvariable = name, width = 10)
+        nameEnt.pack(side = RIGHT)
+
+        b1=Button(frame4, text ="Back")
+        b1.pack(side=LEFT)
+        b2=Button(frame4, text ="Next")
+        b2.pack(side=RIGHT)
+
+def makeReservation(self):
+        self.pasengerInfoWin.withdraw()
+        self.reservationWin.deiconify()
+        self.reservationWin.title("Make Reservation")
+
+        frame = Frame(self.passengerInfoWin)
+        frame.pack(side=TOP)
+        frame2 = Frame(self.passengerInfoWin)
+        frame2.pack(side=TOP)
+        frame3 = Frame(self.passengerInfoWin)
+        frame3.pack(side=TOP)
+        frame4 = Frame(self.passengerInfoWin)
+        frame4.pack(side=TOP)
+
+        selected= Label(frame,text = "Currently Selected")
+        selected.pack(side=LEFT)
+        stuDis= Label(frame,text = "Student Discount Applied")
+        stuDis.pack(side=LEFT)
+        totalC= Label(frame, text = "Total Cost")
+        totalC.pack(side=LEFT)
+
+        choices = ["1", "2", "3", "4"]
+        self.city.set(choices[0])
+        option=OptionMenu(frame, self.city, choices[0], *choices)
+        option.pack(side=RIGHT)
+        disclamer = Label(frame2,text = "Every passenger can bring upto 4 baggage. 2 free of charge, 2 for $30 per bag")
+        disclamer.pack()
 
 
 
