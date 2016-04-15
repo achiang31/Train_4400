@@ -81,7 +81,8 @@ class Phase_three:
         b2=Button(frame2, text ="Register", command=self.switchToRegister)
         b2.pack(side=LEFT)
 
-    '''def loginCredentials(self):
+    #Alan added this
+    def loginCredentials(self):
         if self.username.get() == "" or self.password.get() == "":
             messagebox.showerror("Error", "Invalid input")
             return
@@ -110,7 +111,7 @@ class Phase_three:
                 self.name = row[0]
             self.switchtoMainMenu()
         else:
-            messagebox.showerror("Error", "Invalid username or password")'''
+            messagebox.showerror("Error", "Invalid username or password")
 
     def mainMenu(self):
 
@@ -188,7 +189,9 @@ class Phase_three:
         b_reg=Button(frame3, text ="Create", command=self.registerCredentials)
         b_reg.pack()
 
-    '''def registerCredentials(self):
+
+    #Alan added this
+    def registerCredentials(self):
         if self.registeredUser.get() == "" or self.registeredPass.get() == "" or self.registeredPassConfirm.get() == "" or self.registerEmail.get() == "":
             messagebox.showerror("Error", "Invalid input")
             return
@@ -215,7 +218,7 @@ class Phase_three:
         print(query2)
         cursor.execute(query2)
         result2 = cursor.fetchall()
-        self.switchToLogin()'''
+        self.switchToLogin()
 
     def schoolInfo(self):
         self.primaryWindow.withdraw()
