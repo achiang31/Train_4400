@@ -36,7 +36,7 @@ class Phase_three:
         self.findAvailWindow.title("Search Rooms")
         self.findAvailWindow.withdraw()
  #       self.findAvailWindow.protocol("WM_DELETE_WINDOW", self.closeWindow)
-        
+
     def Login(self):
         self.primaryWin.title("Login")
         frame = Frame(self.primaryWin)
@@ -55,10 +55,41 @@ class Phase_three:
         entry2 = Entry(frame, textvariable = self.password, width = 30)
         entry2.grid(row = 1, column = 1)
 
-        b1=Button(frame2, text ="Login", command=self.switchtoMainMenu)
+        b1=Button(frame2, text ="Login", command=self.loginCredentials)
         b1.pack(side=LEFT)
         b2=Button(frame2, text ="Register", command= self.switchToRegister)
         b2.pack(side=LEFT)
+
+    '''def loginCredentials(self):
+        if self.username.get() == "" or self.password.get() == "":
+            messagebox.showerror("Error", "Invalid input")
+            return
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT * FROM CUSTOMER \
+               WHERE Username = '%s' AND Password = '%s'" % (self.username.get(), self.password.get())
+        cursor.execute(query)
+        result1 = cursor.fetchall()
+        query = "SELECT * FROM MANAGER \
+               WHERE Username = '%s' AND Password = '%s'" % (self.username.get(), self.password.get())
+
+        cursor.execute(query)
+        result2 = cursor.fetchall()
+
+        if len(result1) != 0:
+            print("Customer")
+            self.custOrManag = "customer"
+            for row in results:
+                self.name = row[0]
+            self.switchtoMainMenu()
+        elif len(result2) != 0:
+            self.custOrManag = "manager"
+            for row in results1:
+                self.name = row[0]
+            self.switchtoMainMenu()
+        else:
+            messagebox.showerror("Error", "Invalid username or password")'''
 
     def mainMenu(self):
 
@@ -78,7 +109,7 @@ class Phase_three:
         b5.pack(side=TOP)
         b6 = Button(buttonsFrame, text ="Add school information (student discount)", command = self.schoolInfo)
         b6.pack(side=TOP)
-            
+
  #       else:
  #           b7 = Button(buttonsFrame, text ="View revenue report")
 #            b7.pack(side=BOTTOM)
@@ -102,7 +133,7 @@ class Phase_three:
         self.primaryWindow.deiconify()
         self.mainMenu()
 
-    
+
     def Register(self):
         self.newUserWindow.title("New User Registration")
         frame2 = Frame(self.newUserWindow)
@@ -133,8 +164,39 @@ class Phase_three:
         self.email_entry = Entry(frame, textvariable = self.registerEmail, width = 30)
         self.email_entry.grid(row = 3, column = 1)
 
-        b_reg=Button(frame3, text ="Create")
+        b_reg=Button(frame3, text ="Create", command=self.registerCredentials)
         b_reg.pack()
+
+    '''def registerCredentials(self):
+        if self.registeredUser.get() == "" or self.registeredPass.get() == "" or self.registeredPassConfirm.get() == "" or self.registerEmail.get() == "":
+            messagebox.showerror("Error", "Invalid input")
+            return
+
+        if self.registeredPass.get() != self.registeredPassConfirm.get():
+            messagebox.showerror("Error", "Passwords must match")
+            return
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "SELECT * FROM CUSTOMER, MANAGER \
+               WHERE CUSTOMER.Username = '%s' OR MANAGER.Username = '%s'" % (self.registeredUser.get(), self.registeredUser.get())
+        print(query1)
+        cursor.execute(query1)
+        result1 = cursor.fetchall()
+        print(result1)
+        cursor.execute(query1)
+        if len(result1) != 0:
+            messagebox.showerror("Error", "Username already in use")
+            return
+
+        query2 = "INSERT INTO CUSTOMER(Username, Password, Email) \
+               VALUES ('%s', '%s', '%s')" % (self.registeredUser.get(), self.registeredPass.get(), self.registerEmail.get())
+        print(query2)
+        cursor.execute(query2)
+        result2 = cursor.fetchall()
+        self.switchToLogin()'''
+
+
 
     def schoolInfo(self):
         self.primaryWindow.withdraw()
@@ -188,7 +250,7 @@ class Phase_three:
         frame2.pack(side=TOP)
         frame3=Frame(self.findAvailWindow)
         frame3.pack(side=TOP)
-        
+
         location= Label(frame,text = "Departs From")
         location.pack(side=LEFT)
         self.city = StringVar()
@@ -202,7 +264,7 @@ class Phase_three:
 #        start_date= Label(frame,text ="Start Date (MM/DD/YYYY)")
 #       self.startDateEntry = Entry(frame1, textvariable = start_date, width = 30)
 #        self.endDateEntry = Entry(frame1, textvariable = end_date, width = 30)
-        
+
         depDate= Label(frame2,text ="Departure Date")
         depDate.pack(side=LEFT)
         self.date = StringVar()
@@ -210,7 +272,7 @@ class Phase_three:
         self.date.set(choices[0])
         option=OptionMenu(frame2, self.date, choices[0], *choices)
         option.pack(side=RIGHT)
-        
+
         b=Button(frame3, text ="Find Trains")
         b.pack(side=RIGHT)
 
