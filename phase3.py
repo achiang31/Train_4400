@@ -5,7 +5,6 @@ from tkinter import messagebox
 from tkinter.ttk import *
 import pymysql
 import calendar
-from datetime import datetime
 
 class Phase_three:
     def __init__(self,primaryWin):
@@ -16,7 +15,7 @@ class Phase_three:
         self.Register()
         self.newUserWindow.title("New User Registration")
         self.newUserWindow.withdraw()
-#       self.newUserWindow.protocol("WM_DELETE_WINDOW", self.closeWindow)
+#        self.newUserWindow.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.primaryWindow = Toplevel()
         self.primaryWindow.title("Welcome "+self.username.get())
@@ -26,35 +25,38 @@ class Phase_three:
         self.schoolInfoWin= Toplevel()
         self.schoolInfoWin.title("Add School Info")
         self.schoolInfoWin.withdraw()
- #       self.schoolInfo.protocol("WM_DELETE_WINDOW", self.closeWindow)
+  #      self.schoolInfo.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.trainSchWin= Toplevel()
         self.trainSchWin.title("View Train Schedule")
         self.trainSchWin.withdraw()
- #       self.schoolInfo.protocol("WM_DELETE_WINDOW", self.closeWindow)
+   #     self.trainSchWin.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.scheduleWin= Toplevel()
         self.scheduleWin.title("View Train Schedule")
         self.scheduleWin.withdraw()
- #       self.schoolInfo.protocol("WM_DELETE_WINDOW", self.closeWindow)
+    #    self.scheduleWin.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
 
         self.findAvailWindow= Toplevel()
         self.findAvailWindow.title("Search Train")
         self.findAvailWindow.withdraw()
- #       self.findAvailWindow.protocol("WM_DELETE_WINDOW", self.closeWindow)
+     #   self.findAvailWindow.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.departureWin = Toplevel()
         self.departureWin.title("Select Departure")
         self.departureWin.withdraw()
+      #  self.departureWin.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.passengerInfoWin = Toplevel()
         self.passengerInfoWin.title("Travel Extras & Passenger Info")
         self.passengerInfoWin.withdraw()
+       # self.passengerInfoWin.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.reservationWin = Toplevel()
         self.reservationWin.title("Make Reservation")
         self.reservationWin.withdraw()
+        #self.reservationWin.protocol("WM_DELETE_WINDOW", self.closeWindow)
 
         self.paymentIWin = Toplevel()
         self.paymentIWin.title("Add Card")
@@ -76,14 +78,22 @@ class Phase_three:
         self.updateWin2.title("Update Reservation")
         self.updateWin2.withdraw()
 
+        self.viewReviewWin = Toplevel()
+        self.viewReviewWin.title("View review")
+        self.viewReviewWin.withdraw()
+
+        self.viewReviewWin2 = Toplevel()
+        self.viewReviewWin2.title("View review")
+        self.viewReviewWin2.withdraw()
+
+    
 
     def Connect(self):
         try:
-            server = pymysql.connect(host="academic-mysql.cc.gatech.edu", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
-            return server
+            db = pymysql.connect(host="academic-mysql.cc.gatech.edu", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
+            return db
         except:
             messagebox.showerror("Error", "Check Internet Connection")
-
 
     def Login(self):
         self.primaryWin.title("Login")
@@ -108,7 +118,7 @@ class Phase_three:
         b2=Button(frame2, text ="Register", command= self.switchToRegister)
         b2.pack(side=LEFT)
 
-def loginCredentials(self):
+    def loginCredentials(self):
         if self.username.get() == "" or self.password.get() == "":
             messagebox.showerror("Error", "Invalid input")
             return
@@ -140,7 +150,7 @@ def loginCredentials(self):
             messagebox.showerror("Error", "Invalid username or password")
 
     def mainMenu(self):
-        self.primaryWindow.deiconify()
+        
         self.primaryWindow.title("Choose Functionality ")
         buttonsFrame = Frame(self.primaryWindow)
         buttonsFrame.pack()
@@ -152,7 +162,7 @@ def loginCredentials(self):
         b3.pack(side=TOP)
         b4 = Button(buttonsFrame, text ="Cancel a reservation")
         b4.pack(side=TOP)
-        b5 = Button(buttonsFrame, text ="Give review")
+        b5 = Button(buttonsFrame, text ="Give review", command = self.viewReview)
         b5.pack(side=TOP)
         b6 = Button(buttonsFrame, text ="Add school information (student discount)", command = self.schoolInfo)
         b6.pack(side=TOP)
@@ -170,6 +180,7 @@ def loginCredentials(self):
 
     def switchtoMainMenu(self):
         self.primaryWin.withdraw()
+        self.primaryWindow.deiconify()
         self.mainMenu()
 
     def Register(self):
@@ -274,6 +285,10 @@ def loginCredentials(self):
         b1 = Button(frame2, text ="Search", command = self.schedule)
         b1.pack(side=LEFT)
 
+
+######################Remember to fix the back button functionality#############################################
+        
+
     def getTrainTree(self, frame):
         tree=Treeview(frame)
         tree.pack()
@@ -312,12 +327,13 @@ def loginCredentials(self):
 ##            tree.insert('', i, text='', values=result)
 ##            i += 1
 
-        b1 = Button(frame1, text ="Back", command = self.switchtoMain)
+        b1 = Button(frame1, text ="Back", command = self.switchtotrainSchedule)
         b1.pack(side= TOP)
 
-    def switchtoMain(self):
+    def switchtotrainSchedule(self):
         self.scheduleWin.withdraw()
-        self.primaryWindow.deiconify()
+        self.trainSchWin.deiconify()
+        #self.mainMenu()
 
     def searchTrain(self):
         self.primaryWindow.withdraw()
@@ -572,10 +588,10 @@ def loginCredentials(self):
         expdate = Entry(frame4, textvariable = date, width = 10)
         expdate.pack(side = RIGHT)
 
-        b4=Button(frame5, text ="Submit", command = self.addCardCheck)
+        b4=Button(frame5, text ="Submit", command = self.switchToConfirm1)
         b4.pack(side=LEFT)
 
-    '''def addCardCheck(self):
+    def addCardCheck(self):
         expDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
         server = self.Connect()
         cursor = server.cursor()
@@ -583,7 +599,6 @@ def loginCredentials(self):
                WHERE Card_Number = '%s'" % (self.cardNumber.get())
         cursor.execute(query)
         results = cursor.fetchall()
-
         if len(results) != 0:
             messagebox.showerror("Error", "Card number already in use")
         elif self.expDate.get() == "" or self.cardName.get() == "" or self.cardNumber.get() == "" or self.cvv.get() == "":
@@ -601,7 +616,7 @@ def loginCredentials(self):
             VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
             print(query)
             cursor.execute(query)
-            self.switchToConfirm1()'''
+            self.switchToConfirm1()
 
     def deleteCard(self):
         self.reservationWin.withdraw()
@@ -620,25 +635,23 @@ def loginCredentials(self):
         option=OptionMenu(frame, self.cardNum, choices[0], *choices)
         option.pack(side=RIGHT)
 
-        b1=Button(frame2, text ="Submit", command = self.deleteCardCheck)
+        b1=Button(frame2, text ="Submit", command = self.switchToConfirm2)
         b1.pack(side=BOTTOM)
-
-    '''def deleteCardCheck(self):
+        
+    def deleteCardCheck(self):
         server = self.Connect()
         cursor = server.cursor()
         cursor.execute("SELECT * FROM PAYMENT_INFO WHERE Card_Number ='%s'" %(self.cardChoice.get()))
         results = cursor.fetchall()
-
         for row in results:
             self.endDate = row[2]
             endDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
             if endDate > datetime.now():
                 messagebox.showerror("Error", "Card is being used for existing reservation")
-
         cursor = server.cursor()
         cursor.execute("DELETE FROM PAYMENT_INFORMATION WHERE Card_Number='%s'" % (self.cardChoice.get()))
-        self.switchToConfirm2()'''
-
+        self.switchToConfirm2()
+        
     def switchToConfirm1(self):
         self.paymentIWin.withdraw()
         self.confirmation()
@@ -721,7 +734,51 @@ def loginCredentials(self):
         b2 = Button(frame2, text = "Next")
         b2.pack(side = RIGHT)
 
+    def viewReview(self):
+        self.primaryWindow.withdraw()
+        self.viewReviewWin.deiconify()
+        self.viewReviewWin.title("View Review")
 
+        frame = Frame(self.viewReviewWin)
+        frame.pack()
+
+        l1 = Label(frame, text = "Train Number")
+        l1.grid(row = 0, column = 0, sticky = W)
+        e1 = Entry(frame, width = 20)
+        e1.grid(row = 0, column = 1)
+        b1 = Button(frame, text = "Back")
+        b1.grid(row = 1, column = 0)
+        b2 = Button(frame, text = "Next", command = self.viewReview2)
+        b2.grid(row = 1, column = 1)
+
+    def viewTree(self, frame):
+        tree=Treeview(frame)
+        tree.pack()
+
+        tree["columns"]=("select","train","time","dept", "arrv", "class", "pr", "bag", "name")
+        tree.heading("select", text= "Select")
+        tree.heading("train", text= "Train (Train Number)")
+        tree.heading("time", text= "Time (Duration)")
+        tree.heading("dept", text= "Departs From")
+        tree.heading("arrv", text= "Arrives At")
+        tree.heading("class", text= "Class")
+        tree.heading("pr", text= "Price")
+        tree.heading("bag", text= "# of baggages")
+        tree.heading("name", text= "Passenger Name")
+        return tree
+    
+    def viewReview2(self):
+        self.viewReviewWin.withdraw()
+        self.viewReviewWin2.deiconify()
+        self.viewReviewWin2.title("View Review")
+
+        frame = Frame(self.viewReviewWin2)
+        frame.pack()
+
+        tree = self.viewTree(frame)
+        
+        b1 = Button(frame, text = "Back to Choose Functionality")
+        b1.pack(side = BOTTOM)
 
 mw = Tk()
 app = Phase_three(mw)
