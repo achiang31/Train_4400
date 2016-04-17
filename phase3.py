@@ -5,6 +5,7 @@ from tkinter import messagebox
 from tkinter.ttk import *
 import pymysql
 import calendar
+from datetime import datetime
 
 class Phase_three:
     def __init__(self,primaryWin):
@@ -78,8 +79,8 @@ class Phase_three:
 
     def Connect(self):
         try:
-            db = pymysql.connect(host="academic-mysql.cc.gatech.edu", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
-            return db
+            server = pymysql.connect(host="academic-mysql.cc.gatech.edu", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
+            return server
         except:
             messagebox.showerror("Error", "Check Internet Connection")
 
@@ -571,8 +572,36 @@ def loginCredentials(self):
         expdate = Entry(frame4, textvariable = date, width = 10)
         expdate.pack(side = RIGHT)
 
-        b4=Button(frame5, text ="Submit", command = self.switchToConfirm1)
+        b4=Button(frame5, text ="Submit", command = self.addCardCheck)
         b4.pack(side=LEFT)
+
+    def addCardCheck(self):
+        expDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT * FROM PAYMENT_INFORMATION \
+               WHERE Card_Number = '%s'" % (self.cardNumber.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        if len(results) != 0:
+            messagebox.showerror("Error", "Card number already in use")
+        elif self.expDate.get() == "" or self.cardName.get() == "" or self.cardNumber.get() == "" or self.cvv.get() == "":
+            messagebox.showerror("Error", "Expiration Date, Name, Number, and CVV must be filled")
+        elif len(self.cardNumber.get()) != 10:
+            messagebox.showerror("Error", "Card Number must be 10 digits")
+        elif len(self.cvv.get()) != 3:
+            messagebox.showerror("Error", "CVV must be 3 digits")
+        elif expDate < datetime.now():
+            messagebox.showerror("Error", "Card has already expired")
+        else:
+            server = self.Connect()
+            cursor = server.cursor()
+            query = "INSERT INTO PAYMENT_INFORMATION(Card_Number, Name, Exp_Date, CVV, Username) \
+            VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
+            print(query)
+            cursor.execute(query)
+            self.switchToConfirm1()
 
     def deleteCard(self):
         self.reservationWin.withdraw()
@@ -591,8 +620,24 @@ def loginCredentials(self):
         option=OptionMenu(frame, self.cardNum, choices[0], *choices)
         option.pack(side=RIGHT)
 
-        b1=Button(frame2, text ="Submit", command = self.switchToConfirm2)
+        b1=Button(frame2, text ="Submit", command = self.deleteCardCheck)
         b1.pack(side=BOTTOM)
+
+    def deleteCardCheck(self):
+        server = self.Connect()
+        cursor = server.cursor()
+        cursor.execute("SELECT * FROM PAYMENT_INFO WHERE Card_Number ='%s'" %(self.cardChoice.get()))
+        results = cursor.fetchall()
+
+        for row in results:
+            self.endDate = row[2]
+            endDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
+            if endDate > datetime.now():
+                messagebox.showerror("Error", "Card is being used for existing reservation")
+
+        cursor = server.cursor()
+        cursor.execute("DELETE FROM PAYMENT_INFORMATION WHERE Card_Number='%s'" % (self.cardChoice.get()))
+        self.switchToConfirm2()
 
     def switchToConfirm1(self):
         self.paymentIWin.withdraw()
