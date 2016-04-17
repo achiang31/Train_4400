@@ -575,7 +575,7 @@ def loginCredentials(self):
         b4=Button(frame5, text ="Submit", command = self.addCardCheck)
         b4.pack(side=LEFT)
 
-    def addCardCheck(self):
+    '''def addCardCheck(self):
         expDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
         server = self.Connect()
         cursor = server.cursor()
@@ -601,7 +601,7 @@ def loginCredentials(self):
             VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
             print(query)
             cursor.execute(query)
-            self.switchToConfirm1()
+            self.switchToConfirm1()'''
 
     def deleteCard(self):
         self.reservationWin.withdraw()
@@ -623,7 +623,7 @@ def loginCredentials(self):
         b1=Button(frame2, text ="Submit", command = self.deleteCardCheck)
         b1.pack(side=BOTTOM)
 
-    def deleteCardCheck(self):
+    '''def deleteCardCheck(self):
         server = self.Connect()
         cursor = server.cursor()
         cursor.execute("SELECT * FROM PAYMENT_INFO WHERE Card_Number ='%s'" %(self.cardChoice.get()))
@@ -637,7 +637,7 @@ def loginCredentials(self):
 
         cursor = server.cursor()
         cursor.execute("DELETE FROM PAYMENT_INFORMATION WHERE Card_Number='%s'" % (self.cardChoice.get()))
-        self.switchToConfirm2()
+        self.switchToConfirm2()'''
 
     def switchToConfirm1(self):
         self.paymentIWin.withdraw()
