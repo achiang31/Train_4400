@@ -36,7 +36,7 @@ class Phase_three:
         self.scheduleWin.title("View Train Schedule")
         self.scheduleWin.withdraw()
  #       self.schoolInfo.protocol("WM_DELETE_WINDOW", self.closeWindow)
-        
+
 
         self.findAvailWindow= Toplevel()
         self.findAvailWindow.title("Search Train")
@@ -75,7 +75,7 @@ class Phase_three:
         self.updateWin2.title("Update Reservation")
         self.updateWin2.withdraw()
 
-        
+
     def Connect(self):
         try:
             db = pymysql.connect(host="academic-mysql.cc.gatech.edu", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
@@ -83,7 +83,7 @@ class Phase_three:
         except:
             messagebox.showerror("Error", "Check Internet Connection")
 
-        
+
     def Login(self):
         self.primaryWin.title("Login")
         frame = Frame(self.primaryWin)
@@ -106,6 +106,37 @@ class Phase_three:
         b1.pack(side=LEFT)
         b2=Button(frame2, text ="Register", command= self.switchToRegister)
         b2.pack(side=LEFT)
+
+def loginCredentials(self):
+        if self.username.get() == "" or self.password.get() == "":
+            messagebox.showerror("Error", "Invalid input")
+            return
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT * FROM CUSTOMER \
+               WHERE Username = '%s' AND Password = '%s'" % (self.username.get(), self.password.get())
+        cursor.execute(query)
+        result1 = cursor.fetchall()
+        query = "SELECT * FROM MANAGER \
+               WHERE Username = '%s' AND Password = '%s'" % (self.username.get(), self.password.get())
+
+        cursor.execute(query)
+        result2 = cursor.fetchall()
+
+        if len(result1) != 0:
+            print("Customer")
+            self.custOrManag = "customer"
+            for row in results:
+                self.name = row[0]
+            self.switchtoMainMenu()
+        elif len(result2) != 0:
+            self.custOrManag = "manager"
+            for row in results1:
+                self.name = row[0]
+            self.switchtoMainMenu()
+        else:
+            messagebox.showerror("Error", "Invalid username or password")
 
     def mainMenu(self):
         self.primaryWindow.deiconify()
@@ -139,40 +170,69 @@ class Phase_three:
     def switchtoMainMenu(self):
         self.primaryWin.withdraw()
         self.mainMenu()
-    
+
     def Register(self):
         self.newUserWindow.title("New User Registration")
         frame=Frame(self.newUserWindow)
         frame.pack()
         frame2=Frame(self.newUserWindow)
         frame2.pack(side = BOTTOM)
-        
+
         label1 = Label(frame,text = "Username", justify = LEFT)
         label1.grid(row = 0, column = 0, sticky = W)
         self.registeredUser = StringVar()
         self.uentry = Entry(frame, textvariable = self.registeredUser, width = 30, justify = RIGHT)
         self.uentry.grid(row = 0, column = 1, sticky = W)
-                
+
         label2 = Label(frame,text ="Email Address", justify = LEFT)
         label2.grid(row = 1, column = 0, sticky = W)
         self.registeredPass = StringVar()
         self.password_entry = Entry(frame, textvariable = self.registeredPass, width = 30, justify = RIGHT)
         self.password_entry.grid(row = 1, column = 1, sticky = W)
-        
+
         label3 = Label(frame,text = "Password", justify = LEFT)
         label3.grid(row = 2, column = 0, sticky = W)
         self.registeredPassConfirm = StringVar()
         self.confirm_password_entry = Entry(frame, textvariable = self.registeredPassConfirm, width = 30, justify = RIGHT)
         self.confirm_password_entry.grid(row = 2, column = 1, sticky = W)
-        
-        label4 = Label(frame,text ="Confirm Password", justify = LEFT)     
+
+        label4 = Label(frame,text ="Confirm Password", justify = LEFT)
         label4.grid(row = 3, column = 0, sticky = W)
         self.registerEmail = StringVar()
         self.email_entry = Entry(frame, textvariable = self.registerEmail, width = 30, justify = RIGHT)
         self.email_entry.grid(row = 3, column = 1, sticky = W)
-         
+
         b_reg=Button(frame2, text ="Create")
         b_reg.pack(side = BOTTOM)
+
+    def registerCredentials(self):
+        if self.registeredUser.get() == "" or self.registeredPass.get() == "" or self.registeredPassConfirm.get() == "" or self.registerEmail.get() == "":
+            messagebox.showerror("Error", "Invalid input")
+            return
+
+        if self.registeredPass.get() != self.registeredPassConfirm.get():
+            messagebox.showerror("Error", "Passwords must match")
+            return
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "SELECT * FROM CUSTOMER, MANAGER \
+               WHERE CUSTOMER.Username = '%s' OR MANAGER.Username = '%s'" % (self.registeredUser.get(), self.registeredUser.get())
+        print(query1)
+        cursor.execute(query1)
+        result1 = cursor.fetchall()
+        print(result1)
+        cursor.execute(query1)
+        if len(result1) != 0:
+            messagebox.showerror("Error", "Username already in use")
+            return
+
+        query2 = "INSERT INTO CUSTOMER(Username, Password, Email) \
+               VALUES ('%s', '%s', '%s')" % (self.registeredUser.get(), self.registeredPass.get(), self.registerEmail.get())
+        print(query2)
+        cursor.execute(query2)
+        result2 = cursor.fetchall()
+        self.switchToLogin()
 
     def schoolInfo(self):
         self.primaryWindow.withdraw()
@@ -223,7 +283,7 @@ class Phase_three:
         tree.heading("dept", text= "Departure Time")
         tree.heading("station", text= "Station")
         return tree
-    
+
     def schedule(self):
         self.trainSchWin.withdraw()
         self.scheduleWin.deiconify()
@@ -233,7 +293,7 @@ class Phase_three:
         frame1.pack()
         frame2 = Frame(self.scheduleWin)
         frame2.pack()
-        
+
         tree = self.getTrainTree(frame1)
         chosenTrain = self.trainName.get()
 ##        sql = "SELECT * FROM ROOM WHERE LOCATION = '%s' AND NOT EXISTS \
@@ -253,11 +313,11 @@ class Phase_three:
 
         b1 = Button(frame1, text ="Back", command = self.switchtoMain)
         b1.pack(side= TOP)
-            
+
     def switchtoMain(self):
         self.scheduleWin.withdraw()
         self.primaryWindow.deiconify()
-        
+
     def searchTrain(self):
         self.primaryWindow.withdraw()
         self.findAvailWindow.deiconify()
@@ -271,7 +331,7 @@ class Phase_three:
         frame2.pack(side=TOP)
         frame3=Frame(self.findAvailWindow)
         frame3.pack(side=TOP)
-        
+
         location= Label(frame,text = "Departs From")
         location.pack(side=LEFT)
         self.city = StringVar()
@@ -287,15 +347,15 @@ class Phase_three:
         self.arrv.set(choices[0])
         option=OptionMenu(frame1, self.arrv, choices[0], *choices)
         option.pack(side=RIGHT)
-        
+
         depDate= Label(frame2,text ="Departure Date")
         depDate.pack(side=LEFT)
         self.date = StringVar()
         start_date= Label(frame2,text ="Start Date (MM/DD/YYYY)")
         self.startDateEntry = Entry(frame2, textvariable = self.date, width = 10)
         self.startDateEntry.pack(side = RIGHT)
-# add calendar 
-        
+# add calendar
+
         b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
 
@@ -341,16 +401,16 @@ class Phase_three:
         b1.pack(side=LEFT)
         b2=Button(frame, text ="Next", command = self.passengerInfo)
         b2.pack(side=RIGHT)
-            
+
     def switchtoMain2(self):
         self.passengerInfoWin.withdraw()
         self.primaryWindow.deiconify()
-        
+
     def passengerInfo(self):
         self.departureWin.withdraw()
         self.passengerInfoWin.deiconify()
         self.passengerInfoWin.title("Travel Extras & Passenger Info")
-        
+
         frame = Frame(self.passengerInfoWin)
         frame.pack(side=TOP)
         frame2 = Frame(self.passengerInfoWin)
@@ -359,7 +419,7 @@ class Phase_three:
         frame3.pack(side=TOP)
         frame4 = Frame(self.passengerInfoWin)
         frame4.pack(side=TOP)
-        
+
         baggage= Label(frame,text = "Number of Baggage")
         baggage.pack(side=LEFT)
         self.city = StringVar()
@@ -394,7 +454,7 @@ class Phase_three:
         tree.heading("pr", text= "Price")
         tree.heading("bag", text= "# of baggages")
         tree.heading("name", text= "Passenger Name")
-        tree.heading("rem", text= "Remove")        
+        tree.heading("rem", text= "Remove")
         return tree
 
 
@@ -402,7 +462,7 @@ class Phase_three:
         self.passengerInfoWin.withdraw()
         self.reservationWin.deiconify()
         self.reservationWin.title("Make Reservation")
-        
+
         frame = Frame(self.reservationWin)
         frame.pack(side=TOP)
         frame2 = Frame(self.reservationWin)
@@ -413,7 +473,7 @@ class Phase_three:
         frame4.pack(side= TOP)
         frame5 = Frame(self.reservationWin)
         frame5.pack(side=BOTTOM)
-        
+
         selected= Label(frame,text = "Currently Selected")
         selected.pack(side=LEFT)
 
@@ -421,7 +481,7 @@ class Phase_three:
 
     #######################FIX THIS###################
 ##        chosenTrain = self.trainName.get()
-##        
+##
 ##        chosenCity = self.city.get()
 ##        chosenArrv = self.arrv.get()
 ##        chosenDate = self.date.get()
@@ -440,7 +500,7 @@ class Phase_three:
 ##        for result in results:
 ##            tree.insert('', i, text='', values=result)
 ##            i += 1
-        
+
         stuDis= Label(frame,text = "Student Discount Applied.")
         stuDis.pack(side= BOTTOM)
         totalC= Label(frame2, text = "Total Cost")
@@ -450,17 +510,17 @@ class Phase_three:
         costEnt.pack(side = RIGHT)
 
         useCard= Label(frame3, text = "Use Card")
-        useCard.pack(side=LEFT)   
+        useCard.pack(side=LEFT)
         choices = ["1", "2", "3", "4"]
         self.city.set(choices[0])
         option=OptionMenu(frame3, self.city, choices[0], *choices)
         option.pack(side=LEFT)
-        
+
         b5=Button(frame3, text ="Delete Card", command = self.deleteCard)
         b5.pack(side=RIGHT)
         b1=Button(frame3, text ="Add Card", command = self.addCard)
         b1.pack(side=RIGHT)
-        
+
         b2=Button(frame4, text ="Continue adding a train")
         b2.pack(side=LEFT)
 
@@ -474,7 +534,7 @@ class Phase_three:
         self.reservationWin.withdraw()
         self.paymentIWin.deiconify()
         self.paymentIWin.title("Add Card")
-        
+
         frame = Frame(self.paymentIWin)
         frame.pack(side=TOP)
         frame2 = Frame(self.paymentIWin)
@@ -494,37 +554,37 @@ class Phase_three:
         l3.pack(side=LEFT)
         l4= Label(frame4,text = "Expiration Date")
         l4.pack(side=LEFT)
-        
+
         name = StringVar()
         cardName = Entry(frame, textvariable = name, width = 10)
         cardName.pack(side = RIGHT)
-        
+
         num = StringVar()
         cardNum = Entry(frame2, textvariable = num, width = 10)
         cardNum.pack(side = RIGHT)
-        
+
         CVVnum = StringVar()
         Cvv = Entry(frame3, textvariable = CVVnum, width = 10)
         Cvv.pack(side = RIGHT)
-        
-        date = StringVar()                             
+
+        date = StringVar()
         expdate = Entry(frame4, textvariable = date, width = 10)
-        expdate.pack(side = RIGHT)                                    
+        expdate.pack(side = RIGHT)
 
         b4=Button(frame5, text ="Submit", command = self.switchToConfirm1)
         b4.pack(side=LEFT)
-                               
+
     def deleteCard(self):
         self.reservationWin.withdraw()
         self.paymentIWin2.deiconify()
         self.paymentIWin2.title("Delete Card")
-        
+
         frame = Frame(self.paymentIWin2)
         frame.pack(side=TOP)
         frame2 = Frame(self.paymentIWin2)
         frame2.pack(side=BOTTOM)
         cardNum= Label(frame, text = "Card Number")
-        cardNum.pack(side=LEFT)   
+        cardNum.pack(side=LEFT)
         choices = ["1", "2", "3", "4"]
         self.cardNum = StringVar()
         self.cardNum.set(choices[0])
@@ -545,14 +605,14 @@ class Phase_three:
     def backToMain(self):
         self.confirm.withdraw()
         self.primaryWindow.deiconify()
-        
+
     def confirmation(self):
         self.confirm.deiconify()
         self.confirm.title("Confirmation")
-        
+
         frame = Frame(self.confirm)
-        frame.pack()        
-        
+        frame.pack()
+
         label1 = Label(frame, text="Reservation ID:")
         label1.grid(row = 0, column = 0,sticky=E)
         e1 = Entry(frame, text = "Some ID # goes here", width = 10)
@@ -562,7 +622,7 @@ class Phase_three:
 
         label3 = Label(frame, text="Thank you so much for your purchase! Please save the reservation ID for your records.")
         label3.grid(row = 2, column = 0, columnspan = 2)
-        
+
         b=Button(frame, text ="Back", command=self.backToMain)
         b.grid(row=3,column=1,sticky=E)
 
@@ -596,8 +656,8 @@ class Phase_three:
         tree.heading("class", text= "Class")
         tree.heading("pr", text= "Price")
         tree.heading("bag", text= "# of baggages")
-        tree.heading("name", text= "Passenger Name")      
-        return tree   
+        tree.heading("name", text= "Passenger Name")
+        return tree
 
     def updateReservation2(self):
         self.updateWin.withdraw()
@@ -617,7 +677,7 @@ class Phase_three:
         b2.pack(side = RIGHT)
 
 
-        
+
 mw = Tk()
 app = Phase_three(mw)
 mw.mainloop()
