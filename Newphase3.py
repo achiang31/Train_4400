@@ -318,7 +318,7 @@ class Phase_three:
 
 
 ######################Remember to fix the back button functionality#############################################
-        
+    
 
     def getTrainTree(self, frame):
         tree=Treeview(frame)
@@ -338,9 +338,7 @@ class Phase_three:
 
         frame1 = Frame(self.scheduleWin)
         frame1.pack()
-        frame2 = Frame(self.scheduleWin)
-        frame2.pack()
-
+        
         tree = self.getTrainTree(frame1)
         chosenTrain = self.trainName.get()
 ##        sql = "SELECT * FROM ROOM WHERE LOCATION = '%s' AND NOT EXISTS \
@@ -358,10 +356,10 @@ class Phase_three:
 ##            tree.insert('', i, text='', values=result)
 ##            i += 1
 
-        b1 = Button(frame1, text ="Back", command = self.switchtotrainSchedule)
-        b1.pack(side= TOP)
+        b1 = Button(frame1, text ="Back", command = self.switchtotrainSearch)
+        b1.pack(side= BOTTOM)
 
-    def switchtotrainSchedule(self):
+    def switchtotrainSearch(self):
         self.scheduleWin.withdraw()
         self.trainSchWin.deiconify()
         #self.mainMenu()
