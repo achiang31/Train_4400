@@ -297,7 +297,7 @@ class Phase_three:
         b1.pack(side=LEFT)
         b2 = Button(frame2, text ="Submit")
         b2.pack(side=RIGHT)
-  
+
 
     def trainSchedule(self):
         self.primaryWindow.destroy()
@@ -317,13 +317,6 @@ class Phase_three:
         b1 = Button(frame2, text ="Search", command = self.schedule)
         b1.pack(side=LEFT)
 
-<<<<<<< HEAD
-
-######################Remember to fix the back button functionality#############################################
-
-
-=======
->>>>>>> ff2c203b0820cff92b892efa89fe8637f74d7bea
     def getTrainTree(self, frame):
         tree=Treeview(frame)
         tree.pack()
@@ -495,7 +488,7 @@ class Phase_three:
     def switchToDepartureInfo(self):
         self.passengerInfoWin.destroy()
         self.departureWin.deiconify()
-        
+
     def selectTree(self, frame):
         tree=Treeview(frame)
         tree.pack()
@@ -590,7 +583,7 @@ class Phase_three:
     def switchToPassengerInfo(self):
         self.reservationWin. destroy()
         self.passengerInfoWin.deiconify()
-        
+
     def addCard(self):
         self.reservationWin.withdraw()
         self.paymentIWin.deiconify()
@@ -789,7 +782,7 @@ class Phase_three:
     def switchUpdateReservation(self):
         self.updateWin2.destroy()
         self.updateReservation()
-    
+
     def updateReservation3(self):
         self.updateWin2.withdraw()
         self.updateWin3.deiconify()
@@ -798,10 +791,6 @@ class Phase_three:
         frame = Frame(self.updateWin2)
         frame.pack()
 
-<<<<<<< HEAD
-        print("Update Res 3")
-
-=======
         l1 = Label(frame, text = "Reservation ID")
         l1.grid(row = 0, column = 0, sticky = E)
         e1 = Entry(frame, width = 10)
@@ -811,8 +800,8 @@ class Phase_three:
         b2 = Button(frame, text = "Back")
         b2.grid(row = 1, column = 1, sticky = E)
 
-      
-        
+
+
 >>>>>>> ff2c203b0820cff92b892efa89fe8637f74d7bea
 
     def cancelRes(self):
@@ -902,11 +891,6 @@ class Phase_three:
         frame = Frame(self.giveReviewWin)
         frame.pack()
 
-<<<<<<< HEAD
-        self
-=======
-        self.trainNo = StringVar()
->>>>>>> ff2c203b0820cff92b892efa89fe8637f74d7bea
         l1 = Label(frame, text = "Train Number")
         l1.grid(row = 0, column = 0, sticky = W)
         e1 = Entry(frame, text = self.trainNo, width = 20)
@@ -920,16 +904,6 @@ class Phase_three:
         option=OptionMenu(frame, self.rating, choices[0], * choices)
         option.grid(row = 0, column = 1)
 
-<<<<<<< HEAD
-        #query server here to submit reviews
-        #if self.rating == choices[0]:
-        #    query = "INSERT INTO REVIEW() VALUES()
-
-
-
-=======
-        self.comment = StringVar()
->>>>>>> ff2c203b0820cff92b892efa89fe8637f74d7bea
         l3 = Label(frame, text = "Comment")
         l3.grid(row = 2, column = 0, sticky = W)
         e3 = Entry(frame, text = self.comment, width = 20)
