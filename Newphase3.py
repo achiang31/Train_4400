@@ -891,6 +891,8 @@ class Phase_three:
         frame = Frame(self.giveReviewWin)
         frame.pack()
 
+        self.trainNo = StringVar()
+
         l1 = Label(frame, text = "Train Number")
         l1.grid(row = 0, column = 0, sticky = W)
         e1 = Entry(frame, text = self.trainNo, width = 20)
@@ -903,6 +905,13 @@ class Phase_three:
         self.rating.set(choices[0])
         option=OptionMenu(frame, self.rating, choices[0], * choices)
         option.grid(row = 0, column = 1)
+
+
+        #query server here to submit reviews
+        #if self.rating == choices[0]:
+            #query = "INSERT INTO REVIEW() VALUES()
+
+        self.comment = StringVar()
 
         l3 = Label(frame, text = "Comment")
         l3.grid(row = 2, column = 0, sticky = W)
