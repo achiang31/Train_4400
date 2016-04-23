@@ -192,7 +192,7 @@ class Phase_three:
         b6.grid(row = 5, column = 0, columnspan = 2, sticky = EW)
         b7 = Button(buttonsFrame, text ="Log out")
         b7.grid(row = 6, column = 0, columnspan = 2, sticky = EW)
-
+        
        ### elif self.custOrManag == "manager":
         """b8 = Button(buttonsFrame, text ="View revenue report", command = self.viewRevenueRep)
         b8.grid(row = 0, column = 0, columnspan = 2, sticky = EW)
@@ -298,10 +298,9 @@ class Phase_three:
         b2 = Button(frame2, text ="Submit")
         b2.pack(side=RIGHT)
 
-
     def trainSchedule(self):
-        self.primaryWindow.destroy()
-        self.trainSchWin = Toplevel()
+        self.primaryWindow.withdraw()
+        self.trainSchWin.deiconify()
         self.trainSchWin.title("View Train Schedule")
         frame1 = Frame(self.trainSchWin)
         frame2 = Frame(self.trainSchWin)
@@ -317,6 +316,10 @@ class Phase_three:
         b1 = Button(frame2, text ="Search", command = self.schedule)
         b1.pack(side=LEFT)
 
+
+######################Remember to fix the back button functionality#############################################
+    
+
     def getTrainTree(self, frame):
         tree=Treeview(frame)
         tree.pack()
@@ -329,13 +332,13 @@ class Phase_three:
         return tree
 
     def schedule(self):
-        self.trainSchWin.destroy()
-        self.scheduleWin = Toplevel()
+        self.trainSchWin.withdraw()
+        self.scheduleWin.deiconify()
         self.scheduleWin.title("View Train Schedule")
 
         frame1 = Frame(self.scheduleWin)
         frame1.pack()
-
+        
         tree = self.getTrainTree(frame1)
         chosenTrain = self.trainName.get()
 ##        sql = "SELECT * FROM ROOM WHERE LOCATION = '%s' AND NOT EXISTS \
@@ -353,17 +356,17 @@ class Phase_three:
 ##            tree.insert('', i, text='', values=result)
 ##            i += 1
 
-        b1 = Button(frame1, text ="Back", command = self.switchToMainMenu)
-        b1.pack(side= BOTTOM)
+        b1 = Button(frame1, text ="Back", command = self.switchtotrainSearch)
+        b1.pack(side= TOP)
 
-    def switchToMainMenu(self):
-        self.scheduleWin.destroy()
-        self.primaryWindow = Toplevel()
-        self.mainMenu()
+    def switchtotrainSearch(self):
+        self.scheduleWin.withdraw()
+        self.trainSchWin.deiconify()
+        #self.mainMenu()
 
     def searchTrain(self):
         self.primaryWindow.withdraw()
-        self.findAvailWindow = Toplevel()
+        self.findAvailWindow.deiconify()
 
         self.findAvailWindow.title("Search Train")
         frame = Frame(self.findAvailWindow)
@@ -397,7 +400,7 @@ class Phase_three:
         start_date= Label(frame2,text ="Start Date (MM/DD/YYYY)")
         self.startDateEntry = Entry(frame2, textvariable = self.date, width = 10)
         self.startDateEntry.pack(side = RIGHT)
-
+# add calendar
 
         b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
@@ -415,7 +418,7 @@ class Phase_three:
 
     def departureInfo(self):
         self.findAvailWindow.withdraw()
-        self.departureWin = Toplevel()
+        self.departureWin.deiconify()
         self.departureWin.title("Select Departure")
 
         frame = Frame(self.departureWin)
@@ -440,19 +443,18 @@ class Phase_three:
 ##            tree.insert('', i, text='', values=result)
 ##            i += 1
 
-        b1=Button(frame, text ="Back", command = self.switchtoSearchTrain)
+        b1=Button(frame, text ="Back")
         b1.pack(side=LEFT)
         b2=Button(frame, text ="Next", command = self.passengerInfo)
         b2.pack(side=RIGHT)
 
-    def switchtoSearchTrain(self):
-        self.departureWin.destroy()
-        self.findAvailWindow.deiconify()
-
+    def switchtoMain2(self):
+        self.passengerInfoWin.withdraw()
+        self.primaryWindow.deiconify()
 
     def passengerInfo(self):
         self.departureWin.withdraw()
-        self.passengerInfoWin = Toplevel()
+        self.passengerInfoWin.deiconify()
         self.passengerInfoWin.title("Travel Extras & Passenger Info")
 
         frame = Frame(self.passengerInfoWin)
@@ -480,14 +482,10 @@ class Phase_three:
         nameEnt = Entry(frame3, textvariable = name, width = 10)
         nameEnt.pack(side = RIGHT)
 
-        b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
+        b1=Button(frame4, text ="Back")
         b1.pack(side=LEFT)
         b2=Button(frame4, text ="Next", command=self.makeReservation)
         b2.pack(side=RIGHT)
-
-    def switchToDepartureInfo(self):
-        self.passengerInfoWin.destroy()
-        self.departureWin.deiconify()
 
     def selectTree(self, frame):
         tree=Treeview(frame)
@@ -508,7 +506,7 @@ class Phase_three:
 
     def makeReservation(self):
         self.passengerInfoWin.withdraw()
-        self.reservationWin = Toplevel()
+        self.reservationWin.deiconify()
         self.reservationWin.title("Make Reservation")
 
         frame = Frame(self.reservationWin)
@@ -549,9 +547,6 @@ class Phase_three:
 ##            tree.insert('', i, text='', values=result)
 ##            i += 1
 
-    #make sure to handle duplicate reservations (prevent them)
-
-
         stuDis= Label(frame,text = "Student Discount Applied.")
         stuDis.pack(side= BOTTOM)
         totalC= Label(frame2, text = "Total Cost")
@@ -575,14 +570,11 @@ class Phase_three:
         b2=Button(frame4, text ="Continue adding a train")
         b2.pack(side=LEFT)
 
-        b3=Button(frame5, text ="Back", command = self.switchToPassengerInfo)
+        b3=Button(frame5, text ="Back")
         b3.pack(side=LEFT)
-        b4=Button(frame5, text ="Submit", command = self.confirmation)
+        b4=Button(frame5, text ="Submit")
         b4.pack(side=RIGHT)
  #calculations line
-    def switchToPassengerInfo(self):
-        self.reservationWin. destroy()
-        self.passengerInfoWin.deiconify()
 
     def addCard(self):
         self.reservationWin.withdraw()
@@ -674,7 +666,7 @@ class Phase_three:
 
         b1=Button(frame2, text ="Submit", command = self.switchToConfirm2)
         b1.pack(side=BOTTOM)
-
+        
     def deleteCardCheck(self):
         server = self.Connect()
         cursor = server.cursor()
@@ -688,7 +680,7 @@ class Phase_three:
         cursor = server.cursor()
         cursor.execute("DELETE FROM PAYMENT_INFORMATION WHERE Card_Number='%s'" % (self.cardChoice.get()))
         self.switchToConfirm2()
-
+        
     def switchToConfirm1(self):
         self.paymentIWin.withdraw()
         self.confirmation()
@@ -698,12 +690,11 @@ class Phase_three:
         self.confirmation()
 
     def backToMain(self):
-        self.confirm.destroy()
+        self.confirm.withdraw()
         self.primaryWindow.deiconify()
 
     def confirmation(self):
-        self.reservationWin.destroy()
-        self.confirm = Toplevel()
+        self.confirm.deiconify()
         self.confirm.title("Confirmation")
 
         frame = Frame(self.confirm)
@@ -719,15 +710,13 @@ class Phase_three:
         label3 = Label(frame, text="Thank you so much for your purchase! Please save the reservation ID for your records.")
         label3.grid(row = 2, column = 0, columnspan = 2)
 
-        b=Button(frame, text ="Go back to choose functionality", command=self.backToMain)
+        b=Button(frame, text ="Back", command=self.backToMain)
         b.grid(row=3,column=1,sticky=E)
 
     def updateReservation(self):
         self.primaryWindow.withdraw()
-        self.updateWin = Toplevel()
+        self.updateWin.deiconify()
         self.updateWin.title("Update Reservation")
-
-        #need query here
 
         frame = Frame(self.updateWin)
         frame.pack()
@@ -738,13 +727,8 @@ class Phase_three:
         e1.grid(row = 0, column = 1)
         b1 = Button(frame, text = "Search", command = self.updateReservation2)
         b1.grid(row = 0, column = 2, sticky = E)
-        b2 = Button(frame, text = "Back", command = self.switchMainMenu)
+        b2 = Button(frame, text = "Back")
         b2.grid(row = 1, column = 1, sticky = E)
-
-    def switchMainMenu(self):
-        self.updateWin.destroy()
-        self.primaryWindow = Toplevel()
-        self.mainMenu()
 
     def updateTree(self, frame):
         tree=Treeview(frame)
@@ -764,7 +748,7 @@ class Phase_three:
 
     def updateReservation2(self):
         self.updateWin.withdraw()
-        self.updateWin2 = Toplevel()
+        self.updateWin2.deiconify()
         self.updateWin2.title("Update Reservation")
 
         frame = Frame(self.updateWin2)
@@ -774,14 +758,10 @@ class Phase_three:
 
         tree = self.updateTree(frame)
 
-        b1 = Button(frame2, text = "Back", command = self.switchUpdateReservation)
+        b1 = Button(frame2, text = "Back")
         b1.pack(side = LEFT)
         b2 = Button(frame2, text = "Next", command = self.updateReservation3)
         b2.pack(side = RIGHT)
-
-    def switchUpdateReservation(self):
-        self.updateWin2.destroy()
-        self.updateReservation()
 
     def updateReservation3(self):
         self.updateWin2.withdraw()
@@ -791,18 +771,8 @@ class Phase_three:
         frame = Frame(self.updateWin2)
         frame.pack()
 
-        l1 = Label(frame, text = "Reservation ID")
-        l1.grid(row = 0, column = 0, sticky = E)
-        e1 = Entry(frame, width = 10)
-        e1.grid(row = 0, column = 1)
-        b1 = Button(frame, text = "Search", command = self.cancelRes2)
-        b1.grid(row = 0, column = 2, sticky = E)
-        b2 = Button(frame, text = "Back")
-        b2.grid(row = 1, column = 1, sticky = E)
-
-
-
->>>>>>> ff2c203b0820cff92b892efa89fe8637f74d7bea
+        print("Update Res 3")
+        
 
     def cancelRes(self):
         self.primaryWindow.withdraw()
@@ -821,7 +791,7 @@ class Phase_three:
         b2 = Button(frame, text = "Back")
         b2.grid(row = 1, column = 1, sticky = E)
 
-
+        
     def cancelRes2(self):
         self.cancelWin.withdraw()
         self.cancelWin2.deiconify()
@@ -831,10 +801,10 @@ class Phase_three:
         frame.pack()
 
         print("Cancel Res 2")
+        
 
-
-
-
+    
+    
     def viewReview(self):
         self.primaryWindow.withdraw()
         self.viewReviewWin.deiconify()
@@ -867,7 +837,7 @@ class Phase_three:
         tree.heading("bag", text= "# of baggages")
         tree.heading("name", text= "Passenger Name")
         return tree
-
+    
     def viewReview2(self):
         self.viewReviewWin.withdraw()
         self.viewReviewWin2.deiconify()
@@ -877,7 +847,7 @@ class Phase_three:
         frame.pack()
 
         tree = self.viewTree(frame)
-
+        
         b1 = Button(frame, text = "Back to Choose Functionality")
         b1.pack(side = BOTTOM)
 
@@ -890,12 +860,10 @@ class Phase_three:
 
         frame = Frame(self.giveReviewWin)
         frame.pack()
-
-        self.trainNo = StringVar()
-
+        
         l1 = Label(frame, text = "Train Number")
         l1.grid(row = 0, column = 0, sticky = W)
-        e1 = Entry(frame, text = self.trainNo, width = 20)
+        e1 = Entry(frame, width = 20)
         e1.grid(row = 0, column = 1)
 
         l2 = Label(frame, text = "Rating")
@@ -903,19 +871,12 @@ class Phase_three:
         self.rating = StringVar()
         choices = ["Very Good", "Good", "Neutral", "Bad", "Very Bad"]
         self.rating.set(choices[0])
-        option=OptionMenu(frame, self.rating, choices[0], * choices)
+        option=OptionMenu(frame, self.rating, choices[0], *choices)
         option.grid(row = 0, column = 1)
-
-
-        #query server here to submit reviews
-        #if self.rating == choices[0]:
-            #query = "INSERT INTO REVIEW() VALUES()
-
-        self.comment = StringVar()
-
+        
         l3 = Label(frame, text = "Comment")
         l3.grid(row = 2, column = 0, sticky = W)
-        e3 = Entry(frame, text = self.comment, width = 20)
+        e3 = Entry(frame, width = 20)
         e3.grid(row = 2, column = 1)
 
         b1=Button(frame, text ="Submit")#, command = )
@@ -929,7 +890,7 @@ class Phase_three:
         tree.heading("mon", text= "Month")
         tree.heading("rev", text= "Revenue")
         return tree
-
+    
     def viewRevenueRep(self):
         self.primaryWindow.withdraw()
         self.viewRevenueReport.deiconify()
@@ -958,7 +919,7 @@ class Phase_three:
         frame = Frame(self.viewpopRRWin)
         frame.pack()
 
-        tree = self.viewTree3(frame)
+        tree = self.viewTree3(frame)                
 
         b1 = Button(frame, text = "Back")
         b1.pack(side = BOTTOM)
