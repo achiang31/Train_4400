@@ -421,10 +421,10 @@ def searchTrain(self):
 
             frame = Frame(self.departureWin)
             frame.pack(side=TOP)
-            
+
             chosenCity = self.city.get()
             chosenArrv = self.arrv.get()
-<<<<<<< HEAD
+
             chosenDate = self.date.get() #date is identical to entered date
 
             server = self.Connect()
@@ -435,15 +435,12 @@ def searchTrain(self):
             stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
 
             query = "SELECT STOP.Train_Number, STOP.Departure_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price FROM STOP, TRAIN_ROUTE, Stops \
-WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
+                WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
 
 
             cursor.execute(query)
             results = cursor.fetchall()
             #time/duration of trip must be calculated from Arrival_Time- Departure Time
-=======
-            chosenDate = self.date.get() 
->>>>>>> 993631cf7bf82b4122b10d767bbd274e524aaf2d
 
 ##            server = self.Connect()
 ##            cursor = server.cursor()
@@ -459,7 +456,7 @@ WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = S
 ##            results = cursor.fetchall()
 
             results = [("d","d","d","d"),("d","d","d","d"),("d","d","d","d")]
-        
+
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
@@ -480,7 +477,7 @@ WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = S
             self.row = a
             self.value1 = b
             self.value2 = c
-            
+
             b1=Button(frame, text ="Back", command = self.switchtoSearchTrain)
             b1.grid(row = a, column = 0)
             b2=Button(frame, text ="Next", command = self.passengerInfo)
