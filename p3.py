@@ -403,18 +403,13 @@ class Phase_three:
         depDate= Label(frame2,text ="Departure Date (YYYY-MM-DD)")
         depDate.grid(row = 2, column = 0, sticky = E)
         self.date = StringVar()
-    
+
         self.startDateEntry = Entry(frame2, textvariable = self.date, width = 10)
         self.startDateEntry.grid(row = 2, column = 1, sticky = W)
 
         b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
-    def selected(self):
-        pass
-        #self.v.get represents the radio button # chosen
-        #if value of self.v.get = 5 then train on row 3 was selected - pull that row from the departure Info
-        #query to finalize that as reservation in the DB under that res ID
-        
+
     def departureInfo(self):
         start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
         if start_date < datetime.now():
@@ -426,47 +421,38 @@ class Phase_three:
 
             frame = Frame(self.departureWin)
             frame.pack(side=TOP)
-            
+
             chosenCity = self.city.get()[2: len(self.city.get())-3]
             chosenArrv = self.arrv.get()[2: len(self.arrv.get())-3]
-            chosenDate = self.date.get() 
+            chosenDate = self.date.get()
 
             server = self.Connect()
             cursor = server.cursor()
-            
+
             stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
             stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
             stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
             query = "SELECT STOP.Train_Number, STOP.Departure_Time, STOP.Arrival_Time, STOP.Name, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price FROM STOP, TRAIN_ROUTE, Stops \
             WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
-            
+
             cursor.execute(query)
             results = cursor.fetchall()
-
-           # print(results)
 
             departTime = []
             arriveTime = []
 
             for row in results:
-                if str(row[3]) == chosenCity:
+                if row[3] == chosenCity:
                     departTime.append((row[1], row[3], row[0], row[4], row[5]))
-                if str(row[3]) == chosenArrv:
+                if row[3] == chosenArrv:
                     arriveTime.append((row[2], row[3], row[0], row[4], row[5]))
-            #print(departTime)
-            #print(arriveTime)
+
             duration = []
             for pair1 in departTime:
                 for pair2 in arriveTime:
-<<<<<<< HEAD
                     if pair1[1] == chosenCity and pair2[1] == chosenArrv and pair1[2] == pair2[2]:
                         duration.append((pair1[2], pair1[0], pair2[0], pair2[0] - pair1[0], pair1[3], pair1[4]))
-=======
-                    if pair1[1] == chosenCity and pair2[1] == chosenArrv and pair1[2] == pair2[2]: 
-                        duration.append((pair1[2],pair1[0],pair2[0],pair2[0] - pair1[0],pair1[3],pair1[4]))
->>>>>>> 767de1bb5cbc35665a55245ee342a2de3cdd6138
 
-            #print(duration)
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
@@ -477,18 +463,19 @@ class Phase_three:
             c = 2
             self.v = IntVar()
             for result in duration:
-                print(result)
                 Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
-                Label(frame, text = str(result[1]) + "-" + str(result[2]) + "\n" + str(result[3]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
-                Radiobutton(frame, text = str(result[4]), variable = self.v, value = b, command = self.selected).grid(row = a, column = 4, sticky = "ew")
-                Radiobutton(frame, text = str(result[5]), variable = self.v, value = c, command = self.selected).grid(row = a, column = 6, sticky = "ew")
+                Label(frame, text = str(result[1]) + "-" + str(result[2]) + "\n" + result[3], anchor = "w").grid(row = a, column = 2, sticky = "ew")
+                Radiobutton(frame, text = str(result[4]), variable = self.v, value = b).grid(row = a, column = 4, sticky = "ew")
+                Radiobutton(frame, text = str(result[5]), variable = self.v, value = c).grid(row = a, column = 6, sticky = "ew")
                 a += 1
                 b += 2
                 c += 2
-            
+
             self.row = a
             self.value1 = b
             self.value2 = c
+
+
 
             b1=Button(frame, text ="Back", command = self.switchtoSearchTrain)
             b1.grid(row = a, column = 0)
@@ -530,8 +517,9 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        
+
         query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE Username='%s'" % (self.bags.get(), self.name.get(), self.registeredUser.get())
+        cursor.execute(query)
 
         #cursor.execute(query)
 
@@ -567,11 +555,20 @@ class Phase_three:
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
 
+        #if (self.value2/2 == 0):
+            #then 2nd class price was selected else 1st class was selected
+            #celing of (self.value/2) returns the row number of selected train in the departure info query
+
+
+        result = []
+
+        query = "SELECT Is_student FROM CUSTOMER WHERE "
+
         a = 2
         b = 1
         self.w = IntVar()
-        
-        results = [("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d")]  
+
+        results = [("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d")]
         for result in results:
             Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
             Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
@@ -584,8 +581,8 @@ class Phase_three:
             RadioButton(frame, text = "Remove", varaiable = self.w, value = b).grid(row = a, column = 8)
             a = a + 1
             b += 9
-            
-       
+
+        #the value of b/9 should give you the row # of the query that needs to be deleted
 
         stuDis= Label(frame2,text = "Student Discount Applied.")
         stuDis.grid(row = 0, column = 0)
@@ -627,7 +624,7 @@ class Phase_three:
 
     def remove(self):
         #that reservation needs to be removed from the database
-        pass 
+        pass
     def switchToSearchTrain(self):
         self.reservationWin.destroy()
         self.searchTrain()
@@ -830,6 +827,10 @@ class Phase_three:
         b2 = Button(frame, text = "Back", command = self.switchMainMenu)
         b2.grid(row = 1, column = 1, sticky = E)
 
+        if self.resID not in results:
+            messagebox.showerror("Error. No such reservation found.")
+
+
     def switchMainMenu(self):
         self.updateWin.destroy()
         self.primaryWindow = Toplevel()
@@ -850,8 +851,7 @@ class Phase_three:
 ##        tree.heading("bag", text= "# of Baggages")
 ##        tree.heading("name", text= "Passenger Name")
 ##        return tree
-    def select2(self):
-        print(self.w.get())
+
 #####################table info, new dept date, change fee, updated cost,#################
     def updateReservation2(self):
         self.updateWin.withdraw()
@@ -875,17 +875,19 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        #query = "SELECT * FROM RESERVES WHERE ReservationID = '%s'" % (self.resID.get())
-        #cursor.execute(query)
-        #results = cursor.fetchall()
+        query = "SELECT * FROM RESERVES WHERE ReservationID = '%s'" % (self.resID.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
 
-        a = 2
+        a = 1
         b = 1
-        results = [("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d")]  
+        c = 2
         self.w = IntVar()
         for result in results:
-            Radiobutton(frame, variable = self.w, value = b, command = self.select2).grid(row = a, column = 0)
-            Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
+            b = Radiobutton(frame, text = "Select", variable = self.w, anchor= "w")
+            b.grid(row = a, column = 0 , stickey = "ew")
+            l10 = Label(frame, text = str(result[0]), anchor = "w")
+            l10.grid(row = a, column = 1, sticky = "ew")
             l11 = Label(frame, text = str(result[1]), anchor = "w")
             l11.grid(row = a, column = 2, sticky = "ew")
             l12 = Label(frame, text = str(result[2]), anchor = "w")
@@ -901,7 +903,6 @@ class Phase_three:
             l17 = Label(frame, text = str(result[7]), anchor = "w")
             l17.grid(row = a, column = 8, sticky = "ew")
             a = a + 1
-            b += 9
 
         b1 = Button(frame2, text = "Back", command = self.switchUpdateReservation)
         b1.pack(side = LEFT)
