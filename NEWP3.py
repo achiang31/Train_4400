@@ -399,14 +399,13 @@ class Phase_three:
         #something like "for pair in result: choices.append(pair[0])"
         #make sure the displayed at the Names, NOT Locations
 
-        self.city.set(choices[0])
+        #self.city.set(choices[0])
         option=OptionMenu(frame, self.city, choices[0], *choices)
         option.grid(row = 0, column = 1, sticky = W)
 
         arriveAt= Label(frame1,text ="Arrive At")
         arriveAt.grid(row = 1, column = 0, sticky = E)
         self.arrv = StringVar()
-
 
         server = self.Connect()
         cursor = server.cursor()
@@ -417,7 +416,7 @@ class Phase_three:
         ##remember to print a message saying "There are no routes from X to Y" if that is the case
 
 
-        self.arrv.set(choices[0])
+        #self.arrv.set(choices[0])
         option=OptionMenu(frame1, self.arrv, choices[0], *choices)
         option.grid(row = 1, column = 1, sticky = W)
 
@@ -509,18 +508,18 @@ class Phase_three:
 
         baggage= Label(frame,text = "Number of Baggage")
         baggage.pack(side=LEFT)
-        self.city = StringVar()
+        self.bags = StringVar()
         choices = ["1", "2", "3", "4"]
-        self.city.set(choices[0])
-        option=OptionMenu(frame, self.city, choices[0], *choices)
+        #self.bags.set(choices[0])
+        option=OptionMenu(frame, self.bags, choices[0], *choices)
         option.pack(side=RIGHT)
         disclamer = Label(frame2,text = "Every passenger can bring upto 4 baggage. 2 free of charge, 2 for $30 per bag")
         disclamer.pack()
 
         passName= Label(frame3,text ="Passenger Name")
         passName.pack(side=LEFT)
-        name = StringVar()
-        nameEnt = Entry(frame3, textvariable = name, width = 10)
+        self.name = StringVar()
+        nameEnt = Entry(frame3, textvariable = self.name, width = 10)
         nameEnt.pack(side = RIGHT)
 
         server = self.Connect()
@@ -566,7 +565,7 @@ class Phase_three:
         frame2 = Frame(self.reservationWin)
         frame2.pack(side=TOP)
 
-        selected= Label(frame,text = "Currently Selected")
+        selected = Label(frame,text = "Currently Selected")
         selected.grid(row = 0, column = 0)
 
         l1 = Label(frame,text = "Train(Train Number)").grid(row = 1, column = 0)
@@ -578,6 +577,11 @@ class Phase_three:
         l7 = Label(frame,text = "# of baggages").grid(row = 1, column = 6)
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
+
+        #self.v = 1 when selected
+        #self.bags.get()
+        #self.name.get()
+
 
         results = [("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf")]
         a = 1
@@ -702,20 +706,23 @@ class Phase_three:
         l4= Label(frame4,text = "Expiration Date")
         l4.pack(side=LEFT)
 
-        name = StringVar()
-        cardName = Entry(frame, textvariable = name, width = 10)
+        self.name = StringVar()
+        cardName = Entry(frame, textvariable = self.name, width = 10)
         cardName.pack(side = RIGHT)
 
-        num = StringVar()
-        cardNum = Entry(frame2, textvariable = num, width = 10)
+        self.num = StringVar()
+        cardNum = Entry(frame2, textvariable = self.num, width = 10)
         cardNum.pack(side = RIGHT)
 
-        CVVnum = StringVar()
-        Cvv = Entry(frame3, textvariable = CVVnum, width = 10)
+        self.CVVnum = StringVar()
+        Cvv = Entry(frame3, textvariable = self.CVVnum, width = 10)
         Cvv.pack(side = RIGHT)
 
-        date = StringVar()
-        expdate = Entry(frame4, textvariable = date, width = 10)
+        self.date = StringVar()
+        if self.date < datetime.now():
+            messagebox.showerror("Error, your card is expired.")
+
+        expdate = Entry(frame4, textvariable = self.date, width = 10)
         expdate.pack(side = RIGHT)
 
         b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
