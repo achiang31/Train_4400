@@ -321,7 +321,7 @@ class Phase_three:
         self.trainNumber = IntVar()
         self.entry = Entry(frame1, textvariable = self.trainNumber, width = 10)
         self.entry.pack(side=RIGHT)
-        
+
         b1 = Button(frame2, text ="Search", command = self.schedule)
         b1.pack(side=LEFT)
 
@@ -347,7 +347,7 @@ class Phase_three:
         tree = self.getTrainTree(frame1)
         server = self.Connect()
         cursor = server.cursor()
-        
+
         trainNum = self.trainNumber.get()
         query1 = "SELECT * FROM STOP WHERE Train_Number = '%d'" % (trainNum)
 
@@ -360,7 +360,7 @@ class Phase_three:
 
         b1 = Button(frame1, text ="Back", command = self.switchToMainMenu)
         b1.pack(side= BOTTOM)
-        
+
     def switchToMainMenu(self):
         self.scheduleWin.destroy()
         self.primaryWindow = Toplevel()
@@ -389,7 +389,7 @@ def searchTrain(self):
         query = "SELECT Name FROM STATION"
         cursor.execute(query)
         results = cursor.fetchall()
-     
+
         option=OptionMenu(frame, self.city, results[0], *results)
         option.grid(row = 0, column = 1, sticky = W)
 
@@ -423,7 +423,7 @@ def searchTrain(self):
 
     def departureInfo(self):
         start_date = datetime.strptime(self.startDateEntry.get(), '%y/%m/%d')
-        
+
         if start_date < datetime.now():
             messagebox.showerror("Error", "Invalid Date (Either in the past or start > end)")
         else:
@@ -637,9 +637,13 @@ def searchTrain(self):
 
         useCard= Label(frame2, text = "Use Card")
         useCard.grid(row = 4, column = 0)
-        choices = ["1", "2", "3", "4"]
-        self.city.set(choices[0])
-        option=OptionMenu(frame2, self.city, choices[0], *choices)
+
+        query = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.registeredUser.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        self.card.set(results[0])
+        option=OptionMenu(frame2, self.card, results[0], *results)
         option.grid(row = 4, column = 1)
 
         b5=Button(frame2, text ="Delete Card", command = self.deleteCard)
@@ -772,14 +776,17 @@ def searchTrain(self):
 
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "SELECT Card_Number FROM PAYMENT_INFO"
+        query1 = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.registeredUser.get())
+        cursor.execute(query1)
+        results = cursor.fetchall()
 
         self.cardNum = StringVar()
-        self.cardNum.set(choices[0])
-        option=OptionMenu(frame, self.cardNum, choices[0], *choices)
+        self.cardNum.set(results[0])
+        option=OptionMenu(frame, self.cardNum, results[0], *results)
         option.pack(side=RIGHT)
 
         query2 = "DELETE FROM PAYMENT_INFO WHERE Card_Number = '%s'" % (self.cardNum.get())
+        cursor.execute(query2)
 
         b1=Button(frame2, text ="Submit", command = self.switchToMakeReservation2)
         b1.pack(side=BOTTOM)
@@ -794,7 +801,7 @@ def searchTrain(self):
     def deleteCardCheck(self):
         server = self.Connect()
         cursor = server.cursor()
-        cursor.execute("SELECT * FROM PAYMENT_INFO WHERE Card_Number ='%s'" %(self.cardChoice.get()))
+        cursor.execute("SELECT * FROM PAYMENT_INFO WHERE Card_Number ='%s'" % (self.cardChoice.get()))
         results = cursor.fetchall()
         for row in results:
             self.endDate = row[2]
@@ -817,7 +824,7 @@ def searchTrain(self):
         self.confirm.destroy()
         self.primaryWindow = Toplevel()
         self.mainMenu()
-#############the reservation ID needs to show up in the entry####################
+
     def confirmation(self):
         self.reservationWin.destroy()
         self.confirm = Toplevel()
@@ -832,6 +839,12 @@ def searchTrain(self):
         e1.grid(row = 0, column = 1)
         label3 = Label(frame, text="Thank you so much for your purchase! Please save the reservation ID for your records.")
         label3.grid(row = 2, column = 0, columnspan = 2)
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT ReservationID FROM RESERVATION WHERE Card_Number = '%d'" % (self.card.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
 
         b=Button(frame, text ="Go back to choose functionality", command=self.backToMain)
         b.grid(row=3,column=1,sticky=E)
@@ -1155,6 +1168,7 @@ def searchTrain(self):
         self.viewReviewWin2.destroy()
         self.primaryWindow = Toplevel()
         self.mainMenu()
+
     def giveReview(self):
         self.primaryWindow.destroy()
         self.giveReviewWin = Toplevel()

@@ -837,6 +837,7 @@ class Phase_three:
         self.confirm.destroy()
         self.primaryWindow = Toplevel()
         self.mainMenu()
+
 #############the reservation ID needs to show up in the entry####################
     def confirmation(self):
         self.reservationWin.destroy()
@@ -845,6 +846,10 @@ class Phase_three:
 
         frame = Frame(self.confirm)
         frame.pack()
+
+
+
+
 
         label1 = Label(frame, text="Reservation ID:")
         label1.grid(row = 0, column = 0,sticky=E)
@@ -856,7 +861,7 @@ class Phase_three:
         b=Button(frame, text ="Go back to choose functionality", command=self.backToMain)
         b.grid(row=3,column=1,sticky=E)
 
-########################search reservation using id & table info neesd to show####################
+########################search reservation using id & table info needs to show####################
 
     def updateReservation(self):
         self.primaryWindow.destroy()
