@@ -205,8 +205,6 @@ class Phase_three:
         #self.primaryWindow.deiconify()
         self.mainMenu()
 
-
-############################# When the user enters the data, it needs to be added to teh database after you hit the vreate button#####################################
     def Register(self):
         self.newUserWindow.title("New User Registration")
         frame=Frame(self.newUserWindow)
@@ -288,8 +286,6 @@ class Phase_three:
         b2 = Button(frame2, text ="Submit", command = self.writeToDB)
         b2.grid(row = 2, column = 1)
 
-##################### Write the email address to the Database if it ends with EDU
-
     def writeToDB(self):
         if self.emailaddress.get()[-4:] == ".edu":
             server = self.Connect()
@@ -311,7 +307,6 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-#####################get the train number that the user enters and then print out the shcedule on the next screen################################################
     def trainSchedule(self):
         self.primaryWindow.destroy()
         self.trainSchWin = Toplevel()
@@ -358,7 +353,6 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-################### for the drop down menus pull the cities for the departs from and the arrives at ########################################
     def searchTrain(self):
         self.primaryWindow.withdraw()
         self.findAvailWindow = Toplevel()
@@ -432,7 +426,6 @@ class Phase_three:
 ##        tree.heading("2nd", text= "2nd Class Price")
 ##        return tree
 
-############# the trains that fit the user's choice should show up here in the table #######################################################
     def departureInfo(self):
         start_date = datetime.strptime(self.startDateEntry.get(), '%m/%d/%Y')
         #end_date = datetime.strptime(self.endDateEntry.get(), '%m/%d/%Y')
