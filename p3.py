@@ -986,6 +986,14 @@ class Phase_three:
         e3 = Entry(frame5, textvariable = self.value, width = 10)
         e3.grid(row = 1, column = 1)
 
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d'" % (e1)
+        cursor.execute(query1)
+        query2 = "SELECT Change_fee FROM SYSTEM_INFO"
+        cursor.execute(query2)
+        results = cursor.fetchall()
+
         b2=Button(frame5, text ="Back", command = self.switchUpdateReservation2)
         b2.grid(row =2, column = 0, sticky = E)
         b3=Button(frame5, text ="Submit", command = self.switchTOConfirmation)
@@ -1075,7 +1083,6 @@ class Phase_three:
         self.cancelWin2.destroy()
         self.confirmation()
 
-############train number,table info
     def viewReview(self):
         self.primaryWindow.withdraw()
         self.viewReviewWin = Toplevel()
@@ -1086,12 +1093,13 @@ class Phase_three:
 
         l1 = Label(frame, text = "Train Number")
         l1.grid(row = 0, column = 0, sticky = W)
-        e1 = Entry(frame, width = 20)
+        e1 = Entry(frame, textvariable = self.TrainReviewNumber width = 20)
         e1.grid(row = 0, column = 1)
         b1 = Button(frame, text = "Back", command = self.backMain)
         b1.grid(row = 1, column = 0)
         b2 = Button(frame, text = "Next", command = self.viewReview2)
         b2.grid(row = 1, column = 1)
+
     def backMain(self):
         self.viewReviewWin.destroy()
         self.primaryWindow = Toplevel()
@@ -1120,6 +1128,12 @@ class Phase_three:
 
         frame = Frame(self.viewReviewWin2)
         frame.pack()
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT Comment, Rating FROM REVIEW WHERE REVIEW.Train_Number = '%d'" % (TrainReviewNumber)
+        cursor.execute(query)
+        results = cursor.fetchall()
 
         tree = self.viewTree(frame)
 
