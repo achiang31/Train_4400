@@ -849,8 +849,6 @@ def searchTrain(self):
         b=Button(frame, text ="Go back to choose functionality", command=self.backToMain)
         b.grid(row=3,column=1,sticky=E)
 
-########################search reservation using id & table info neesd to show####################
-
     def updateReservation(self):
         self.primaryWindow.destroy()
         self.updateWin = Toplevel()
@@ -858,15 +856,25 @@ def searchTrain(self):
 
         frame = Frame(self.updateWin)
         frame.pack()
-
+        self.resID = IntVar()
         l1 = Label(frame, text = "Reservation ID")
         l1.grid(row = 0, column = 0, sticky = E)
-        e1 = Entry(frame, width = 10)
+        e1 = Entry(frame, textvariable = self.resID, width = 10)
         e1.grid(row = 0, column = 1)
         b1 = Button(frame, text = "Search", command = self.updateReservation2)
         b1.grid(row = 0, column = 2, sticky = E)
         b2 = Button(frame, text = "Back", command = self.switchMainMenu)
         b2.grid(row = 1, column = 1, sticky = E)
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT ReservationID FROM RESERVES WHERE Passenger_Name = '%s'" % (self.name.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        if self.resID not in results:
+            messagebox.showerror("Error. No such reservation found.")
+
 
     def switchMainMenu(self):
         self.updateWin.destroy()
@@ -910,7 +918,12 @@ def searchTrain(self):
         l7 = Label(frame,text = "# of baggages").grid(row = 1, column = 7)
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 8)
 
-        results = [("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf")]
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT * FROM RESERVES WHERE ReservationID = '%s'" % (self.resID.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
+
         a = 1
         b = 1
         c = 2
