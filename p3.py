@@ -460,7 +460,7 @@ class Phase_three:
             for pair1 in departTime:
                 for pair2 in arriveTime:
                     if pair1[1] == chosenCity and pair2[1] == chosenArrv and pair1[2] == pair2[2]:
-                        self.duration.append((pair1[2],pair1[0],pair2[0],pair2[0] - pair1[0],pair1[3],pair1[4]))
+                        self.duration.append((pair1[2],pair1[0],pair2[0],pair2[0] - pair1[0],pair1[3],pair1[4], pair1[1], pair2[1]))
 
             print(self.duration)
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
@@ -563,11 +563,12 @@ class Phase_three:
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
 
         results = []
-        departInfo = ceil(self.v)
-        for info in self.duration.get()[departInfo]:
-            results.append(info)
+        departInfo = ceil(self.v.get())
+        firstHalf = self.duration.get()[departInfo]
+        price =
+        secondHalf = (self.classChosen.get(), self.bags.get(), self.name.get())
 
-
+        results.append()
         #ALAAP put the passengerInfo() stuff here, append into results
 
 
