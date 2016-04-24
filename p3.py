@@ -1242,9 +1242,10 @@ class Phase_three:
 
     def viewRevenueRep(self):
 
-        #thirdMoth - result1
-        #secondMonth - result2
-        #thirdMonth - result3
+        #Month          -    Revenue
+        #thirdMoth      -    $result1
+        #secondMonth    -    $result2
+        #thirdMonth     -    $result3
 
         self.primaryWindow.withdraw()
         self.viewRevenueReport = Toplevel()
@@ -1257,7 +1258,6 @@ class Phase_three:
         firstMonth = now.month - 1
         secondMonth = now.month - 2
         thirdMonth = now.month - 3
-
 
         server = self.Connect()
         cursor = server.cursor()
