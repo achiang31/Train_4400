@@ -66,7 +66,7 @@ class Phase_three:
         self.passengerInfoWin = Toplevel()
         self.passengerInfoWin.title("Travel Extras & Passenger Info")
         self.passengerInfoWin.withdraw()
-        
+
         self.reservationWin = Toplevel()
         self.reservationWin.title("Make Reservation")
         self.reservationWin.withdraw()
@@ -160,18 +160,16 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        query = "SELECT * FROM CUSTOMER \
-               WHERE Username = '%s' AND Password = '%s'" % (self.username.get(), self.password.get())
+        query = "SELECT * FROM CUSTOMER, USER \
+               WHERE (Username = '%s' AND USER.Password = '%s'" % (self.username.get(), self.password.get())
         cursor.execute(query)
         result1 = cursor.fetchall()
-        query = "SELECT * FROM MANAGER \
-               WHERE Username = '%s' AND Password = '%s'" % (self.username.get(), self.password.get())
-
+        query = "SELECT * FROM MANAGER, USER \
+               WHERE Username = '%s' AND USER.Password = '%s'" % (self.username.get(), self.password.get())
         cursor.execute(query)
         result2 = cursor.fetchall()
 
         if len(result1) != 0:
-            print("Customer")
             self.custOrManag = "customer"
             for row in results:
                 self.name = row[0]
@@ -203,7 +201,7 @@ class Phase_three:
         b6.grid(row = 5, column = 0, columnspan = 2, sticky = EW)
         b7 = Button(buttonsFrame, text ="Log out")
         b7.grid(row = 6, column = 0, columnspan = 2, sticky = EW)
-        
+
        ### elif self.custOrManag == "manager":
         """b8 = Button(buttonsFrame, text ="View revenue report", command = self.viewRevenueRep)
         b8.grid(row = 0, column = 0, columnspan = 2, sticky = EW)
@@ -225,8 +223,6 @@ class Phase_three:
         self.primaryWindow.deiconify()
         self.mainMenu()
 
-
-############################# When the user enters the data, it needs to be added to teh database after you hit the vreate button#####################################
     def Register(self):
         self.newUserWindow.title("New User Registration")
         frame=Frame(self.newUserWindow)
@@ -274,10 +270,8 @@ class Phase_three:
         cursor = server.cursor()
         query1 = "SELECT * FROM CUSTOMER, MANAGER \
                WHERE CUSTOMER.Username = '%s' OR MANAGER.Username = '%s'" % (self.registeredUser.get(), self.registeredUser.get())
-        print(query1)
         cursor.execute(query1)
         result1 = cursor.fetchall()
-        print(result1)
         cursor.execute(query1)
         if len(result1) != 0:
             messagebox.showerror("Error", "Username already in use")
@@ -285,7 +279,6 @@ class Phase_three:
 
         query2 = "INSERT INTO CUSTOMER(Username, Password, Email) \
                VALUES ('%s', '%s', '%s')" % (self.registeredUser.get(), self.registeredPass.get(), self.registerEmail.get())
-        print(query2)
         cursor.execute(query2)
         result2 = cursor.fetchall()
         self.switchToLogin()
@@ -303,7 +296,7 @@ class Phase_three:
         self.entry.grid(row = 0, column = 1)
         label1 = Label(frame1,text = "School Email Address")
         label1.grid(row = 0, column = 0)
-        label2 = Label(frame1,text = "Your school email adress ends with .edu")
+        label2 = Label(frame1,text = "Your school email address ends with .edu")
         label2.grid(row = 1, column = 0)
 
         b1 = Button(frame2, text ="Back", command = self.switchMain)
@@ -311,18 +304,20 @@ class Phase_three:
         b2 = Button(frame2, text ="Submit", command = self.writeToDB)
         b2.grid(row = 2, column = 1)
 
-##################### Write SQL code here
-        
     def writeToDB(self):
         if self.emailaddress.get()[-4:] == ".edu":
-            print("edu") 
+            server = self.Connect()
+            cursor = server.cursor()
+            query = "UPDATE CUSTOMER SET Is_student = 1 WHERE Username = '%s'" % (self.registeredUser.get())
+            cursor.execute(query)
+            result = cursor.fetchall()
+            ##switch to main menu here? self.switchtoMainMenu()
 
     def switchMain(self):
         self.schoolInfoWin.destroy()
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-#####################get the train number that the user enters and then print out the shcedule on the next screen################################################
     def trainSchedule(self):
         self.primaryWindow.destroy()
         self.trainSchWin = Toplevel()
@@ -334,9 +329,17 @@ class Phase_three:
         label1 = Label(frame1,text = "Train Number")
         label1.pack(side=LEFT)
 
-        self.trainName = StringVar()
-        self.entry = Entry(frame1, textvariable = self.trainName , width = 10)
+        self.trainNumber = StringVar()
+        self.entry = Entry(frame1, textvariable = self.trainNumber , width = 10)
         self.entry.pack(side=RIGHT)
+
+        server = self.Connect()
+        cursor = server.cursor()
+        trainNum = int(self.trainNumber)
+        query = "SELECT (Arrival_Time, Departure_Time, Name) FROM STOP WHERE Train_Number = '%d'" % (trainNum)
+        cursor.execute(query)
+        result = cursor.fetchall()
+        #how to display the stuff that was returned???
 
         b1 = Button(frame2, text ="Search", command = self.schedule)
         b1.pack(side=LEFT)
@@ -345,7 +348,7 @@ class Phase_three:
         tree=Treeview(frame)
         tree.pack()
         tree["show"] = "headings"
-        tree["columns"]=( "train","arrv","dept","station")        
+        tree["columns"]=( "train","arrv","dept","station")
         tree.heading("train", text= "Train (Train Number)")
         tree.heading("arrv", text= "Arrival Time")
         tree.heading("dept", text= "Departure Time")
@@ -359,9 +362,17 @@ class Phase_three:
 
         frame1 = Frame(self.scheduleWin)
         frame1.pack()
-        
+
         tree = self.getTrainTree(frame1)
-        chosenTrain = self.trainName.get()
+        chosenTrain = self.trainNumber.get()
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT * FROM "
+
+
+
+
 ##        sql = "SELECT * FROM ROOM WHERE LOCATION = '%s' AND NOT EXISTS \
 ##                (SELECT Room_Number \
 ##                FROM RESERVATION_HAS_ROOM NATURAL JOIN RESERVATION \
@@ -385,7 +396,6 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-################### for the drop down menus pull the cities for the departs from and the arrives at ########################################
     def searchTrain(self):
         self.primaryWindow.withdraw()
         self.findAvailWindow = Toplevel()
@@ -403,7 +413,18 @@ class Phase_three:
         location= Label(frame,text = "Departs From")
         location.grid(row = 0, column = 0, sticky = E)
         self.city = StringVar()
-        choices = ["Atlanta", "Charlotte", "Savannah", "Orlando", "Miami"]
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT Name FROM STATION"
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        choices = []
+        #result is a list with all the city names and station names as tuples
+        #something like "for pair in result: choices.append(pair[0])"
+        #make sure the displayed at the Names, NOT Locations
+
         self.city.set(choices[0])
         option=OptionMenu(frame, self.city, choices[0], *choices)
         option.grid(row = 0, column = 1, sticky = W)
@@ -411,7 +432,21 @@ class Phase_three:
         arriveAt= Label(frame1,text ="Arrive At")
         arriveAt.grid(row = 1, column = 0, sticky = E)
         self.arrv = StringVar()
-        choices = ["Atlanta", "Charlotte", "Savannah", "Orlando", "Miami"]
+
+        choices =
+
+        #result is a list with all the city names and station names as tuples
+        #something like "for pair in result: choices.append(pair[0])"
+        #make sure the displayed at the Names, NOT Locations
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT Name FROM STATION"
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        ##remember to print a message saying "There are no routes from X to Y" if that is the case
+
         self.arrv.set(choices[0])
         option=OptionMenu(frame1, self.arrv, choices[0], *choices)
         option.grid(row = 1, column = 1, sticky = W)
@@ -438,7 +473,7 @@ class Phase_three:
         return tree
 
 ############# the trains that fit the user's choice should show up here in the table #######################################################
-    def departureInfo(self):      
+    def departureInfo(self):
         start_date = datetime.strptime(self.startDateEntry.get(), '%m/%d/%Y')
         #end_date = datetime.strptime(self.endDateEntry.get(), '%m/%d/%Y')
         if start_date < datetime.now():
@@ -454,21 +489,14 @@ class Phase_three:
             tree = self.departTree(frame)
             chosenCity = self.city.get()
             chosenArrv = self.arrv.get()
-            chosenDate = self.date.get()
-##        sql = "SELECT * FROM ROOM WHERE LOCATION = '%s' AND NOT EXISTS \
-##                (SELECT Room_Number \
-##                FROM RESERVATION_HAS_ROOM NATURAL JOIN RESERVATION \
-##            WHERE ROOM.Room_Number = RESERVATION_HAS_ROOM.Room_Number AND ROOM.LOCATION = RESERVATION_HAS_ROOM.LOCATION AND RESERVATION.Is_Cancelled = '0' AND (('%s' >= Start_Date \
-##            AND '%s' <= End_Date) OR ('%s' >= Start_Date AND '%s' <= End_Date) OR ('%s' >= Start_Date AND '%s' <= End_Date)))" % (chosenCity, start_date, end_date, start_date, start_date, end_date, end_date)
-##        print('Getting all rooms associated with city: %s' % (sql))
-##        db = self.Connect()
-##        cursor = db.cursor()
-##        cursor.execute(sql)
-##        results = cursor.fetchall()
-##        i = 0
-##        for result in results:
-##            tree.insert('', i, text='', values=result)
-##            i += 1
+            chosenDate = self.date.get() #date is identical to entered date
+
+            stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
+            stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
+            stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
+
+            query = "SELECT (STOP.Train_Number, STOP.Depature_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price) FROM (STOP, TRAIN_ROUTE) WHERE \
+                STOP.Train_Number =  Stops.Train_Number AND TRAIN_ROUTE.Train_Number = Stops.Train_Number)"
 
             b1=Button(frame, text ="Back", command = self.switchtoSearchTrain)
             b1.pack(side=LEFT)
@@ -518,10 +546,10 @@ class Phase_three:
     def switchToDepartureInfo(self):
         self.passengerInfoWin.destroy()
         self.departureWin.deiconify()
-        
+
     def selectTree(self, frame):
         tree=Treeview(frame)
-        tree.grid(row =1, column = 0) 
+        tree.grid(row =1, column = 0)
         tree["show"] = "headings"
         tree["columns"]=("train","time","dept","arrv", "class", "pr", "bag", "name", "rem")
         tree.heading("train", text= "Train (Train Number)")
@@ -545,14 +573,14 @@ class Phase_three:
         frame.pack(side=TOP)
         frame2 = Frame(self.reservationWin)
         frame2.pack(side=TOP)
-        
+
         selected= Label(frame,text = "Currently Selected")
-        selected.grid(row = 0, column = 0) 
+        selected.grid(row = 0, column = 0)
 
         tree = self.selectTree(frame)
 
     #######################FIX THIS###################
-##        chosenTrain = self.trainName.get()
+##        chosenTrain = self.trainNumber.get()
 ##
 ##        chosenCity = self.city.get()
 ##        chosenArrv = self.arrv.get()
@@ -576,7 +604,7 @@ class Phase_three:
         stuDis= Label(frame2,text = "Student Discount Applied.")
         stuDis.grid(row = 2, column = 0)
         totalC= Label(frame2, text = "Total Cost")
-        totalC.grid(row = 3, column = 0) 
+        totalC.grid(row = 3, column = 0)
         cost = StringVar()
         costEnt = Entry(frame2, textvariable = cost, width = 10)
         costEnt.grid(row = 3, column = 1)
@@ -591,7 +619,7 @@ class Phase_three:
         b5=Button(frame2, text ="Delete Card", command = self.deleteCard)
         b5.grid(row = 4, column =2)
         b1=Button(frame2, text ="Add Card", command = self.addCard)
-        b1.grid(row = 4, column =3) 
+        b1.grid(row = 4, column =3)
 
         b2=Button(frame2, text ="Continue adding a train", command = self.switchToSearchTrain)
         b2.grid(row = 5, column = 0)
@@ -599,13 +627,13 @@ class Phase_three:
         b3=Button(frame2, text ="Back", command = self.switchToPassengerInfo)
         b3.grid(row = 6, column = 0)
         b4=Button(frame2, text ="Submit", command = self.confirmation)
-        b4.grid(row =6, column = 1) 
+        b4.grid(row =6, column = 1)
  #calculations line
 
     def switchToSearchTrain(self):
         self.reservationWin.destroy()
         self.searchTrain()
-        
+
     def switchToPassengerInfo(self):
         self.reservationWin. destroy()
         self.passengerInfoWin.deiconify()
@@ -621,7 +649,7 @@ class Phase_three:
 ##        self.totalCostVarLabel.pack(side=TOP)
 ##        totallabel5.pack(side=TOP)
 
-#################if this is chosen then add the card to the DB######################        
+#################if this is chosen then add the card to the DB######################
     def addCard(self):
         self.reservationWin.withdraw()
         self.paymentIWin = Toplevel()
@@ -719,7 +747,7 @@ class Phase_three:
     def switchToMakeReservation2(self):
         self.paymentIWin2.destroy()
         self.makeReservation()
-        
+
     def deleteCardCheck(self):
         server = self.Connect()
         cursor = server.cursor()
@@ -733,7 +761,7 @@ class Phase_three:
         cursor = server.cursor()
         cursor.execute("DELETE FROM PAYMENT_INFORMATION WHERE Card_Number='%s'" % (self.cardChoice.get()))
         self.switchToConfirm2()
-        
+
     def switchToConfirm1(self):
         self.paymentIWin.withdraw()
         self.confirmation()
@@ -822,9 +850,9 @@ class Phase_three:
 
     def switchUpdateReservation(self):
         self.updateWin2.destroy()
-        self.updateWin = Toplevel() 
+        self.updateWin = Toplevel()
         self.updateReservation()
-      
+
     def switchUpdateReservation2(self):
         self.updateWin3.destroy()
         self.updateReservation2()
@@ -843,7 +871,7 @@ class Phase_three:
         tree.heading("bag", text= "# of Baggages")
         tree.heading("name", text= "Passenger Name")
         return tree
-        
+
     def updateTree3(self, frame):
         tree=Treeview(frame)
         tree.grid(row = 4, column = 0, sticky = E)
@@ -858,7 +886,7 @@ class Phase_three:
         tree.heading("bag", text= "# of Baggages")
         tree.heading("name", text= "Passenger Name")
         return tree
-    
+
     def updateReservation3(self):
         self.updateWin2.withdraw()
         self.updateWin3 = Toplevel()
@@ -874,9 +902,9 @@ class Phase_three:
         frame4.pack()
         frame5 = Frame(self.updateWin3)
         frame5.pack()
-        
+
         l1 = Label(frame, text = "Current Train Ticket")
-        l1.grid(row = 1, column = 1, sticky = E) 
+        l1.grid(row = 1, column = 1, sticky = E)
 
         tree = self.updateTree2(frame2)
 
@@ -887,27 +915,27 @@ class Phase_three:
         e1.grid(row = 0, column = 1, sticky = EW)
         b1 = Button(frame3, text = "Search avaibility", command = self.trainSchedule)
         b1.grid(row = 0, column = 2, sticky = EW)
-        
+
         l2 = Label(frame3, text = "Updated Train Ticket")
         l2.grid(row = 1, column = 1, sticky = E)
 
         tree2 = self.updateTree3(frame4)
-        
+
         changeFee = Label(frame5,text ="Change Fee")
         changeFee.grid(row = 0, column = 0, sticky = E)
         self.value = StringVar()
         e2 = Entry(frame5,textvariable = self.value, width = 10)
         e2.grid(row = 0, column = 1, sticky = E)
         updatedCost = Label(frame5,text ="Updated Total Cost")
-        updatedCost.grid(row = 1, column = 0, sticky = E) 
+        updatedCost.grid(row = 1, column = 0, sticky = E)
         e3 = Entry(frame5, textvariable = self.value, width = 10)
         e3.grid(row = 1, column = 1)
 
         b2=Button(frame5, text ="Back", command = self.switchUpdateReservation2)
         b2.grid(row =2, column = 0, sticky = E)
         b3=Button(frame5, text ="Submit", command = self.confirmation)
-        b3.grid(row =2, column = 1, sticky = E) 
-        
+        b3.grid(row =2, column = 1, sticky = E)
+
     def cancelRes(self):
         self.primaryWindow.withdraw()
         self.cancelWin.deiconify()
@@ -924,7 +952,7 @@ class Phase_three:
         b1.grid(row = 0, column = 2, sticky = E)
         b2 = Button(frame, text = "Back")
         b2.grid(row = 1, column = 1, sticky = E)
-  
+
     def updateTree4(self, frame):
         tree=Treeview(frame)
         tree.grid(row = 0, column = 0, sticky = E)
@@ -939,7 +967,7 @@ class Phase_three:
         tree.heading("bag", text= "# of Baggages")
         tree.heading("name", text= "Passenger Name")
         return tree
-           
+
     def cancelRes2(self):
         self.cancelWin.withdraw()
         self.cancelWin2 = Toplevel()
@@ -951,7 +979,7 @@ class Phase_three:
         frame2.pack()
         frame3 = Frame(self.cancelWin2)
         frame3.pack()
-        
+
         tree = self.updateTree4(frame)
 
         l1= Label(frame2,text ="Total Cost of Reservation")
@@ -959,7 +987,7 @@ class Phase_three:
         self.cost = StringVar()
         e1= Entry(frame2,textvariable = self.cost, width = 10)
         e1.grid(row = 1, column = 1, sticky = EW)
-        
+
         l2 = Label(frame2, text = "Date of Cancellation")
         l2.grid(row = 2, column = 0, sticky = E)
         self.date = StringVar()
@@ -971,12 +999,12 @@ class Phase_three:
         self.amount = StringVar()
         e2= Entry(frame2,textvariable = self.amount, width = 10)
         e2.grid(row = 3, column = 1, sticky = EW)
-                  
+
         b2=Button(frame3, text ="Back", command = self.switchUpdateReservation2)
         b2.grid(row =4, column = 0, sticky = E)
         b3=Button(frame3, text ="Submit", command = self.confirmation)
-        b3.grid(row =4, column = 1, sticky = E) 
-    
+        b3.grid(row =4, column = 1, sticky = E)
+
     def viewReview(self):
         self.primaryWindow.withdraw()
         self.viewReviewWin.deiconify()
@@ -1009,7 +1037,7 @@ class Phase_three:
         tree.heading("bag", text= "# of baggages")
         tree.heading("name", text= "Passenger Name")
         return tree
-    
+
     def viewReview2(self):
         self.viewReviewWin.withdraw()
         self.viewReviewWin2.deiconify()
@@ -1019,7 +1047,7 @@ class Phase_three:
         frame.pack()
 
         tree = self.viewTree(frame)
-        
+
         b1 = Button(frame, text = "Back to Choose Functionality")
         b1.pack(side = BOTTOM)
 
@@ -1062,7 +1090,7 @@ class Phase_three:
         tree.heading("mon", text= "Month")
         tree.heading("rev", text= "Revenue")
         return tree
-    
+
     def viewRevenueRep(self):
         self.primaryWindow.withdraw()
         self.viewRevenueReport.deiconify()
@@ -1091,7 +1119,7 @@ class Phase_three:
         frame = Frame(self.viewpopRRWin)
         frame.pack()
 
-        tree = self.viewTree3(frame)                
+        tree = self.viewTree3(frame)
 
         b1 = Button(frame, text = "Back")
         b1.pack(side = BOTTOM)
