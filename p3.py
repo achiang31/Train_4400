@@ -7,6 +7,7 @@ import pymysql
 import calendar
 from datetime import datetime
 from datetime import month
+from datetime import date
 from math import *
 
 class Phase_three:
@@ -1031,7 +1032,7 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d'" % (e1)
+        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d'" % (self.date.get())
         cursor.execute(query1)
         query2 = "SELECT Change_fee FROM SYSTEM_INFO"
         cursor.execute(query2)
@@ -1255,13 +1256,13 @@ class Phase_three:
         frame.pack()
 
         currMonth = now.month
-        firstMonth = now.month - 1
-        secondMonth = now.month - 2
-        thirdMonth = now.month - 3
+        firstMonth = datetime.date(2016, now.month - 1, 1)
+        secondMonth = datetime.date(2016, now.month - 2, 1)
+        thirdMonth = datetime.date(2016, now.month - 3, 1)
 
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN 2016-'%d'-01 AND 2016-'%d'-01" % (thirdMonth, secondMonth)
+        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%d' AND 2016-'%d'-01" % (thirdMonth, secondMonth)
         query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN 2016-'%d'-01 AND 2016-'%d'-01" % (secondMonth, firstMonth)
         query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN 2016-'%d'-01 AND 2016-'%d'-01" % (firstMonth, currMonth)
         cursor.execute(query1)
@@ -1298,6 +1299,20 @@ class Phase_three:
         self.viewpopRRWin.title("View Popular Route Report")
         frame = Frame(self.viewpopRRWin)
         frame.pack()
+
+        currMonth = now.month
+        firstMonth = now.month - 1
+        secondMonth = now.month - 2
+        thirdMonth = now.month - 3
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "SELECT COUNT(DISTINCT ReservationID) FROM RESERVES, RESERVATION WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN " % (0, )
+
+
+        queryUltimate = "SELECT MAX("
+
+
 
         tree = self.viewTree3(frame)
 
