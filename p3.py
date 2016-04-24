@@ -6,8 +6,6 @@ from tkinter.ttk import *
 import pymysql
 import calendar
 from datetime import datetime
-from datetime import month
-from datetime import date
 from math import *
 
 class Phase_three:
@@ -17,10 +15,10 @@ class Phase_three:
 
         self.totalCost = 0
 
-        self.newUserWindow = Toplevel()
-        self.Register()
-        self.newUserWindow.title("New User Registration")
-        self.newUserWindow.withdraw()
+ #       self.newUserWindow = Toplevel()
+ #       self.Register()
+#        self.newUserWindow.title("New User Registration")
+ #       self.newUserWindow.withdraw()
 
         self.primaryWindow = Toplevel()
         self.primaryWindow.title("Welcome "+self.username.get())
@@ -114,6 +112,7 @@ class Phase_three:
             messagebox.showerror("Error", "Check Internet Connection")
 
     def Login(self):
+        
         self.primaryWin.title("Login")
         frame = Frame(self.primaryWin)
         frame.pack()
@@ -197,11 +196,14 @@ class Phase_three:
 
     def switchToRegister(self):
         self.primaryWin.destroy()
-        self.newUserWindow.deiconify()
+        self.newUserWindow = Toplevel()
+ #       self.newUserWindow = Toplevel()
+        self.Register()
 
     def switchToLogin(self):
-        self.newUserWindow.withdraw()
-        self.primaryWin.deiconify()
+        self.newUserWindow.destroy()
+        self.primaryWin = Toplevel()
+        self.Login()
 
     def switchtoMainMenu(self):
         self.primaryWin.withdraw()
@@ -209,6 +211,7 @@ class Phase_three:
         self.mainMenu()
 
     def Register(self):
+ #       self.newUserWindow = Toplevel()
         self.newUserWindow.title("New User Registration")
         frame=Frame(self.newUserWindow)
         frame.pack()
@@ -223,19 +226,19 @@ class Phase_three:
 
         label2 = Label(frame,text ="Email Address", justify = LEFT)
         label2.grid(row = 1, column = 0, sticky = W)
-        self.registeredPass = StringVar()
+        self.registerEmail = StringVar()
         self.password_entry = Entry(frame, textvariable = self.registerEmail, width = 30, justify = RIGHT)
         self.password_entry.grid(row = 1, column = 1, sticky = W)
 
         label3 = Label(frame,text = "Password", justify = LEFT)
         label3.grid(row = 2, column = 0, sticky = W)
-        self.registeredPassConfirm = StringVar()
+        self.registeredPass = StringVar()
         self.confirm_password_entry = Entry(frame, textvariable = self.registeredPass, width = 30, justify = RIGHT)
         self.confirm_password_entry.grid(row = 2, column = 1, sticky = W)
 
         label4 = Label(frame,text ="Confirm Password", justify = LEFT)
         label4.grid(row = 3, column = 0, sticky = W)
-        self.registerEmail = StringVar()
+        self.registeredPassConfirm = StringVar()
         self.email_entry = Entry(frame, textvariable = self.registeredPassConfirm, width = 30, justify = RIGHT)
         self.email_entry.grid(row = 3, column = 1, sticky = W)
 
@@ -262,10 +265,8 @@ class Phase_three:
             messagebox.showerror("Error", "Username already in use")
             return
 
-        querypatch = "INSERT INTO USER(Username, Password) VALUES ('%s' , '%s')" % (self.registeredUser.get(), self.registeredPass.get())
-        cursor.execute(querypatch)
-        query2 = "INSERT INTO CUSTOMER(Username, Email) \
-               VALUES ('%s', '%s')" % (self.registeredUser.get(), self.registerEmail.get())
+        query2 = "INSERT INTO CUSTOMER(Username, Password, Email) \
+               VALUES ('%s', '%s', '%s')" % (self.registeredUser.get(), self.registeredPass.get(), self.registerEmail.get())
         cursor.execute(query2)
         result2 = cursor.fetchall()
         self.switchToLogin()
@@ -458,17 +459,16 @@ class Phase_three:
                     departTime.append((row[1], row[3], row[0], row[4], row[5]))
                 if str(row[3]) == chosenArrv:
                     arriveTime.append((row[2], row[3], row[0], row[4], row[5]))
-            #print(departTime)
-            #print(arriveTime)
             self.duration = []
             for pair1 in departTime:
                 for pair2 in arriveTime:
                     if pair1[1] == chosenCity and pair2[1] == chosenArrv and pair1[2] == pair2[2]:
                         self.duration.append((pair1[2],pair1[0],pair2[0],pair2[0] - pair1[0],pair1[3],pair1[4], pair1[1], pair2[1]))
+                        # 0: Train_Number, 1: Departure_Time, 2: Arrival_Time, 3: Duration, 4: First_Class_Price, 5: Second_Class_Price, 6: chosenCity, 7: chosenArrv
 
             print(self.duration)
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
-            l2 = Label(frame,text = "Time(self.Duration)").grid(row = 0, column = 2)
+            l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
             l4 = Label(frame,text = "2nd Class Price").grid(row = 0, column = 6)
 
@@ -529,13 +529,13 @@ class Phase_three:
         nameEnt.pack(side = RIGHT)
 
         temp = ceil(self.v.get())
-        self.trainChosen = self.duration.get()[temp][0]
+        self.trainChosen = self.duration[temp][0]
         if self.v.get() % 2 == 0:
             self.classChosen = 2
         else:
             self.classChosen = 1
-        self.depart = self.duration.get()[temp][6]
-        self.arrive = self.duration.get()[temp][7]
+        self.depart = self.duration[temp][6]
+        self.arrive = self.duration[temp][7]
 
 
 
@@ -544,15 +544,18 @@ class Phase_three:
         query = "SELECT MAX(ReservationID) FROM RESERVES"
         cursor.execute(query)
         maxID = cursor.fetchall()
-        newReservationID = maxID[0] + 1;
+        
+        
+        self.newReservationID = maxID[0][0] + 1;
+        print(type(self.newReservationID))
 
-        query = "INSERT INTO RESERVATION VALUES ('%d', 0, '%s', NULL)" % (newReservationID, self.registeredUser.get())
+        query = "INSERT INTO RESERVATION VALUES ('%d', 0, '%s', 0000000000000000)" % (self.newReservationID, self.registeredUser.get())
         cursor.execute(query)
 
-        query = "INSERT INTO RESERVES VALUES ('%d', '%d', '%d', '%Y-%m-%d', '', 0, '%s', '%s')" % (newReservationID, self.traincChosen.get(), self.classChosen.get(), self.date.get(), self.depart.get(), self.arrive.get())
+        query = "INSERT INTO RESERVES VALUES ('%d', '%d', '%d', '%Y-%m-%d', '', 0, '%s', '%s')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), self.depart, self.arrive)
         cursor.execute(query)
 
-        query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags.get(), self.name.get(), newReservationID)
+        query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags, self.name, self.newReservationID)
         cursor.execute(query)
 
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
@@ -587,22 +590,21 @@ class Phase_three:
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
 
+        if self.bags.get() < 3:
+            bagPrice = 0
+        else:
+            extraBags = self.bags.get() - 2
+            bagPrice = extraBags * 30
+
         results = []
         departInfo = ceil(self.v.get())
         firstHalf = self.duration.get()[departInfo]
-        price =
+        self.price = self.selected.get() + bagPrice
         secondHalf = (self.classChosen.get(), self.bags.get(), self.name.get())
 
-        results.append()
-        #ALAAP put the passengerInfo() stuff here, append into results
+        results.append(self.trainChosen.get(), self.duration.get()[3], self.duration.get()[6], self.duration.get()[7], self.classChosen.get(), self.price, self.bags.get(), self.name.get())
 
-
-
-
-
-
-
-
+        query = "UPDATE RESERVES SET Total_Cost='%d' WHERE ReservationID='%d'" % (self.price, self.newReservationID.get())
 
         a = 2
         b = 1
@@ -662,8 +664,6 @@ class Phase_three:
         b4=Button(frame2, text ="Submit", command = self.confirmation)
         b4.grid(row =6, column = 1)
 
-
-       # query = "INSERT INTO "
 
 
     def remove(self):
@@ -1034,7 +1034,7 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d'" % (self.date.get())
+        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d'" % (e1)
         cursor.execute(query1)
         query2 = "SELECT Change_fee FROM SYSTEM_INFO"
         cursor.execute(query2)
@@ -1139,7 +1139,7 @@ class Phase_three:
 
         l1 = Label(frame, text = "Train Number")
         l1.grid(row = 0, column = 0, sticky = W)
-        e1 = Entry(frame, textvariable = self.TrainReviewNumber width = 20)
+        e1 = Entry(frame, textvariable = self.TrainReviewNumber, width = 20)
         e1.grid(row = 0, column = 1)
         b1 = Button(frame, text = "Back", command = self.backMain)
         b1.grid(row = 1, column = 0)
@@ -1191,7 +1191,6 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-    #################store review in database, INSERT INTO###############
     def giveReview(self):
         self.primaryWindow.destroy()
         self.giveReviewWin = Toplevel()
@@ -1244,39 +1243,12 @@ class Phase_three:
         return tree
 
     def viewRevenueRep(self):
-
-        #Month          -    Revenue
-        #thirdMoth      -    $result1
-        #secondMonth    -    $result2
-        #thirdMonth     -    $result3
-
         self.primaryWindow.withdraw()
         self.viewRevenueReport = Toplevel()
         self.viewRevenueReport.title("View Revenue Report")
 
         frame = Frame(self.viewRevenueReport)
         frame.pack()
-
-        currMonth = now.month
-        firstMonth = datetime.date(2016, now.month - 1, 1)
-        secondMonth = datetime.date(2016, now.month - 2, 1)
-        thirdMonth = datetime.date(2016, now.month - 3, 1)
-        #>>> datetime.datetime.strptime('24052010', "%d%m%Y").date() ??????
-
-
-        server = self.Connect()
-        cursor = server.cursor()
-        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (thirdMonth, secondMonth)
-        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (secondMonth, firstMonth)
-        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (firstMonth, currMonth)
-        cursor.execute(query1)
-        result1 = cursor.fetchall()
-        cursor.execute(query2)
-        result2 = cursor.fetchall()
-        cursor.execute(query3)
-        result3 = cursor.fetchall()
-
-
 
         tree = self.viewTree2(frame)
         b1 = Button(frame, text = "Back", command = self.switchMain)
@@ -1298,29 +1270,11 @@ class Phase_three:
         return tree
 
     def viewpopRR(self):
-        #Month  -   Route   -   Reservations
-
         self.primaryWindow.withdraw()
         self.viewpopRRWin = Toplevel()
         self.viewpopRRWin.title("View Popular Route Report")
         frame = Frame(self.viewpopRRWin)
         frame.pack()
-
-        currMonth = now.month
-        firstMonth = now.month - 1
-        secondMonth = now.month - 2
-        thirdMonth = now.month - 3
-
-        server = self.Connect()
-        cursor = server.cursor()
-        queryMonth1 = "CREATE VIEW Month1 (Reservations) AS SELECT ReservationID FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
-        cursor.execute(queryMonth1)
-        queryPerTrain1 = "CREATE VIEW PerTrain1 AS SELECT COUNT(DISTINCT Reservations) FROM Month1, RESERVES GROUP BY RESERVES.Train_Number"
-
-        queryUltimate1 = "SELECT MAX(Num) FROM PerTrain1"
-        queryPenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
-        queryAntepenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
-
 
         tree = self.viewTree3(frame)
 
