@@ -438,23 +438,20 @@ class Phase_three:
             cursor.execute(query)
             results = cursor.fetchall()
 
-
-
             departTime = []
             arriveTime = []
 
             for row in results:
                 if row[3] == chosenCity:
-                    departTime.append(row[1], row[3], row[0], row[4], row[5])
-                elif row[3] == chosenArrv:
-                    arriveTime.append(row[2], row[3], row[0], row[4], row[5])
+                    departTime.append((row[1], row[3], row[0], row[4], row[5]))
+                if row[3] == chosenArrv:
+                    arriveTime.append((row[2], row[3], row[0], row[4], row[5]))
 
             duration = []
             for pair1 in departTime:
                 for pair2 in arriveTime:
                     if pair1[1] == chosenCity and pair2[1] == chosenArrv:
-                        duration.append(pair1[2], pair1[0], pair2[0], pair2[0] - pair1[0], pair1[3], pair1[4])
-
+                        duration.append((pair1[2], pair1[0], pair2[0], pair2[0] - pair1[0], pair1[3], pair1[4]))
 
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
@@ -466,10 +463,10 @@ class Phase_three:
             c = 2
             self.v = IntVar()
             for result in duration:
-                Label(frame, text = str(duration[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
-                Label(frame, text = str(duration[1]) + "-" + str(duration[2]) + "\n" + duration[3], anchor = "w").grid(row = a, column = 2, sticky = "ew")
-                Radiobutton(frame, text = str(duration[4]), variable = self.v, value = b).grid(row = a, column = 4, sticky = "ew")
-                Radiobutton(frame, text = str(duration[5]), variable = self.v, value = c).grid(row = a, column = 6, sticky = "ew")
+                Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
+                Label(frame, text = str(result[1]) + "-" + str(result[2]) + "\n" + result[3], anchor = "w").grid(row = a, column = 2, sticky = "ew")
+                Radiobutton(frame, text = str(result[4]), variable = self.v, value = b).grid(row = a, column = 4, sticky = "ew")
+                Radiobutton(frame, text = str(result[5]), variable = self.v, value = c).grid(row = a, column = 6, sticky = "ew")
                 a += 1
                 b += 2
                 c += 2
