@@ -1259,12 +1259,14 @@ class Phase_three:
         firstMonth = datetime.date(2016, now.month - 1, 1)
         secondMonth = datetime.date(2016, now.month - 2, 1)
         thirdMonth = datetime.date(2016, now.month - 3, 1)
+        #>>> datetime.datetime.strptime('24052010', "%d%m%Y").date() ??????
+
 
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%d' AND 2016-'%d'-01" % (thirdMonth, secondMonth)
-        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN 2016-'%d'-01 AND 2016-'%d'-01" % (secondMonth, firstMonth)
-        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN 2016-'%d'-01 AND 2016-'%d'-01" % (firstMonth, currMonth)
+        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (thirdMonth, secondMonth)
+        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (secondMonth, firstMonth)
+        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (firstMonth, currMonth)
         cursor.execute(query1)
         result1 = cursor.fetchall()
         cursor.execute(query2)
@@ -1294,6 +1296,8 @@ class Phase_three:
         return tree
 
     def viewpopRR(self):
+        #Month  -   Route   -   Reservations
+
         self.primaryWindow.withdraw()
         self.viewpopRRWin = Toplevel()
         self.viewpopRRWin.title("View Popular Route Report")
@@ -1307,11 +1311,13 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "SELECT COUNT(DISTINCT ReservationID) FROM RESERVES, RESERVATION WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN " % (0, )
+        queryMonth1 = "CREATE VIEW Month1 (Reservations) AS SELECT ReservationID FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
+        cursor.execute(queryMonth1)
+        queryPerTrain1 = "CREATE VIEW PerTrain1 AS SELECT COUNT(DISTINCT )"
 
-
-        queryUltimate = "SELECT MAX("
-
+        queryUltimate1 = "SELECT MAX(Num) FROM FirstMonth"
+        queryPenultimate1 = "SELECT MAX(Num) FROM FirstMonth WHERE Num < (SELECT MAX(Num) FROM FirstMonth)"
+        queryAntepenultimate1 = "SELECT MAX(Num) FROM FirstMonth WHERE Num < (SELECT MAX(Num) FROM FirstMonth WHERE Num < (SELECT MAX(Num) FROM FirstMonth))"
 
 
         tree = self.viewTree3(frame)
