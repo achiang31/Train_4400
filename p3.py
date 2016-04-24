@@ -403,7 +403,7 @@ class Phase_three:
         depDate= Label(frame2,text ="Departure Date (YYYY-MM-DD)")
         depDate.grid(row = 2, column = 0, sticky = E)
         self.date = StringVar()
-    
+
         self.startDateEntry = Entry(frame2, textvariable = self.date, width = 10)
         self.startDateEntry.grid(row = 2, column = 1, sticky = W)
 
@@ -421,24 +421,24 @@ class Phase_three:
 
             frame = Frame(self.departureWin)
             frame.pack(side=TOP)
-            
+
             chosenCity = self.city.get()[2: len(self.city.get())-3]
             chosenArrv = self.arrv.get()[2: len(self.arrv.get())-3]
-            chosenDate = self.date.get() 
+            chosenDate = self.date.get()
 
 ##            server = self.Connect()
 ##            cursor = server.cursor()
-##            
+##
 ##            stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
 ##            stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
 ##            stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
 ##            query = "SELECT STOP.Train_Number, STOP.Departure_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price FROM STOP, TRAIN_ROUTE, Stops \
 ##            WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
-##            
+##
 ##            cursor.execute(query)
 ##            results = cursor.fetchall()
 
-            results = [("d","d","d","d"),("d","d","d","d"),("d","d","d","d")]        
+            results = [("d","d","d","d"),("d","d","d","d"),("d","d","d","d")]
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
@@ -458,14 +458,14 @@ class Phase_three:
                 a += 1
                 b += 2
                 c += 2
-            
+
             self.row = a
             self.value1 = b
             self.value2 = c
 
             print("value of value 1:" , self.v)
             print("value of value 2:" , self.v)
-            
+
             b1=Button(frame, text ="Back", command = self.switchtoSearchTrain)
             b1.grid(row = a, column = 0)
             b2=Button(frame, text ="Next", command = self.passengerInfo)
@@ -506,8 +506,9 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        
+
         query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE Username='%s'" % (self.bags.get(), self.name.get(), self.registeredUser.get())
+        cursor.execute(query)
 
         #cursor.execute(query)
 
@@ -550,8 +551,8 @@ class Phase_three:
         a = 2
         b = 1
         self.w = IntVar()
-        
-        results = [("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d")]  
+
+        results = [("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d")]
         for result in results:
             Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
             Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
@@ -564,8 +565,8 @@ class Phase_three:
             RadioButton(frame, text = "Remove", varaiable = self.w, value = b).grid(row = a, column = 8)
             a = a + 1
             b += 9
-            
-        #the value of b/9 should give you the row # of the query that needs to be deleted 
+
+        #the value of b/9 should give you the row # of the query that needs to be deleted
 
         stuDis= Label(frame2,text = "Student Discount Applied.")
         stuDis.grid(row = 0, column = 0)
@@ -607,7 +608,7 @@ class Phase_three:
 
     def remove(self):
         #that reservation needs to be removed from the database
-        pass 
+        pass
     def switchToSearchTrain(self):
         self.reservationWin.destroy()
         self.searchTrain()
