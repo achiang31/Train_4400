@@ -221,8 +221,6 @@ class Phase_three:
         #self.primaryWindow.deiconify()
         self.mainMenu()
 
-
-############################# When the user enters the data, it needs to be added to teh database after you hit the vreate button#####################################
     def Register(self):
         self.newUserWindow.title("New User Registration")
         frame=Frame(self.newUserWindow)
@@ -304,8 +302,6 @@ class Phase_three:
         b2 = Button(frame2, text ="Submit", command = self.writeToDB)
         b2.grid(row = 2, column = 1)
 
-##################### Write the email address to the Database if it ends with EDU
-
     def writeToDB(self):
         if self.emailaddress.get()[-4:] == ".edu":
             server = self.Connect()
@@ -327,7 +323,6 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-#####################get the train number that the user enters and then print out the shcedule on the next screen################################################
     def trainSchedule(self):
         self.primaryWindow.destroy()
         self.trainSchWin = Toplevel()
@@ -374,7 +369,6 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-################### for the drop down menus pull the cities for the departs from and the arrives at ########################################
     def searchTrain(self):
         self.primaryWindow.withdraw()
         self.findAvailWindow = Toplevel()
@@ -448,7 +442,6 @@ class Phase_three:
 ##        tree.heading("2nd", text= "2nd Class Price")
 ##        return tree
 
-############# the trains that fit the user's choice should show up here in the table #######################################################
     def departureInfo(self):
         start_date = datetime.strptime(self.startDateEntry.get(), '%m/%d/%Y')
         #end_date = datetime.strptime(self.endDateEntry.get(), '%m/%d/%Y')
@@ -484,22 +477,7 @@ class Phase_three:
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 3)
             l4 = Label(frame,text = "2nd Class Price").grid(row = 0, column = 4)
-##            selected.grid(row = 0, column = 0)
-##            chosenCity = self.city.get()
-##            chosenArrv = self.arrv.get()
-##            chosenDate = self.date.get()
-            #radioBut = RadioButton(self.departureWin, text = "$128", variable = self.v)
 
-##        sql = "SELECT * FROM ROOM WHERE LOCATION = '%s' AND NOT EXISTS \
-##                (SELECT Room_Number \
-##                FROM RESERVATION_HAS_ROOM NATURAL JOIN RESERVATION \
-##            WHERE ROOM.Room_Number = RESERVATION_HAS_ROOM.Room_Number AND ROOM.LOCATION = RESERVATION_HAS_ROOM.LOCATION AND RESERVATION.Is_Cancelled = '0' AND (('%s' >= Start_Date \
-##            AND '%s' <= End_Date) OR ('%s' >= Start_Date AND '%s' <= End_Date) OR ('%s' >= Start_Date AND '%s' <= End_Date)))" % (chosenCity, start_date, end_date, start_date, start_date, end_date, end_date)
-##        print('Getting all rooms associated with city: %s' % (sql))
-##        db = self.Connect()
-##        cursor = db.cursor()
-##        cursor.execute(sql)
-##        results = cursor.fetchall()
             results = [("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf")]
             a = 1
             b = 1
@@ -521,7 +499,6 @@ class Phase_three:
         self.departureWin.destroy()
         self.findAvailWindow.deiconify()
 
-###############the # of bags and passenger name needs ot be stored in the DB######################
     def passengerInfo(self):
         self.departureWin.withdraw()
         self.passengerInfoWin = Toplevel()
@@ -941,7 +918,7 @@ class Phase_three:
             l16.grid(row = a, column = 7, sticky = "ew")
             l17 = Label(frame, text = str(result[7]), anchor = "w")
             l17.grid(row = a, column = 8, sticky = "ew")
-            a = a + 1  
+            a = a + 1
 
         b1 = Button(frame2, text = "Back", command = self.switchUpdateReservation)
         b1.pack(side = LEFT)
