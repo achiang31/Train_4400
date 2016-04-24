@@ -6,6 +6,7 @@ from tkinter.ttk import *
 import pymysql
 import calendar
 from datetime import datetime
+from math import *
 
 class Phase_three:
     def __init__(self,primaryWin):
@@ -455,15 +456,15 @@ class Phase_three:
                     arriveTime.append((row[2], row[3], row[0], row[4], row[5]))
             #print(departTime)
             #print(arriveTime)
-            duration = []
+            self.duration = []
             for pair1 in departTime:
                 for pair2 in arriveTime:
                     if pair1[1] == chosenCity and pair2[1] == chosenArrv and pair1[2] == pair2[2]:
-                        duration.append((pair1[2],pair1[0],pair2[0],pair2[0] - pair1[0],pair1[3],pair1[4]))
+                        self.duration.append((pair1[2],pair1[0],pair2[0],pair2[0] - pair1[0],pair1[3],pair1[4]))
 
-            #print(duration)
+            print(self.duration)
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
-            l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
+            l2 = Label(frame,text = "Time(self.Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
             l4 = Label(frame,text = "2nd Class Price").grid(row = 0, column = 6)
 
@@ -471,7 +472,7 @@ class Phase_three:
             b = 1
             c = 2
             self.v = IntVar()
-            for result in duration:
+            for result in self.duration:
                 print(result)
                 Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
                 Label(frame, text = str(result[1]) + "-" + str(result[2]) + "\n" + str(result[3]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
@@ -527,8 +528,7 @@ class Phase_three:
         cursor = server.cursor()
 
         query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE Username='%s'" % (self.bags.get(), self.name.get(), self.registeredUser.get())
-
-        #cursor.execute(query)
+        cursor.execute(query)
 
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
         b1.pack(side=LEFT)
@@ -562,12 +562,28 @@ class Phase_three:
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
 
+        results = []
+        departInfo = ceil(self.v)
+        for info in self.duration.get()[departInfo]:
+            results.append(info)
+
+
+        #ALAAP put the passengerInfo() stuff here, append into results
+
+
+
+
+
+
+
+
+
         a = 2
         b = 1
         self.w = IntVar()
 
-        results = [("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d")]
         for result in results:
+                #configure to display result[2] and result[3] in one box as newline (like in departureInfo())
             Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
             Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
             Label(frame, text = str(result[2]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
@@ -581,6 +597,10 @@ class Phase_three:
             b += 9
 
 
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT Is_student FROM CUSTOMER WHERE Username = '%s'" % (self.registeredUser.get())
+        cursor.execute(query)
 
         stuDis= Label(frame2,text = "Student Discount Applied.")
         stuDis.grid(row = 0, column = 0)
