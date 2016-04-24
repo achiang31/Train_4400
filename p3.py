@@ -6,6 +6,7 @@ from tkinter.ttk import *
 import pymysql
 import calendar
 from datetime import datetime
+from datetime import month
 from math import *
 
 class Phase_three:
@@ -1187,6 +1188,7 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
+    #################store review in database, INSERT INTO###############
     def giveReview(self):
         self.primaryWindow.destroy()
         self.giveReviewWin = Toplevel()
@@ -1239,12 +1241,37 @@ class Phase_three:
         return tree
 
     def viewRevenueRep(self):
+
+        #thirdMoth - result1
+        #secondMonth - result2
+        #thirdMonth - result3
+
         self.primaryWindow.withdraw()
         self.viewRevenueReport = Toplevel()
         self.viewRevenueReport.title("View Revenue Report")
 
         frame = Frame(self.viewRevenueReport)
         frame.pack()
+
+        currMonth = now.month
+        firstMonth = now.month - 1
+        secondMonth = now.month - 2
+        thirdMonth = now.month - 3
+
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN 2016-'%d'-01 AND 2016-'%d'-01" % (thirdMonth, secondMonth)
+        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN 2016-'%d'-01 AND 2016-'%d'-01" % (secondMonth, firstMonth)
+        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN 2016-'%d'-01 AND 2016-'%d'-01" % (firstMonth, currMonth)
+        cursor.execute(query1)
+        result1 = cursor.fetchall()
+        cursor.execute(query2)
+        result2 = cursor.fetchall()
+        cursor.execute(query3)
+        result3 = cursor.fetchall()
+
+
 
         tree = self.viewTree2(frame)
         b1 = Button(frame, text = "Back", command = self.switchMain)
