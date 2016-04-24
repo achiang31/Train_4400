@@ -450,7 +450,7 @@ class Phase_three:
             duration = []
             for pair1 in departTime:
                 for pair2 in arriveTime:
-                    if pair1[1] == chosenCity and pair2[1] == chosenArrv:
+                    if pair1[1] == chosenCity and pair2[1] == chosenArrv and pair1[2] == pair2[2]:
                         duration.append((pair1[2], pair1[0], pair2[0], pair2[0] - pair1[0], pair1[3], pair1[4]))
 
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
