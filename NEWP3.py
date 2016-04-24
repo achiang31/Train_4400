@@ -546,6 +546,13 @@ class Phase_three:
         nameEnt = Entry(frame3, textvariable = name, width = 10)
         nameEnt.pack(side = RIGHT)
 
+        server = self.Connect()
+        cursor = server.cursor()
+        num = int(option)
+        query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE Username='%s'" % (num, nameEnt, self.registeredUser.get())
+
+        cursor.execute(query)
+
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
         b1.pack(side=LEFT)
         b2=Button(frame4, text ="Next", command=self.makeReservation)
