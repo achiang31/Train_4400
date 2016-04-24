@@ -470,7 +470,9 @@ class Phase_three:
                 STOP.Train_Number =  Stops.Train_Number AND TRAIN_ROUTE.Train_Number = Stops.Train_Number)"
 
             cursor.execute(query)
-            result = cursor.fetchall()
+            results = cursor.fetchall()
+            #time/duration of trip must be calculated from Arrival_Time- Departure Time
+
 
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 1)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
@@ -584,6 +586,13 @@ class Phase_three:
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
 
+        l1 = train number of self.v
+        l2 =
+
+
+
+
+
         #self.v = 1 when selected
         #self.bags.get()
         #self.name.get()
@@ -667,6 +676,10 @@ class Phase_three:
         b4.grid(row =6, column = 1)
  #calculations line
 
+        query = "INSERT INTO "
+
+
+
     def switchToSearchTrain(self):
         self.reservationWin.destroy()
         self.searchTrain()
@@ -686,7 +699,6 @@ class Phase_three:
 ##        self.totalCostVarLabel.pack(side=TOP)
 ##        totallabel5.pack(side=TOP)
 
-#################if this is chosen then add the card to the DB######################
     def addCard(self):
         self.reservationWin.withdraw()
         self.paymentIWin = Toplevel()
@@ -765,7 +777,7 @@ class Phase_three:
             print(query)
             cursor.execute(query)
             self.switchToConfirm1()
-#################if this is chosen then delete the card from the DB######################
+
     def deleteCard(self):
         self.reservationWin.withdraw()
         self.paymentIWin2= Toplevel()
@@ -777,11 +789,17 @@ class Phase_three:
         frame2.pack(side=BOTTOM)
         cardNum= Label(frame, text = "Card Number")
         cardNum.pack(side=LEFT)
-        choices = ["1", "2", "3", "4"]
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "SELECT Card_Number FROM PAYMENT_INFO"
+
         self.cardNum = StringVar()
         self.cardNum.set(choices[0])
         option=OptionMenu(frame, self.cardNum, choices[0], *choices)
         option.pack(side=RIGHT)
+
+        query2 = "DELETE FROM PAYMENT_INFO WHERE Card_Number = '%s'" % (self.cardNum.get())
 
         b1=Button(frame2, text ="Submit", command = self.switchToMakeReservation2)
         b1.pack(side=BOTTOM)
