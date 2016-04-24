@@ -366,7 +366,7 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-def searchTrain(self):
+    def searchTrain(self):
         self.primaryWindow.withdraw()
         self.findAvailWindow = Toplevel()
 
@@ -400,10 +400,10 @@ def searchTrain(self):
         option=OptionMenu(frame1, self.arrv, results[0], *results)
         option.grid(row = 1, column = 1, sticky = W)
 
-        depDate= Label(frame2,text ="Departure Date")
+        depDate= Label(frame2,text ="Departure Date (YYYY-MM-DD)")
         depDate.grid(row = 2, column = 0, sticky = E)
         self.date = StringVar()
-        start_date= Label(frame2,text ="Start Date (YYYY-MM-DD)")
+    
         self.startDateEntry = Entry(frame2, textvariable = self.date, width = 10)
         self.startDateEntry.grid(row = 2, column = 1, sticky = W)
 
@@ -421,42 +421,24 @@ def searchTrain(self):
 
             frame = Frame(self.departureWin)
             frame.pack(side=TOP)
-
-            chosenCity = self.city.get()
-            chosenArrv = self.arrv.get()
-
-            chosenDate = self.date.get() #date is identical to entered date
-
-            server = self.Connect()
-            cursor = server.cursor()
-
-            stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
-            stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
-            stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
-
-            query = "SELECT STOP.Train_Number, STOP.Departure_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price FROM STOP, TRAIN_ROUTE, Stops \
-                WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
-
-
-            cursor.execute(query)
-            results = cursor.fetchall()
-            #time/duration of trip must be calculated from Arrival_Time- Departure Time
+            
+            chosenCity = self.city.get()[2: len(self.city.get())-3]
+            chosenArrv = self.arrv.get()[2: len(self.arrv.get())-3]
+            chosenDate = self.date.get() 
 
 ##            server = self.Connect()
 ##            cursor = server.cursor()
-##
+##            
 ##            stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
 ##            stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
 ##            stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
-##
-##            query = "SELECT (STOP.Train_Number, STOP.Depature_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price) FROM (STOP, TRAIN_ROUTE) WHERE \
-##                STOP.Train_Number =  Stops.Train_Number AND TRAIN_ROUTE.Train_Number = Stops.Train_Number)"
-##
+##            query = "SELECT STOP.Train_Number, STOP.Departure_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price FROM STOP, TRAIN_ROUTE, Stops \
+##            WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
+##            
 ##            cursor.execute(query)
 ##            results = cursor.fetchall()
 
-            results = [("d","d","d","d"),("d","d","d","d"),("d","d","d","d")]
-
+            results = [("d","d","d","d"),("d","d","d","d"),("d","d","d","d")]        
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
@@ -468,16 +450,22 @@ def searchTrain(self):
             self.v = IntVar()
             for result in results:
                 Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
-                Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
-                Radiobutton(frame, text = str(result[2]), variable = self.v, value = b).grid(row = a, column = 4, sticky = "ew")
-                Radiobutton(frame, text = str(result[3]), variable = self.v, value = c).grid(row = a, column = 6, sticky = "ew")
+                Label(frame, text = str(result[2] - result[1]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
+                print(str(result[2]))
+                print(str(result[1]))
+                Radiobutton(frame, text = str(result[3]), variable = self.v, value = b).grid(row = a, column = 4, sticky = "ew")
+                Radiobutton(frame, text = str(result[4]), variable = self.v, value = c).grid(row = a, column = 6, sticky = "ew")
                 a += 1
                 b += 2
                 c += 2
+            
             self.row = a
             self.value1 = b
             self.value2 = c
 
+            print("value of value 1:" , self.v)
+            print("value of value 2:" , self.v)
+            
             b1=Button(frame, text ="Back", command = self.switchtoSearchTrain)
             b1.grid(row = a, column = 0)
             b2=Button(frame, text ="Next", command = self.passengerInfo)
@@ -503,9 +491,8 @@ def searchTrain(self):
 
         baggage= Label(frame,text = "Number of Baggage")
         baggage.pack(side=LEFT)
-        self.bags = StringVar()
+        self.bags = IntVar()
         choices = ["1", "2", "3", "4"]
-        #self.bags.set(choices[0])
         option=OptionMenu(frame, self.bags, choices[0], *choices)
         option.pack(side=RIGHT)
         disclamer = Label(frame2,text = "Every passenger can bring upto 4 baggage. 2 free of charge, 2 for $30 per bag")
@@ -519,10 +506,10 @@ def searchTrain(self):
 
         server = self.Connect()
         cursor = server.cursor()
-        num = int(option)
-        query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE Username='%s'" % (num, nameEnt, self.registeredUser.get())
+        
+        query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE Username='%s'" % (self.bags.get(), self.name.get(), self.registeredUser.get())
 
-        cursor.execute(query)
+        #cursor.execute(query)
 
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
         b1.pack(side=LEFT)
@@ -533,23 +520,6 @@ def searchTrain(self):
         self.passengerInfoWin.destroy()
         self.departureWin.deiconify()
 
-##    def selectTree(self, frame):
-##        tree=Treeview(frame)
-##        tree.grid(row =1, column = 0)
-##        tree["show"] = "headings"
-##        tree["columns"]=("train","time","dept","arrv", "class", "pr", "bag", "name", "rem")
-##        tree.heading("train", text= "Train (Train Number)")
-##        tree.heading("time", text= "Time (Duration)")
-##        tree.heading("dept", text= "Departs From")
-##        tree.heading("arrv", text= "Arrives At")
-##        tree.heading("class", text= "Class")
-##        tree.heading("pr", text= "Price")
-##        tree.heading("bag", text= "# of baggages")
-##        tree.heading("name", text= "Passenger Name")
-##        tree.heading("rem", text= "Remove")
-##        return tree
-
-################## table values need to appear and teh total cost for the trip should appear in the entry and if you press submit the reservation needs to be added onto the DB#####################
     def makeReservation(self):
         self.passengerInfoWin.withdraw()
         self.reservationWin = Toplevel()
@@ -573,83 +543,48 @@ def searchTrain(self):
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
 
-        l1 = train number of self.v
-        l2 =
+        #if (self.value2/2 == 0):
+            #then 2nd class price was selected else 1st class was selected
+            #celing of (self.value/2) returns the row number of selected train in the departure info query
 
-
-
-
-
-        #self.v = 1 when selected
-        #self.bags.get()
-        #self.name.get()
-
-
-        results = [("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf")]
-        a = 1
+        a = 2
         b = 1
-        c = 2
         self.w = IntVar()
+        
+        results = [("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d")]  
         for result in results:
-            l10 = Label(frame, text = str(result[0]), anchor = "w")
-            l10.grid(row = a, column = 0, sticky = "ew")
-            l11 = Label(frame, text = str(result[1]), anchor = "w")
-            l11.grid(row = a, column = 1, sticky = "ew")
-            l12 = Label(frame, text = str(result[2]), anchor = "w")
-            l12.grid(row = a, column = 2, sticky = "ew")
-            l13 = Label(frame, text = str(result[3]), anchor = "w")
-            l13.grid(row = a, column = 3, sticky = "ew")
-            l14 = Label(frame, text = str(result[4]), anchor = "w")
-            l14.grid(row = a, column = 4, sticky = "ew")
-            l15 =Label(frame, text = str(result[5]), anchor = "w")
-            l15.grid(row = a, column = 5, sticky = "ew")
-            l16 = Label(frame, text = str(result[6]), anchor = "w")
-            l16.grid(row = a, column = 6, sticky = "ew")
-            l17 = Label(frame, text = str(result[7]), anchor = "w")
-            l17.grid(row = a, column = 7, sticky = "ew")
-            b = Button(frame, text = "Remove", variable = self.w, anchor= "w")
-            b.grid(row = a, column = 8 , stickey = "ew")
+            Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
+            Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
+            Label(frame, text = str(result[2]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
+            Label(frame, text = str(result[3]), anchor = "w").grid(row = a, column = 3, sticky = "ew")
+            Label(frame, text = str(result[4]), anchor = "w").grid(row = a, column = 4, sticky = "ew")
+            Label(frame, text = str(result[5]), anchor = "w").grid(row = a, column = 5, sticky = "ew")
+            Label(frame, text = str(result[6]), anchor = "w").grid(row = a, column = 6, sticky = "ew")
+            Label(frame, text = str(result[7]), anchor = "w").grid(row = a, column = 7, sticky = "ew")
+            RadioButton(frame, text = "Remove", varaiable = self.w, value = b).grid(row = a, column = 8)
             a = a + 1
-
-
-    #######################FIX THIS###################
-##        chosenTrain = self.trainName.get()
-##
-##        chosenCity = self.city.get()
-##        chosenArrv = self.arrv.get()
-##        chosenDate = self.date.get()
-
-##        sql = "SELECT * FROM ROOM WHERE LOCATION = '%s' AND NOT EXISTS \
-##                (SELECT Room_Number \
-##                FROM RESERVATION_HAS_ROOM NATURAL JOIN RESERVATION \
-##            WHERE ROOM.Room_Number = RESERVATION_HAS_ROOM.Room_Number AND ROOM.LOCATION = RESERVATION_HAS_ROOM.LOCATION AND RESERVATION.Is_Cancelled = '0' AND (('%s' >= Start_Date \
-##            AND '%s' <= End_Date) OR ('%s' >= Start_Date AND '%s' <= End_Date) OR ('%s' >= Start_Date AND '%s' <= End_Date)))" % (chosenCity, start_date, end_date, start_date, start_date, end_date, end_date)
-##        print('Getting all rooms associated with city: %s' % (sql))
-##        db = self.Connect()
-##        cursor = db.cursor()
-##        cursor.execute(sql)
-##        results = cursor.fetchall()
-##        i = 0
-##        for result in results:
-##            tree.insert('', i, text='', values=result)
-##            i += 1
+            b += 9
+            
+        #the value of b/9 should give you the row # of the query that needs to be deleted 
 
         stuDis= Label(frame2,text = "Student Discount Applied.")
-        stuDis.grid(row = 2, column = 0)
+        stuDis.grid(row = 0, column = 0)
         totalC= Label(frame2, text = "Total Cost")
-        totalC.grid(row = 3, column = 0)
+        totalC.grid(row = 1, column = 0)
         cost = StringVar()
         costEnt = Entry(frame2, textvariable = cost, width = 10)
-        costEnt.grid(row = 3, column = 1)
+        costEnt.grid(row = 1, column = 1)
 
         useCard= Label(frame2, text = "Use Card")
         useCard.grid(row = 4, column = 0)
 
-        query = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.registeredUser.get())
-        cursor.execute(query)
-        results = cursor.fetchall()
+##        query = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.registeredUser.get())
+##        cursor.execute(query)
+##        results = cursor.fetchall()
 
-        self.card.set(results[0])
+        #self.card.set(results[0])
+        self.card = IntVar()
+        results = ["0", "1", "2", "3"]
         option=OptionMenu(frame2, self.card, results[0], *results)
         option.grid(row = 4, column = 1)
 
@@ -665,12 +600,14 @@ def searchTrain(self):
         b3.grid(row = 6, column = 0)
         b4=Button(frame2, text ="Submit", command = self.confirmation)
         b4.grid(row =6, column = 1)
- #calculations line
-
-        query = "INSERT INTO "
 
 
+       # query = "INSERT INTO "
 
+
+    def remove(self):
+        #that reservation needs to be removed from the database
+        pass 
     def switchToSearchTrain(self):
         self.reservationWin.destroy()
         self.searchTrain()
@@ -736,7 +673,7 @@ def searchTrain(self):
 
         server = self.Connect()
         curosr = server.cursor()
-        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get()), self.date.get(), self.name.get(), self.registeredUser.get())
+        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.date.get(), self.name.get(), self.registeredUser.get())
         cursor.execute(query)
 
         b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
@@ -880,7 +817,7 @@ def searchTrain(self):
         results = cursor.fetchall()
 
         if self.resID not in results:
-            messagebox.showerror("Error. No such reservation")
+            messagebox.showerror("Error. No such reservation found.")
 
 
     def switchMainMenu(self):
