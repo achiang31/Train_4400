@@ -463,9 +463,12 @@ class Phase_three:
             frame.pack(side=TOP)
 
             tree = self.departTree(frame)
-             chosenCity = self.city.get()
+            chosenCity = self.city.get()
             chosenArrv = self.arrv.get()
             chosenDate = self.date.get() #date is identical to entered date
+
+            server = self.Connect()
+            cursor = server.cursor()
 
             stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
             stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
@@ -473,6 +476,9 @@ class Phase_three:
 
             query = "SELECT (STOP.Train_Number, STOP.Depature_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price) FROM (STOP, TRAIN_ROUTE) WHERE \
                 STOP.Train_Number =  Stops.Train_Number AND TRAIN_ROUTE.Train_Number = Stops.Train_Number)"
+
+            cursor.execute(query)
+            result = cursor.fetchall()
 
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 1)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
@@ -725,21 +731,28 @@ class Phase_three:
         l4= Label(frame4,text = "Expiration Date")
         l4.pack(side=LEFT)
 
-        name = StringVar()
-        cardName = Entry(frame, textvariable = name, width = 10)
+        self.name = StringVar()
+        cardName = Entry(frame, textvariable = self.name, width = 10)
         cardName.pack(side = RIGHT)
 
-        num = StringVar()
-        cardNum = Entry(frame2, textvariable = num, width = 10)
+        self.num = StringVar()
+        cardNum = Entry(frame2, textvariable = self.num, width = 10)
         cardNum.pack(side = RIGHT)
 
-        CVVnum = StringVar()
-        Cvv = Entry(frame3, textvariable = CVVnum, width = 10)
+        self.CVVnum = StringVar()
+        Cvv = Entry(frame3, textvariable = self.CVVnum, width = 10)
         Cvv.pack(side = RIGHT)
 
-        date = StringVar()
-        expdate = Entry(frame4, textvariable = date, width = 10)
+        self.date = StringVar()
+        if self.date < datetime.now():
+            messagebox.showerror("Error", "Your Card Has expired")
+        expdate = Entry(frame4, textvariable = self.date, width = 10)
         expdate.pack(side = RIGHT)
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.date.get(), self.name.get(), self.registeredUser.get())
+        cursor.execute(query)
 
         b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
         b4.pack(side=LEFT)
