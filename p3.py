@@ -410,20 +410,8 @@ def searchTrain(self):
         b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
 
-##    def departTree(self, frame):
-##        tree=Treeview(frame)
-##        tree.pack()
-##        tree["show"] = "headings"
-##        tree["columns"]=("train","time","1st","2nd")
-##        tree.heading("train", text= "Train (Train Number)")
-##        tree.heading("time", text= "Time (Duration)")
-##        tree.heading("1st", text= "1st Class Price")
-##        tree.heading("2nd", text= "2nd Class Price")
-##        return tree
-
     def departureInfo(self):
-        start_date = datetime.strptime(self.startDateEntry.get(), '%y/%m/%d')
-
+        start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
         if start_date < datetime.now():
             messagebox.showerror("Error", "Invalid Date (Either in the past or start > end)")
         else:
@@ -433,44 +421,47 @@ def searchTrain(self):
 
             frame = Frame(self.departureWin)
             frame.pack(side=TOP)
-
-            tree = self.departTree(frame)
+            
             chosenCity = self.city.get()
             chosenArrv = self.arrv.get()
-            chosenDate = self.date.get() #date is identical to entered date
+            chosenDate = self.date.get() 
 
-            server = self.Connect()
-            cursor = server.cursor()
+##            server = self.Connect()
+##            cursor = server.cursor()
+##
+##            stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
+##            stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
+##            stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
+##
+##            query = "SELECT (STOP.Train_Number, STOP.Depature_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price) FROM (STOP, TRAIN_ROUTE) WHERE \
+##                STOP.Train_Number =  Stops.Train_Number AND TRAIN_ROUTE.Train_Number = Stops.Train_Number)"
+##
+##            cursor.execute(query)
+##            results = cursor.fetchall()
 
-            stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
-            stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
-            stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
-
-            query = "SELECT (STOP.Train_Number, STOP.Depature_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price) FROM (STOP, TRAIN_ROUTE) WHERE \
-                STOP.Train_Number =  Stops.Train_Number AND TRAIN_ROUTE.Train_Number = Stops.Train_Number)"
-
-            cursor.execute(query)
-            results = cursor.fetchall()
-            #time/duration of trip must be calculated from Arrival_Time- Departure Time
-
-
-            l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 1)
+            results = [("d","d","d","d"),("d","d","d","d"),("d","d","d","d")]
+        
+            l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
-            l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 3)
-            l4 = Label(frame,text = "2nd Class Price").grid(row = 0, column = 4)
+            l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
+            l4 = Label(frame,text = "2nd Class Price").grid(row = 0, column = 6)
 
-            results = [("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf"),("gjdgs", "fjdghvk","fvdfvfd","dfvdf")]
             a = 1
             b = 1
             c = 2
             self.v = IntVar()
             for result in results:
                 Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
-                Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
-                Radiobutton(frame, text = str(result[2]), variable = self.v,value = 3).grid(row = a, column = 2, sticky = "ew")
-                Radiobutton(frame, text = str(result[3]), variable = self.v, value = c).grid(row = a, column = 3, sticky = "ew")
-                a = a + 1
-
+                Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
+                Radiobutton(frame, text = str(result[2]), variable = self.v, value = b).grid(row = a, column = 4, sticky = "ew")
+                Radiobutton(frame, text = str(result[3]), variable = self.v, value = c).grid(row = a, column = 6, sticky = "ew")
+                a += 1
+                b += 2
+                c += 2
+            self.row = a
+            self.value1 = b
+            self.value2 = c
+            
             b1=Button(frame, text ="Back", command = self.switchtoSearchTrain)
             b1.grid(row = a, column = 0)
             b2=Button(frame, text ="Next", command = self.passengerInfo)
