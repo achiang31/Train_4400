@@ -224,19 +224,19 @@ class Phase_three:
         label2 = Label(frame,text ="Email Address", justify = LEFT)
         label2.grid(row = 1, column = 0, sticky = W)
         self.registeredPass = StringVar()
-        self.password_entry = Entry(frame, textvariable = self.registeredPass, width = 30, justify = RIGHT)
+        self.password_entry = Entry(frame, textvariable = self.registerEmail, width = 30, justify = RIGHT)
         self.password_entry.grid(row = 1, column = 1, sticky = W)
 
         label3 = Label(frame,text = "Password", justify = LEFT)
         label3.grid(row = 2, column = 0, sticky = W)
         self.registeredPassConfirm = StringVar()
-        self.confirm_password_entry = Entry(frame, textvariable = self.registeredPassConfirm, width = 30, justify = RIGHT)
+        self.confirm_password_entry = Entry(frame, textvariable = self.registeredPass, width = 30, justify = RIGHT)
         self.confirm_password_entry.grid(row = 2, column = 1, sticky = W)
 
         label4 = Label(frame,text ="Confirm Password", justify = LEFT)
         label4.grid(row = 3, column = 0, sticky = W)
         self.registerEmail = StringVar()
-        self.email_entry = Entry(frame, textvariable = self.registerEmail, width = 30, justify = RIGHT)
+        self.email_entry = Entry(frame, textvariable = self.registeredPassConfirm, width = 30, justify = RIGHT)
         self.email_entry.grid(row = 3, column = 1, sticky = W)
 
         b_reg=Button(frame2, text ="Create", command = self.registerCredentials)
@@ -262,8 +262,10 @@ class Phase_three:
             messagebox.showerror("Error", "Username already in use")
             return
 
-        query2 = "INSERT INTO CUSTOMER(Username, Password, Email) \
-               VALUES ('%s', '%s', '%s')" % (self.registeredUser.get(), self.registeredPass.get(), self.registerEmail.get())
+        querypatch = "INSERT INTO USER(Username, Password) VALUES ('%s' , '%s')" % (self.registeredUser.get(), self.registeredPass.get())
+        cursor.execute(querypatch)
+        query2 = "INSERT INTO CUSTOMER(Username, Email) \
+               VALUES ('%s', '%s')" % (self.registeredUser.get(), self.registerEmail.get())
         cursor.execute(query2)
         result2 = cursor.fetchall()
         self.switchToLogin()
@@ -1313,11 +1315,11 @@ class Phase_three:
         cursor = server.cursor()
         queryMonth1 = "CREATE VIEW Month1 (Reservations) AS SELECT ReservationID FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
         cursor.execute(queryMonth1)
-        queryPerTrain1 = "CREATE VIEW PerTrain1 AS SELECT COUNT(DISTINCT )"
+        queryPerTrain1 = "CREATE VIEW PerTrain1 AS SELECT COUNT(DISTINCT Reservations) FROM Month1, RESERVES GROUP BY RESERVES.Train_Number"
 
-        queryUltimate1 = "SELECT MAX(Num) FROM FirstMonth"
-        queryPenultimate1 = "SELECT MAX(Num) FROM FirstMonth WHERE Num < (SELECT MAX(Num) FROM FirstMonth)"
-        queryAntepenultimate1 = "SELECT MAX(Num) FROM FirstMonth WHERE Num < (SELECT MAX(Num) FROM FirstMonth WHERE Num < (SELECT MAX(Num) FROM FirstMonth))"
+        queryUltimate1 = "SELECT MAX(Num) FROM PerTrain1"
+        queryPenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
+        queryAntepenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
 
 
         tree = self.viewTree3(frame)
