@@ -446,8 +446,9 @@ def searchTrain(self):
             stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
             stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
 
-            query = "SELECT (STOP.Train_Number, STOP.Depature_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price) FROM (STOP, TRAIN_ROUTE) WHERE \
-                STOP.Train_Number =  Stops.Train_Number AND TRAIN_ROUTE.Train_Number = Stops.Train_Number)"
+            query = "SELECT STOP.Train_Number, STOP.Departure_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price FROM STOP, TRAIN_ROUTE, Stops \
+WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
+
 
             cursor.execute(query)
             results = cursor.fetchall()
@@ -873,7 +874,7 @@ def searchTrain(self):
         results = cursor.fetchall()
 
         if self.resID not in results:
-            messagebox.showerror("Error. No such reservation found.")
+            messagebox.showerror("Error. No such reservation")
 
 
     def switchMainMenu(self):
