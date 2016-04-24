@@ -426,19 +426,36 @@ class Phase_three:
             chosenArrv = self.arrv.get()[2: len(self.arrv.get())-3]
             chosenDate = self.date.get()
 
-##            server = self.Connect()
-##            cursor = server.cursor()
-##
-##            stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
-##            stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
-##            stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
-##            query = "SELECT STOP.Train_Number, STOP.Departure_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price FROM STOP, TRAIN_ROUTE, Stops \
-##            WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
-##
-##            cursor.execute(query)
-##            results = cursor.fetchall()
+            server = self.Connect()
+            cursor = server.cursor()
 
-            results = [("d","d","d","d"),("d","d","d","d"),("d","d","d","d")]
+            stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
+            stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
+            stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
+            query = "SELECT STOP.Train_Number, STOP.Departure_Time, STOP.Arrival_Time, STOP.Name, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price FROM STOP, TRAIN_ROUTE, Stops \
+            WHERE (STOP.Train_Number = Stops.Train_Number) AND (TRAIN_ROUTE.Train_Number = Stops.Train_Number) AND (STOP.Name = '%s' OR STOP.Name = '%s')" % (chosenCity, chosenArrv)
+
+            cursor.execute(query)
+            results = cursor.fetchall()
+
+
+
+            departTime = []
+            arriveTime = []
+
+            for row in results:
+                if row[3] == chosenCity:
+                    departTime.append(row[1], row[3], row[0], row[4], row[5])
+                elif row[3] == chosenArrv:
+                    arriveTime.append(row[2], row[3], row[0], row[4], row[5])
+
+            duration = []
+            for pair1 in departTime:
+                for pair2 in arriveTime:
+                    if pair1[1] == chosenCity and pair2[1] == chosenArrv:
+                        duration.append(pair1[2], pair1[0], pair2[0], pair2[0] - pair1[0], pair1[3], pair1[4])
+
+
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
@@ -448,13 +465,11 @@ class Phase_three:
             b = 1
             c = 2
             self.v = IntVar()
-            for result in results:
-                Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
-                Label(frame, text = str(result[2] - result[1]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
-                print(str(result[2]))
-                print(str(result[1]))
-                Radiobutton(frame, text = str(result[3]), variable = self.v, value = b).grid(row = a, column = 4, sticky = "ew")
-                Radiobutton(frame, text = str(result[4]), variable = self.v, value = c).grid(row = a, column = 6, sticky = "ew")
+            for result in duration:
+                Label(frame, text = str(duration[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
+                Label(frame, text = str(duration[1]) + "-" + str(duration[2]) + "\n" + duration[3], anchor = "w").grid(row = a, column = 2, sticky = "ew")
+                Radiobutton(frame, text = str(duration[4]), variable = self.v, value = b).grid(row = a, column = 4, sticky = "ew")
+                Radiobutton(frame, text = str(duration[5]), variable = self.v, value = c).grid(row = a, column = 6, sticky = "ew")
                 a += 1
                 b += 2
                 c += 2
@@ -463,8 +478,7 @@ class Phase_three:
             self.value1 = b
             self.value2 = c
 
-            print("value of value 1:" , self.v)
-            print("value of value 2:" , self.v)
+
 
             b1=Button(frame, text ="Back", command = self.switchtoSearchTrain)
             b1.grid(row = a, column = 0)
@@ -810,12 +824,6 @@ class Phase_three:
         b1.grid(row = 0, column = 2, sticky = E)
         b2 = Button(frame, text = "Back", command = self.switchMainMenu)
         b2.grid(row = 1, column = 1, sticky = E)
-
-        server = self.Connect()
-        cursor = server.cursor()
-        query = "SELECT ReservationID FROM RESERVES WHERE Passenger_Name = '%s'" % (self.name.get())
-        cursor.execute(query)
-        results = cursor.fetchall()
 
         if self.resID not in results:
             messagebox.showerror("Error. No such reservation found.")
