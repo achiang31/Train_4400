@@ -459,12 +459,18 @@ class Phase_three:
             chosenArrv = self.arrv.get()
             chosenDate = self.date.get() #date is identical to entered date
 
+            server = self.Connect()
+            cursor = server.cursor()
+
             stop1 = "CREATE VIEW Stop1 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenCity)
             stop2 = "CREATE VIEW Stop2 (Train_Number) AS SELECT Train_Number FROM STOP WHERE STOP.Name = '%s'" % (chosenArrv)
             stops = "CREATE VIEW Stops (Train_Number) AS SELECT Train_Number FROM Stop2 NATURAL JOIN Stop1"
 
             query = "SELECT (STOP.Train_Number, STOP.Depature_Time, STOP.Arrival_Time, TRAIN_ROUTE.First_Class_Price, TRAIN_ROUTE.Second_Class_Price) FROM (STOP, TRAIN_ROUTE) WHERE \
                 STOP.Train_Number =  Stops.Train_Number AND TRAIN_ROUTE.Train_Number = Stops.Train_Number)"
+
+            cursor.execute(query)
+            result = cursor.fetchall()
 
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 1)
             l2 = Label(frame,text = "Time(Duration)").grid(row = 0, column = 2)
@@ -724,6 +730,11 @@ class Phase_three:
 
         expdate = Entry(frame4, textvariable = self.date, width = 10)
         expdate.pack(side = RIGHT)
+
+        server = self.Connect()
+        curosr = server.cursor()
+        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get()), self.date.get(), self.name.get(), self.registeredUser.get())
+        cursor.execute(query)
 
         b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
         b4.pack(side=LEFT)
