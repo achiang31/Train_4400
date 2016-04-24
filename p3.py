@@ -6,8 +6,7 @@ from tkinter.ttk import *
 import pymysql
 import calendar
 from datetime import datetime
-from datetime import month
-from datetime import date
+from datetime import *
 from math import *
 
 class Phase_three:
@@ -18,7 +17,7 @@ class Phase_three:
         self.totalCost = 0
 
         self.newUserWindow = Toplevel()
-        self.Register()
+        #self.Register()
         self.newUserWindow.title("New User Registration")
         self.newUserWindow.withdraw()
 
@@ -549,13 +548,13 @@ class Phase_three:
         #query = "DELETE FROM CUSTOMER WHERE Username='anushkagupta'"
         #cursor.execute(query)
 
-        query = "INSERT INTO RESERVATION VALUES ('%d', 0, '%s', 0000000000000000)" % (self.newReservationID, self.username.get())
+        query = "INSERT INTO RESERVATION(ReservationID, Is_cancelled, Username, Card_Number) VALUES ('%d', 0, '%s', 0000000000000000)" % (self.newReservationID, self.username.get())
         cursor.execute(query)
 
-        query = "INSERT INTO RESERVES VALUES ('%d', '%d', '%d', '%Y-%m-%d', '', 0, '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), self.depart, self.arrive, self.price.get())
+        query = "INSERT INTO RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) VALUES ('%d', '%d', '%d', '%Y-%m-%d', '', 0, '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), self.depart, self.arrive, self.price.get())
         cursor.execute(query)
 
-        query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags, self.name, self.newReservationID)
+        query = "UPDATE RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags, self.name, self.newReservationID)
         cursor.execute(query)
 
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
