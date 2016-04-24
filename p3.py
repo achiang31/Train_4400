@@ -524,10 +524,31 @@ class Phase_three:
         nameEnt = Entry(frame3, textvariable = self.name, width = 10)
         nameEnt.pack(side = RIGHT)
 
+        temp = ceil(self.v.get())
+        self.trainChosen = self.duration.get()[temp][0]
+        if self.v.get() % 2 == 0:
+            self.classChosen = 2
+        else:
+            self.classChosen = 1
+        self.depart = self.duration.get()[temp][6]
+        self.arrive = self.duration.get()[temp][7]
+
+
+
         server = self.Connect()
         cursor = server.cursor()
+        query = "SELECT MAX(ReservationID) FROM RESERVES"
+        cursor.execute(query)
+        maxID = cursor.fetchall()
+        newReservationID = maxID[0] + 1;
 
-        query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE Username='%s'" % (self.bags.get(), self.name.get(), self.registeredUser.get())
+        query = "INSERT INTO RESERVATION VALUES ('%d', 0, '%s', NULL)" % (newReservationID, self.registeredUser.get())
+        cursor.execute(query)
+
+        query = "INSERT INTO RESERVES VALUES ('%d', '%d', '%d', '%Y-%m-%d', '', 0, '%s', '%s')" % (newReservationID, self.traincChosen.get(), self.classChosen.get(), self.date.get(), self.depart.get(), self.arrive.get())
+        cursor.execute(query)
+
+        query = "UPDATE RESERVES SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags.get(), self.name.get(), newReservationID)
         cursor.execute(query)
 
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
