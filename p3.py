@@ -296,7 +296,7 @@ class Phase_three:
         if self.emailaddress.get()[-4:] == ".edu":
             server = self.Connect()
             cursor = server.cursor()
-            query = "UPDATE CUSTOMER SET Is_student = 1 WHERE Username = '%s'" % (self.registeredUser.get())
+            query = "UPDATE CUSTOMER SET Is_student = 1 WHERE Username = '%s'" % (self.username.get())
             cursor.execute(query)
             result = cursor.fetchall()
         self.schoolInfoWin.destroy()
@@ -549,7 +549,7 @@ class Phase_three:
         #query = "DELETE FROM CUSTOMER WHERE Username='anushkagupta'"
         #cursor.execute(query)
 
-        query = "INSERT INTO RESERVATION VALUES ('%d', 0, '%s', 0000000000000000)" % (self.newReservationID, self.registeredUser.get())
+        query = "INSERT INTO RESERVATION VALUES ('%d', 0, '%s', 0000000000000000)" % (self.newReservationID, self.username.get())
         cursor.execute(query)
 
         query = "INSERT INTO RESERVES VALUES ('%d', '%d', '%d', '%Y-%m-%d', '', 0, '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), self.depart, self.arrive, self.price.get())
@@ -630,7 +630,7 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        query = "SELECT Is_student FROM CUSTOMER WHERE Username = '%s'" % (self.registeredUser.get())
+        query = "SELECT Is_student FROM CUSTOMER WHERE Username = '%s'" % (self.username.get())
         cursor.execute(query)
 
         stuDis= Label(frame2,text = "Student Discount Applied.")
@@ -644,7 +644,7 @@ class Phase_three:
         useCard= Label(frame2, text = "Use Card")
         useCard.grid(row = 4, column = 0)
 
-##        query = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.registeredUser.get())
+##        query = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.username.get())
 ##        cursor.execute(query)
 ##        results = cursor.fetchall()
 
@@ -737,7 +737,7 @@ class Phase_three:
 
         server = self.Connect()
         curosr = server.cursor()
-        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.date.get(), self.name.get(), self.registeredUser.get())
+        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.date.get(), self.name.get(), self.username.get())
         cursor.execute(query)
 
         b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
@@ -784,7 +784,7 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.registeredUser.get())
+        query1 = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.username.get())
         cursor.execute(query1)
         results = cursor.fetchall()
 
@@ -1247,12 +1247,12 @@ class Phase_three:
 
     def viewRevenueRep(self):
 
- -
- - -        #Month          -    Revenue
- - -        #thirdMoth      -    $result1
- - -        #secondMonth    -    $result2
- - -        #thirdMonth     -    $result3
- - -
+
+        #Month          -    Revenue
+        #thirdMoth      -    $result1
+        #secondMonth    -    $result2
+        #thirdMonth     -    $result3
+
         self.primaryWindow.withdraw()
         self.viewRevenueReport = Toplevel()
         self.viewRevenueReport.title("View Revenue Report")
@@ -1261,24 +1261,24 @@ class Phase_three:
         frame.pack()
 
         currMonth = now.month
- -        firstMonth = datetime.date(2016, now.month - 1, 1)
- -        secondMonth = datetime.date(2016, now.month - 2, 1)
- -        thirdMonth = datetime.date(2016, now.month - 3, 1)
- -        #>>> datetime.datetime.strptime('24052010', "%d%m%Y").date() ??????
- -
- -
- -        server = self.Connect()
- -        cursor = server.cursor()
- -        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (thirdMonth, secondMonth)
- -        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (secondMonth, firstMonth)
- -        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (firstMonth, currMonth)
- -        cursor.execute(query1)
- -        result1 = cursor.fetchall()
- -        cursor.execute(query2)
- -        result2 = cursor.fetchall()
- -        cursor.execute(query3)
- -        result3 = cursor.fetchall()
- -
+        firstMonth = datetime.date(2016, now.month - 1, 1)
+        secondMonth = datetime.date(2016, now.month - 2, 1)
+        thirdMonth = datetime.date(2016, now.month - 3, 1)
+        #>>> datetime.datetime.strptime('24052010', "%d%m%Y").date() ??????
+
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (thirdMonth, secondMonth)
+        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (secondMonth, firstMonth)
+        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (firstMonth, currMonth)
+        cursor.execute(query1)
+        result1 = cursor.fetchall()
+        cursor.execute(query2)
+        result2 = cursor.fetchall()
+        cursor.execute(query3)
+        result3 = cursor.fetchall()
+
 
 
         tree = self.viewTree2(frame)
@@ -1301,7 +1301,7 @@ class Phase_three:
         return tree
 
     def viewpopRR(self):
--        #Month  -   Route   -   Reservations
+        #Month  -   Route   -   Reservations
 
         self.primaryWindow.withdraw()
         self.viewpopRRWin = Toplevel()
@@ -1311,24 +1311,24 @@ class Phase_three:
 
 
         currMonth = now.month
- -        firstMonth = now.month - 1
- -        secondMonth = now.month - 2
- -        thirdMonth = now.month - 3
- -
- -        server = self.Connect()
- -        cursor = server.cursor()
- -        queryMonth1 = "CREATE VIEW Month1 (Reservations) AS SELECT ReservationID FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
- -        cursor.execute(queryMonth1)
- -        queryPerTrain1 = "CREATE VIEW PerTrain1 AS SELECT COUNT(DISTINCT Reservations) FROM Month1, RESERVES GROUP BY RESERVES.Train_Number"
- -
- -        queryUltimate1 = "SELECT MAX(Num) FROM PerTrain1"
- -        queryPenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
- -        queryAntepenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
- -
- -
- -          tree = self.viewTree3(frame)
- -
- -
+        firstMonth = now.month - 1
+        secondMonth = now.month - 2
+        thirdMonth = now.month - 3
+
+        server = self.Connect()
+        cursor = server.cursor()
+        queryMonth1 = "CREATE VIEW Month1 (Reservations) AS SELECT ReservationID FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
+        cursor.execute(queryMonth1)
+        queryPerTrain1 = "CREATE VIEW PerTrain1 AS SELECT COUNT(DISTINCT Reservations) FROM Month1, RESERVES GROUP BY RESERVES.Train_Number"
+
+        queryUltimate1 = "SELECT MAX(Num) FROM PerTrain1"
+        queryPenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
+        queryAntepenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
+
+
+          tree = self.viewTree3(frame)
+
+
           tree = self.viewTree3(frame)
 
           b1 = Button(frame, text = "Back", command = self.swtMain)
