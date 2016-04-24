@@ -107,7 +107,8 @@ class Phase_three:
 
     def Connect(self):
         try:
-            db = pymysql.connect(host="academic-mysql.cc.gatech.edu", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
+            db = pymysql.connect(host="https://academic-mysql.cc.gatech.edu/phpmyadmin", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
+            print("connected")
             return db
         except:
             messagebox.showerror("Error", "Check Internet Connection")
@@ -195,6 +196,7 @@ class Phase_three:
             b10.grid(row = 2, column = 0, columnspan = 2, sticky = EW)
 
     def switchToRegister(self):
+        self.Register()
         self.primaryWin.destroy()
         self.newUserWindow.deiconify()
 
@@ -209,9 +211,9 @@ class Phase_three:
 
     def Register(self):
         self.newUserWindow.title("New User Registration")
-        frame=Frame(self.newUserWindow)
+        frame = Frame(self.newUserWindow)
         frame.pack()
-        frame2=Frame(self.newUserWindow)
+        frame2 = Frame(self.newUserWindow)
         frame2.pack(side = BOTTOM)
 
         label1 = Label(frame,text = "Username", justify = LEFT)
@@ -224,20 +226,19 @@ class Phase_three:
         label2.grid(row = 1, column = 0, sticky = W)
         self.registerEmail = StringVar()
         self.email_entry = Entry(frame, textvariable = self.registerEmail, width = 30, justify = RIGHT)
-        self.password_entry.grid(row = 1, column = 1, sticky = W)
+        self.email_entry.grid(row = 1, column = 1, sticky = W)
 
         label3 = Label(frame,text = "Password", justify = LEFT)
         label3.grid(row = 2, column = 0, sticky = W)
         self.registeredPass = StringVar()
         self.password_entry = Entry(frame, textvariable = self.registeredPass, width = 30, justify = RIGHT)
-
-        self.confirm_password_entry.grid(row = 2, column = 1, sticky = W)
+        self.password_entry.grid(row = 2, column = 1, sticky = W)
 
         label4 = Label(frame,text ="Confirm Password", justify = LEFT)
         label4.grid(row = 3, column = 0, sticky = W)
         self.registeredPassConfirm = StringVar()
         self.confirm_password_entry = Entry(frame, textvariable = self.registeredPassConfirm, width = 30, justify = RIGHT)
-        self.email_entry.grid(row = 3, column = 1, sticky = W)
+        self.confirm_password_entry.grid(row = 3, column = 1, sticky = W)
 
         b_reg=Button(frame2, text ="Create", command = self.registerCredentials)
         b_reg.pack(side = BOTTOM)
@@ -264,6 +265,7 @@ class Phase_three:
 
         querypatch = "INSERT INTO USER(Username, Password) VALUES ('%s' , '%s')" % (self.registeredUser.get(), self.registeredPass.get())
         cursor.execute(querypatch)
+
         query2 = "INSERT INTO CUSTOMER(Username, Email) \
             VALUES ('%s', '%s')" % (self.registeredUser.get(), self.registerEmail.get())
         cursor.execute(query2)
@@ -1323,15 +1325,6 @@ class Phase_three:
         queryUltimate1 = "SELECT MAX(Num) FROM PerTrain1"
         queryPenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
         queryAntepenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
-
-
-          tree = self.viewTree3(frame)
-
-
-          tree = self.viewTree3(frame)
-
-          b1 = Button(frame, text = "Back", command = self.swtMain)
-
 
         tree = self.viewTree3(frame)
 
