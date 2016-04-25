@@ -566,6 +566,10 @@ class Phase_three:
         query = "UPDATE RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags, self.name, self.newReservationID)
         cursor.execute(query)
 
+        server.commit()
+        cursor.close()
+        server.close()
+
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
         b1.pack(side=LEFT)
         b2=Button(frame4, text ="Next", command=self.makeReservation)
@@ -748,6 +752,10 @@ class Phase_three:
         query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.date.get(), self.name.get(), self.username.get())
         cursor.execute(query)
 
+        server.commit()
+        cursor.close()
+        server.close()
+
         b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
         b4.pack(side=LEFT)
 
@@ -776,6 +784,11 @@ class Phase_three:
             VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
             print(query)
             cursor.execute(query)
+
+            server.commit()
+            cursor.close()
+            server.close()
+            
             self.switchToConfirm1()
 
     def deleteCard(self):
