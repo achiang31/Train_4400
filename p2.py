@@ -13,6 +13,7 @@ class Phase_three:
         self.primaryWin = primaryWin
         self.Login()
         self.results1 = []
+        self.entrys=[]
         self.newUserWindow = Toplevel()
         #self.Register()
         self.newUserWindow.title("New User Registration")
@@ -122,6 +123,8 @@ class Phase_three:
         label2.grid(row = 1, column = 0,sticky=E)
         self.username = StringVar()
         self.password = StringVar()
+        self.username.set("anushkagupta")
+        self.password.set("dobby")
         entry1 = Entry(frame, textvariable = self.username, width = 30)
         entry1.grid(row = 0, column = 1)
         entry2 = Entry(frame, textvariable = self.password, width = 30)
@@ -424,7 +427,6 @@ class Phase_three:
 
         b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
-
     def selected(self):
         if self.v.get() %2 == 0:
             self.value  = (floor(self.v.get()/2)) -1
@@ -541,13 +543,35 @@ class Phase_three:
 
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
         b1.pack(side=LEFT)
-        b2=Button(frame4, text ="Next", command=self.makeReservation)
+        b2=Button(frame4, text ="Next", command=self.updateTrainList)
         b2.pack(side=RIGHT)
 
     def switchToDepartureInfo(self):
         self.passengerInfoWin.destroy()
         self.departureWin.deiconify()
+    def updateTrainList(self):
+        price = 0
+        if self.bags.get() < 3:
+            bagPrice = 0
+        else:
+            extraBags = self.bags.get() - 2
+            bagPrice = extraBags * 30
+        if self.v.get()%2 == 0: #(if even 2nd class)
+            self.chosenClass = 2
+            price = self.duration[self.value][5]
+        else:
+            self.chosenClass = 1
+            price = self.duration[self.value][4]
 
+        self.price = StringVar()
+        self.price = price + bagPrice
+
+        self.trainChosen = self.duration[self.value][0]
+        self.results1.append((self.trainChosen, self.duration[self.value][1], self.duration[self.value][2], self.duration[self.value][3],
+                       self.duration[self.value][6],self.duration[self.value][7],
+                       self.chosenClass, self.price, self.bags.get(), self.name2.get()))
+        self.makeReservation()
+        
     def makeReservation(self):
         self.passengerInfoWin.withdraw()
         self.reservationWin = Toplevel()
@@ -570,42 +594,34 @@ class Phase_three:
         l7 = Label(frame,text = "# of baggages").grid(row = 1, column = 6)
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
-        price = 0
-        if self.bags.get() < 3:
-            bagPrice = 0
-        else:
-            extraBags = self.bags.get() - 2
-            bagPrice = extraBags * 30
-        if self.v.get()%2 == 0: #(if even 2nd class)
-            self.chosenClass = 2
-            price = self.duration[self.value][5]
-        else:
-            self.chosenClass = 1
-            price = self.duration[self.value][4]
-
-
-        self.price = price + bagPrice
-
-        self.trainChosen = self.duration[self.value][0]
-        self.results1.append((self.trainChosen, self.duration[self.value][1], self.duration[self.value][2], self.duration[self.value][3],
-                       self.duration[self.value][6],self.duration[self.value][7],
-                       self.chosenClass, self.price, self.bags.get(), self.name2.get()))
+        
 
         a = 2
         b = 1
         self.w = IntVar()
+        
         for result in self.results1:
-            Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
-            Label(frame, text = str(result[1]) + "-" + str(result[2]) +"\n" + str(result[3]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
-            Label(frame, text = str(result[4]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
-            Label(frame, text = str(result[5]), anchor = "w").grid(row = a, column = 3, sticky = "ew")
-            Label(frame, text = str(result[6]), anchor = "w").grid(row = a, column = 4, sticky = "ew")
-            Label(frame, text = str(result[7]), anchor = "w").grid(row = a, column = 5, sticky = "ew")
-            Label(frame, text = str(result[8]), anchor = "w").grid(row = a, column = 6, sticky = "ew")
-            Label(frame, text = str(result[9]), anchor = "w").grid(row = a, column = 7, sticky = "ew")
-            Radiobutton(frame, text = "Remove", variable = self.w, value = b, command = self.select2).grid(row = a, column = 8,sticky = "ew")
+            lb1=Label(frame, text = str(result[0]), anchor = "w")
+            lb1.grid(row = a, column = 0, sticky = "ew")
+            lb2=Label(frame, text = str(result[1]) + "-" + str(result[2]) +"\n" + str(result[3]), anchor = "w")
+            lb2.grid(row = a, column = 1, sticky = "ew")
+            lb3=Label(frame, text = str(result[4]), anchor = "w")
+            lb3.grid(row = a, column = 2, sticky = "ew")
+            lb4=Label(frame, text = str(result[5]), anchor = "w")
+            lb4.grid(row = a, column = 3, sticky = "ew")
+            lb5=Label(frame, text = str(result[6]), anchor = "w")
+            lb5.grid(row = a, column = 4, sticky = "ew")
+            lb6=Label(frame, text = str(result[7]), anchor = "w")
+            lb6.grid(row = a, column = 5, sticky = "ew")
+            lb7=Label(frame, text = str(result[8]), anchor = "w")
+            lb7.grid(row = a, column = 6, sticky = "ew")
+            lb8 = Label(frame, text = str(result[9]), anchor = "w")
+            lb8.grid(row = a, column = 7, sticky = "ew")
+            r1 = Radiobutton(frame, text = "Remove", variable = self.w, value = b, command = self.select2)
+            r1.grid(row = a, column = 8,sticky = "ew")
             a = a + 1
             b += 9
+            
         server = self.Connect()
         cursor = server.cursor()
 
@@ -616,11 +632,16 @@ class Phase_three:
 
         query = "SELECT Is_student FROM CUSTOMER WHERE Username = '%s'" % (self.username.get())
         cursor.execute(query)
-        result3 = cursor.fetchall()
+        result3 = cursor.fetchone()
+        temp_price = 0
+        for entry in self.results1:
+            temp_price += entry[7]
+        self.price = temp_price
+        print(result3[0])
         if result3[0] == 1:
-            self.price = self.price - (self.price*discount/100)
+            self.price = self.price*(1-discount/100)
 
-
+        
         stuDis= Label(frame2,text = "Student Discount Applied.")
         stuDis.grid(row = 0, column = 0)
         totalC= Label(frame2, text = "Total Cost")
@@ -656,9 +677,7 @@ class Phase_three:
         b4=Button(frame2, text ="Submit", command = self.confirmation)
         b4.grid(row =6, column = 1)
 
-    def remove(self):
-        #that reservation needs to be removed from the database
-        pass
+    
     def switchToSearch(self):
         self.reservationWin.destroy()
         self.searchTrain()
@@ -719,15 +738,12 @@ class Phase_three:
         expdate = Entry(frame4, textvariable = self.date1, width = 10)
         expdate.pack(side = RIGHT)
 
-        b4=Button(frame5, text ="Submit", command = self.addCardCheck)
+        self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
+
+        b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
         b4.pack(side=LEFT)
 
-        #start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
-        #    if start_date < datetime.now():
-
-
     def addCardCheck(self):
-        self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
         if self.expDate < datetime.now():
             messagebox.showerror("Error, your card is expired.")
 
@@ -739,28 +755,21 @@ class Phase_three:
         results = cursor.fetchall()
         if len(results) != 0:
             messagebox.showerror("Error", "Card number already in use")
-            return
-        elif self.expDate == "" or self.name.get() == "" or self.num.get() == "" or self.CVVnum.get() == "":
+        elif self.expDate.get() == "" or self.cardName.get() == "" or self.cardNumber.get() == "" or self.cvv.get() == "":
             messagebox.showerror("Error", "Expiration Date, Name, Number, and CVV must be filled")
-            return
-        elif len(self.num.get()) != 10:
+        elif len(self.cardNumber.get()) != 10:
             messagebox.showerror("Error", "Card Number must be 10 digits")
-            return
-        elif len(self.CVVnum.get()) != 3:
+        elif len(self.cvv.get()) != 3:
             messagebox.showerror("Error", "CVV must be 3 digits")
-            return
-
-        server = self.Connect()
-        cursor = server.cursor()
-        query = "INSERT INTO PAYMENT_INFO(Card_Number, CVV, Exp_Date, Name_on_card, Username) VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.expDate, self.name.get(), self.username.get())
-        cursor.execute(query)
-        result = cursor.fetchall()
-
-        server.commit()
-        cursor.close()
-        server.close()
-        self.paymentIWin.destroy()
-        self.makeReservation()
+        elif expDate < datetime.now():
+            messagebox.showerror("Error", "Card has already expired")
+        else:
+            server = self.Connect()
+            cursor = server.cursor()
+            query = "INSERT INTO PAYMENT_INFO(Card_Number, CVV, Exp_Date, Name_on_card, Username) \
+            VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
+            cursor.execute(query)
+            self.switchToConfirm1()
 
     def deleteCard(self):
         self.reservationWin.withdraw()
@@ -788,7 +797,7 @@ class Phase_three:
         query2 = "DELETE FROM PAYMENT_INFO WHERE Card_Number = '%s'" % (self.cardNum.get())
         cursor.execute(query2)
 
-        b1=Button(frame2, text ="Submit", command = self.deleteCardCheck())
+        b1=Button(frame2, text ="Submit", command = self.switchToMakeReservation2)
         b1.pack(side=BOTTOM)
 
     def switchToMakeReservation(self):
@@ -809,7 +818,7 @@ class Phase_three:
             if endDate > datetime.now():
                 messagebox.showerror("Error", "Card is being used for existing reservation")
         cursor = server.cursor()
-        cursor.execute("DELETE FROM PAYMENT_INFO WHERE Card_Number='%s'" % (self.cardChoice.get()))
+        cursor.execute("DELETE FROM PAYMENT_INFORMATION WHERE Card_Number='%s'" % (self.cardChoice.get()))
         self.switchToConfirm2()
 
     def switchToConfirm1(self):
@@ -825,6 +834,13 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
+    def select2(self):
+        self.index = floor(self.w.get()/9)
+        self.results1.remove(self.results1[self.index])
+        print(self.results1)
+        self.reservationWin.destroy()
+        self.makeReservation()
+        
     def confirmation(self):
         server = self.Connect()
         cursor = server.cursor()
@@ -851,6 +867,8 @@ class Phase_three:
         frame = Frame(self.confirm)
         frame.pack()
 
+
+
         label1 = Label(frame, text = "Reservation ID:")
         label1.grid(row = 0, column = 0,sticky=E)
         e1 = Label(frame, text = self.newReservationID, width = 10)
@@ -865,6 +883,9 @@ class Phase_three:
         server.commit()
         cursor.close()
         server.close()
+
+        self.entries = []
+        self.results1 = []
 
         b=Button(frame, text ="Go back to choose functionality", command=self.backToMain)
         b.grid(row=3,column=1,sticky=E)
@@ -891,8 +912,7 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-    def select2(self):
-        print(self.w.get())
+    
 #####################table info, new dept date, change fee, updated cost,#################
     def updateReservation2(self):
         self.updateWin.withdraw()
@@ -1023,8 +1043,6 @@ class Phase_three:
 
         l2 = Label(frame3, text = "Updated Train Ticket")
         l2.grid(row = 1, column = 1, sticky = E)
-
-
 
         tree2 = self.updateTree3(frame4)
 
