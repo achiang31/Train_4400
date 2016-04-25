@@ -1142,7 +1142,7 @@ class Phase_three:
 
         if self.cancelDate < (results[1] - datetime.timedelta(days=7)):
             self.refund = self.price.get() * 0.8 - 50
-        elif self.cancelDate > (results[1] - datetime.timedelta(days=7)) AND self.cancelDate < (results[1] + datetime.timedelta(days=1)):
+        elif self.cancelDate > (results[1] - datetime.timedelta(days=7)) and self.cancelDate < (results[1] + datetime.timedelta(days=1)):
             self.refuned = self.price.get() * 0.5 - 50
         elif self.cancelDate > (results[1] - datetime.timedelta(days=1)):
             self.refund = 0
@@ -1251,22 +1251,46 @@ class Phase_three:
         self.trainNo = StringVar()
         l1 = Label(frame, text = "Train Number")
         l1.grid(row = 0, column = 0, sticky = W)
-        e1 = Entry(frame, text = self.trainNo, width = 20)
+        e1 = Entry(frame, textvariable = self.trainNo, width = 20)
         e1.grid(row = 0, column = 1)
 
         l2 = Label(frame, text = "Rating")
         l2.grid(row = 1, column = 0, sticky = W)
-        self.rating = StringVar()
+        self.rating = IntVar()
         choices = ["Very Good", "Good", "Neutral", "Bad", "Very Bad"]
         self.rating.set(choices[0])
-        option=OptionMenu(frame, self.rating, choices[0], *choices)
+        option = OptionMenu(frame, self.rating, choices[0], *choices)
         option.grid(row = 1, column = 1)
 
         self.comment = StringVar()
         l3 = Label(frame, text = "Comment")
         l3.grid(row = 2, column = 0, sticky = W)
-        e3 = Entry(frame, text = self.comment, width = 20)
+        e3 = Entry(frame, textvariable = self.comment, width = 20)
         e3.grid(row = 2, column = 1)
+
+        if self.trainNo == "" or self.rating == ""
+            print ("Train Number and Rating cannot be left blank.")
+            return
+
+        if self.rating.get() == choices[0]:
+            self.rating.set(5)
+        elif self.rating.get() == choices[1]:
+            self.rating.set(4)
+        elif self.rating.get() == choices[2]:
+            self.rating.set(3)
+        elif self.rating.get() == choices[3]:
+            self.rating.set(2)
+        elif self.rating.get() == choices[4]:
+            self.rating.set(1)
+
+        server = self.Connect()
+        cursor = server.cursor()
+        queryFrom = "SELECT MAX(Review_Number) FROM REVIEW"
+        cursor.execute(queryFrom)
+        result = cursor.fetchall()
+
+        query = "INSERT INTO REVIEW(Review_Number, Comment, Rating, Username, Train_Number) VALUES ('%d', '%s' '%d', '%s', '%d')" % (result[0] + 1, self.comment.get(), self.rating.get(), self.username.get(), self.trainNo.get())
+
 
         b1=Button(frame, text ="Submit", command = self.mainBack)
         b1.grid(row = 3, column = 1)
