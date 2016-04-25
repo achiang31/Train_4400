@@ -1166,13 +1166,14 @@ class Phase_three:
             print("Reservation already cancelled, cannot cancel again")
             return
         else:
-            queryCancel = "UPDATE "
+            queryCancel = "UPDATE RESERVATION SET Is_cancelled = 1 WHERE ReservationID = '%d'" % (self.resCancelID.get())
             b3=Button(frame3, text ="Submit", command = self.switchTC)
             b3.grid(row =4, column = 1, sticky = E)
 
     def switchCancelRes1(self):
         self.cancelWin2.destroy()
         self.cancelRes()
+
     def switchTC(self):
         self.cancelWin2.destroy()
         self.confirmation()
