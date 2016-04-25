@@ -5,7 +5,6 @@ from tkinter import messagebox
 from tkinter.ttk import *
 import pymysql
 import calendar
-from datetime import datetime
 from datetime import *
 from math import *
 
@@ -648,12 +647,7 @@ class Phase_three:
         totalC= Label(frame2, text = "Total Cost")
         totalC.grid(row = 1, column = 0)
 
-
-        self.totalCost = #calculate the total cost of the reservation here using # bags, 1st/2nd class
-        queryTCost = INSERT INTO RESERVES(Total_Cost) VALUES (#insert the total cost here)
-
-
-        costEnt = Label(frame2, text = self.totalCost, width = 10)
+        costEnt = Label(frame2, text = self.price.get(), width = 10)
         costEnt.grid(row = 1, column = 1)
 
         useCard= Label(frame2, text = "Use Card")
@@ -1131,15 +1125,18 @@ class Phase_three:
 
         l1= Label(frame2,text ="Total Cost of Reservation")
         l1.grid(row = 1, column = 0, sticky = E)
-        e1= Label(frame2,text = self.totalCost.get(), width = 10)
+        e1= Label(frame2,text = self.price.get(), width = 10)
         e1.grid(row = 1, column = 1, sticky = EW)
+
+        self.cancelDate = date.today()
 
         l2 = Label(frame2, text = "Date of Cancellation")
         l2.grid(row = 2, column = 0, sticky = E)
-        e2= Label(frame2,text = self.date.get(), width = 10)
+        e2= Label(frame2,text = self.cancelDate.get(), width = 10)
         e2.grid(row = 2, column = 1, sticky = EW)
 
-        self.refund = #insert algorithim here after total cost is calculated
+        #calculate using self.price.get()
+        self.refund
 
         l3 = Label(frame2, text = "Amount to be Refunded")
         l3.grid(row = 3, column = 0, sticky = E)
@@ -1150,6 +1147,7 @@ class Phase_three:
         b2.grid(row =4, column = 0, sticky = E)
         b3=Button(frame3, text ="Submit", command = self.switchTC)
         b3.grid(row =4, column = 1, sticky = E)
+
     def switchCancelRes1(self):
         self.cancelWin2.destroy()
         self.cancelRes()
@@ -1286,10 +1284,10 @@ class Phase_three:
         frame = Frame(self.viewRevenueReport)
         frame.pack()
 
-        currMonth = now.month
-        firstMonth = datetime.date(2016, now.month - 1, 1)
-        secondMonth = datetime.date(2016, now.month - 2, 1)
-        thirdMonth = datetime.date(2016, now.month - 3, 1)
+        currMonth = int(datetime.datetime.now().strftime("%m"))
+        firstMonth = datetime.date(2016, currMonth - 1, 1)
+        secondMonth = datetime.date(2016, currMonth - 2, 1)
+        thirdMonth = datetime.date(2016, currMonth - 3, 1)
         #>>> datetime.datetime.strptime('24052010', "%d%m%Y").date() ??????
 
 
@@ -1347,10 +1345,10 @@ class Phase_three:
         frame.pack()
 
 
-        currMonth = now.month
-        firstMonth = now.month - 1
-        secondMonth = now.month - 2
-        thirdMonth = now.month - 3
+        currMonth = int(datetime.datetime.now().strftime("%m"))
+        firstMonth = currMonth - 1
+        secondMonth = currMonth - 2
+        thirdMonth = currMonth - 3
 
         server = self.Connect()
         cursor = server.cursor()
