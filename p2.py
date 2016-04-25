@@ -585,16 +585,6 @@ class Phase_three:
 
         self.price = price + bagPrice
 
-        server = self.Connect()
-        cursor = server.cursor()
-        query = "SELECT MAX(ReservationID) FROM RESERVES"
-        cursor.execute(query)
-        maxID = cursor.fetchall()
-        self.newReservationID = maxID[0][0] + 1;
-
-        server.commit()
-        server.close()
-        cursor.close()
         self.trainChosen = self.duration[self.value][0]
         self.results1.append((self.trainChosen, self.duration[self.value][1], self.duration[self.value][2], self.duration[self.value][3],
                        self.duration[self.value][6],self.duration[self.value][7],
@@ -617,14 +607,11 @@ class Phase_three:
             b += 9
         server = self.Connect()
         cursor = server.cursor()
-        print("results")
-        print(self.results1)
 
         query = "SELECT Student_Discount FROM SYSTEM_INFO"
         cursor.execute(query)
         res = cursor.fetchall()
-        discount = res[0]
-        print(discount)
+        discount = res[0][0]
 
         query = "SELECT Is_student FROM CUSTOMER WHERE Username = '%s'" % (self.username.get())
         cursor.execute(query)
@@ -833,10 +820,14 @@ class Phase_three:
         cursor = server.cursor()
         #self.CARD = int(self.card.get())
 
+        query = "SELECT MAX(ReservationID) FROM RESERVATION"
+        cursor.execute(query)
+        maxID = cursor.fetchall()
+        self.newReservationID = maxID[0][0] + 1;
+
 
         query1 = "INSERT INTO RESERVATION(ReservationID, Is_cancelled, Username, Card_Number) VALUES ('%d', 0, '%s', '%d')" % (self.newReservationID, self.username.get(),self.card.get())
         cursor.execute(query1)
-
 
         for res in self.results1:
             query2 = "INSERT INTO RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) \
@@ -850,18 +841,22 @@ class Phase_three:
         frame = Frame(self.confirm)
         frame.pack()
 
-        label1 = Label(frame, text="Reservation ID:")
+
+
+        label1 = Label(frame, text = "Reservation ID:")
         label1.grid(row = 0, column = 0,sticky=E)
-        e1 = Entry(frame, text = "Some ID # goes here", width = 10)
+        e1 = Label(frame, text = self.newReservationID, width = 10)
         e1.grid(row = 0, column = 1)
         label3 = Label(frame, text="Thank you so much for your purchase! Please save the reservation ID for your records.")
         label3.grid(row = 2, column = 0, columnspan = 2)
 
-        server = self.Connect()
-        cursor = server.cursor()
         query = "SELECT ReservationID FROM RESERVATION WHERE Card_Number = '%d'" % (self.card.get())
         cursor.execute(query)
         results = cursor.fetchall()
+
+        server.commit()
+        cursor.close()
+        server.close()
 
         b=Button(frame, text ="Go back to choose functionality", command=self.backToMain)
         b.grid(row=3,column=1,sticky=E)
