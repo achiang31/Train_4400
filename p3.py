@@ -1129,24 +1129,46 @@ class Phase_three:
         e1.grid(row = 1, column = 1, sticky = EW)
 
         self.cancelDate = date.today()
-
         l2 = Label(frame2, text = "Date of Cancellation")
         l2.grid(row = 2, column = 0, sticky = E)
         e2= Label(frame2,text = self.cancelDate.get(), width = 10)
         e2.grid(row = 2, column = 1, sticky = EW)
 
-        #calculate using self.price.get()
-        self.refund
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT Is_cancelled, MIN(Departure_Date) FROM RESERVATION, RESERVES WHERE ReservationID = '%d'" % (self.resCancelID.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        if self.cancelDate < (results[1] - datetime.timedelta(days=7)):
+            self.refund = self.price.get() * 0.8 - 50
+        elif self.cancelDate > (results[1] - datetime.timedelta(days=7)) AND self.cancelDate < (results[1] + datetime.timedelta(days=1)):
+            self.refuned = self.price.get() * 0.5 - 50
+        elif self.cancelDate > (results[1] - datetime.timedelta(days=1)):
+            self.refund = 0
+            print("Cannot cancel reservation within a day of departure date")
+            return
+
+        if self.refund < 0:
+            self.refund = 0
+
+        self.price = self.price.get() - self.refund.get()
 
         l3 = Label(frame2, text = "Amount to be Refunded")
         l3.grid(row = 3, column = 0, sticky = E)
-        e2= Label(frame2,text = self.refund(), width = 10)
+        e2= Label(frame2,text = self.refund().get(), width = 10)
         e2.grid(row = 3, column = 1, sticky = EW)
 
         b2=Button(frame3, text ="Back", command = self.switchCancelRes1)
         b2.grid(row =4, column = 0, sticky = E)
-        b3=Button(frame3, text ="Submit", command = self.switchTC)
-        b3.grid(row =4, column = 1, sticky = E)
+
+        if results[0] == 1:
+            print("Reservation already cancelled, cannot cancel again")
+            return
+        else:
+            queryCancel = "UPDATE "
+            b3=Button(frame3, text ="Submit", command = self.switchTC)
+            b3.grid(row =4, column = 1, sticky = E)
 
     def switchCancelRes1(self):
         self.cancelWin2.destroy()
