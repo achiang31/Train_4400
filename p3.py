@@ -199,7 +199,7 @@ class Phase_three:
         self.newUserWindow.deiconify()
         self.Register()
         #self.primaryWin.withdraw()
-        
+
     def switchToLogin(self):
         self.newUserWindow.withdraw()
         self.primaryWin.deiconify()
@@ -251,7 +251,7 @@ class Phase_three:
         if self.registeredPass.get() != self.registeredPassConfirm.get():
             messagebox.showerror("Error", "Passwords must match")
             return
-               
+
         db = self.Connect()
         cursor = db.cursor()
         query1 = "SELECT * FROM USER \
@@ -259,21 +259,21 @@ class Phase_three:
 
         cursor.execute(query1)
         result1 = cursor.fetchall()
-        
-       
+
+
         if len(result1) != 0:
             messagebox.showerror("Error", "Username already in use")
             return
-        
+
         querypatch = "INSERT INTO USER(Username, Password) VALUES ('%s' , '%s')" % (self.registeredUser.get(), self.registeredPass.get())
-        cursor.execute(querypatch)       
+        cursor.execute(querypatch)
         result3 = cursor.fetchall()
-        
+
         query2 = "INSERT INTO CUSTOMER(Username, Email) \
             VALUES ('%s', '%s')" % (self.registeredUser.get(), self.registerEmail.get())
         cursor.execute(query2)
         result2 = cursor.fetchall()
-        
+
         cursor.close()
         db.commit()
         db.close()
@@ -788,7 +788,7 @@ class Phase_three:
             server.commit()
             cursor.close()
             server.close()
-            
+
             self.switchToConfirm1()
 
     def deleteCard(self):
@@ -1268,6 +1268,7 @@ class Phase_three:
 
     def viewRevenueRep(self):
 
+        #to store in tree somehow
 
         #Month          -    Revenue
         #thirdMoth      -    $result1
@@ -1322,7 +1323,18 @@ class Phase_three:
         return tree
 
     def viewpopRR(self):
-        #Month  -   Route   -   Reservations
+        #to store in tree somehow
+
+        #Month  -       Route   -       Reservations
+        #thirdMonth     results1[0][0]    results1[0][1]
+        #               results1[1][0]    results1[1][1]
+        #               results1[2][0]    results1[2][2]
+        #secondMonth    results2[0][0]    results2[0][1]
+        #               results2[1][0]    results2[1][1]
+        #               results2[2][0]    results2[2][2]
+        #firstMonth     results3[0][0]    results3[0][1]
+        #               results3[1][0]    results3[1][1]
+        #               results3[2][0]    results3[2][2]
 
         self.primaryWindow.withdraw()
         self.viewpopRRWin = Toplevel()
@@ -1338,13 +1350,42 @@ class Phase_three:
 
         server = self.Connect()
         cursor = server.cursor()
-        queryMonth1 = "CREATE VIEW Month1 (Reservations) AS SELECT ReservationID FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
+        queryMonth1 = "CREATE VIEW Month1 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
         cursor.execute(queryMonth1)
-        queryPerTrain1 = "CREATE VIEW PerTrain1 AS SELECT COUNT(DISTINCT Reservations) FROM Month1, RESERVES GROUP BY RESERVES.Train_Number"
+        queryPerTrain1 = "CREATE VIEW PerTrain1(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month1 GROUP BY Month1.TNumber"
+        cursor.execute(queryPerTrain1)
+        queryUltimate1 = "SELECT * FROM PerTrain1 WHERE Num = MAX(Num)"
+        queryPenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
+        queryAntepenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
+        cursor.execute(queryUltimate1)
+        cursor.execute(queryPenUltimate1)
+        cursor.execute(queryAntepenUltimate1)
+        results1 = cursor.fetchall()
 
-        queryUltimate1 = "SELECT MAX(Num) FROM PerTrain1"
-        queryPenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
-        queryAntepenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
+        queryMonth2 = "CREATE VIEW Month2 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, secondMonth, firstMonth)
+        cursor.execute(queryMonth2)
+        queryPerTrain2 = "CREATE VIEW PerTrain2(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month2 GROUP BY Month2.TNumber"
+        cursor.execute(queryPerTrain2)
+        queryUltimate2 = "SELECT * FROM PerTrain2 WHERE Num = MAX(Num)"
+        queryPenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2)"
+        queryAntepenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2))"
+        cursor.execute(queryUltimate2)
+        cursor.execute(queryPenUltimate2)
+        cursor.execute(queryAntepenUltimate2)
+        results2 = cursor.fetchall()
+
+        queryMonth3 = "CREATE VIEW Month3 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, secondMonth, firstMonth)
+        cursor.execute(queryMonth3)
+        queryPerTrain3 = "CREATE VIEW PerTrain3(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month3 GROUP BY Month3.TNumber"
+        cursor.execute(queryPerTrain3)
+        queryUltimate3 = "SELECT * FROM PerTrain3 WHERE Num = MAX(Num)"
+        queryPenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3)"
+        queryAntepenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3))"
+        cursor.execute(queryUltimate3)
+        cursor.execute(queryPenUltimate3)
+        cursor.execute(queryAntepenUltimate3)
+        results3 = cursor.fetchall()
+
 
         tree = self.viewTree3(frame)
 
