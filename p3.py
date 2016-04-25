@@ -534,7 +534,7 @@ class Phase_three:
         nameEnt = Entry(frame3, textvariable = self.name, width = 10)
         nameEnt.pack(side = RIGHT)
 
-        temp = ceil(self.v.get())
+        temp = floor(self.v.get())
         self.trainChosen = self.duration[temp][0]
         if self.v.get() % 2 == 0:
             self.classChosen = 2
@@ -607,7 +607,7 @@ class Phase_three:
             bagPrice = extraBags * 30
 
         results = []
-        departInfo = ceil(self.v.get())
+        departInfo = floor(self.v.get())
         firstHalf = self.duration.get()[departInfo]
         self.price = self.selected.get() + bagPrice
         secondHalf = (self.classChosen.get(), self.bags.get(), self.name.get())
