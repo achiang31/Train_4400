@@ -916,8 +916,14 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
+<<<<<<< HEAD
     def update1(self):
         self.index = floor(self.w.get()/8)
+=======
+    def update1(self):  #Alaap
+        self.index = floor(self.w.get()/8)
+
+>>>>>>> 0886c6c6f29b951145b5426737fc2e361a1a943a
 #####################table info, new dept date, change fee, updated cost,#################
     def updateReservation2(self):
         self.updateWin.withdraw()
