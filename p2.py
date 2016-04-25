@@ -927,6 +927,9 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
+    def update1(self):  #Alaap
+        self.index = floor(self.w.get()/8)
+
 #####################table info, new dept date, change fee, updated cost,#################
     def updateReservation2(self):
         self.updateWin.withdraw()
@@ -959,7 +962,7 @@ class Phase_three:
         self.w = IntVar()
         print(self.results)
         for result in self.results:
-            Radiobutton(frame, variable = self.w, value = b, command = self.select2).grid(row = a, column = 0)
+            Radiobutton(frame, variable = self.w, value = b, command = self.update1).grid(row = a, column = 0)
             Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
 
             l12 = Label(frame, text = str(result[6]), anchor = "w")
@@ -1049,10 +1052,10 @@ class Phase_three:
         tree.insert('', i, text='', values=(updateTuple[1], updateTuple[6],updateTuple[7], updateTuple[2], updateTuple[8], updateTuple[5],updateTuple[4]))
         newdepDate= Label(frame3,text ="New Departure Date")
         newdepDate.grid(row = 0, column = 0, sticky = E)
-        self.date = StringVar()
+        self.date = StringVar() ## assume YYYY-MM-DD
         e1= Entry(frame3,textvariable = self.date, width = 10)
         e1.grid(row = 0, column = 1, sticky = EW)
-        b1 = Button(frame3, text = "Search avaibility", command = self.trainSchedule)
+        b1 = Button(frame3, text = "Search availability", command = self.trainSchedule)
         b1.grid(row = 0, column = 2, sticky = EW)
 
         l2 = Label(frame3, text = "Updated Train Ticket")
@@ -1073,24 +1076,30 @@ class Phase_three:
         e3 = Entry(frame5, textvariable = self.value, width = 10)
         e3.grid(row = 1, column = 1)
 
-
+        self.updatedDate = datetime.strptime(self.date.get(), '%Y-%m-%d')
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d' WH" % (e1)
-        cursor.execute(query1)
         query2 = "SELECT Change_fee FROM SYSTEM_INFO"
         cursor.execute(query2)
-        results = cursor.fetchall()
+        changefee = cursor.fetchall()
+        change_fee = changefee[0]
+        query3 = "SELECT Total_Cost FROM RESERVES WHERE ReservationID='%d' AND Train_Number='%d'" % (self.resID.get(), result1[self.index])
+        cursor.execute(query3)
+        totalcost = cursor.fetchall()
+        total_cost = totalcost[0]
+        self.total_cost = total_cost + change_fee
 
         b2=Button(frame5, text ="Back", command = self.switchUpdateReservation2)
         b2.grid(row =2, column = 0, sticky = E)
-        b3=Button(frame5, text ="Submit", command = self.switchTOConfirmation)
+        b3=Button(frame5, text ="Submit", command = self.submit)
         b3.grid(row =2, column = 1, sticky = E)
 
 
-    def switchTOConfirmation(self):
+    def submit(self):
         self.updateWin3.destroy()
-        self.confirmation()
+        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%s', RESERVES.Total_Cost = '%d' WHERE ReservationID='%d' AND Train_Number='%d'" % (self.updatedDate, self.total_cost, self.resID.get(), self.results1[self.index])
+        cursor.execute(query1)
+        self.mainMenu()
 
 ################## reservation id search, table/ total cost, date, amount to be refunded#######################
     def cancelRes(self):
