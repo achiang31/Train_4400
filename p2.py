@@ -1,11 +1,5 @@
 #Arthi Nithi, Anjani Agrawal, Alan Chiang, Alaap Murali
 
-#changed passengerInfo()
-#makeReservation()
-#select2()
-#SQL timedate, AS month, GROUP BY month
-
-
 from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import *
@@ -129,6 +123,8 @@ class Phase_three:
         label2.grid(row = 1, column = 0,sticky=E)
         self.username = StringVar()
         self.password = StringVar()
+        self.username.set("anushkagupta")
+        self.password.set("dobby")
         entry1 = Entry(frame, textvariable = self.username, width = 30)
         entry1.grid(row = 0, column = 1)
         entry2 = Entry(frame, textvariable = self.password, width = 30)
@@ -431,7 +427,6 @@ class Phase_three:
 
         b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
-
     def selected(self):
         if self.v.get() %2 == 0:
             self.value  = (floor(self.v.get()/2)) -1
@@ -554,7 +549,6 @@ class Phase_three:
     def switchToDepartureInfo(self):
         self.passengerInfoWin.destroy()
         self.departureWin.deiconify()
-
     def updateTrainList(self):
         price = 0
         if self.bags.get() < 3:
@@ -571,10 +565,11 @@ class Phase_three:
 
         self.price = StringVar()
         self.price = price + bagPrice
+
         self.trainChosen = self.duration[self.value][0]
         self.results1.append((self.trainChosen, self.duration[self.value][1], self.duration[self.value][2], self.duration[self.value][3],
-            self.duration[self.value][6],self.duration[self.value][7],
-            self.chosenClass, self.price, self.bags.get(), self.name2.get()))
+                       self.duration[self.value][6],self.duration[self.value][7],
+                       self.chosenClass, self.price, self.bags.get(), self.name2.get()))
         self.makeReservation()
 
     def makeReservation(self):
@@ -682,6 +677,7 @@ class Phase_three:
         b4=Button(frame2, text ="Submit", command = self.confirmation)
         b4.grid(row =6, column = 1)
 
+
     def switchToSearch(self):
         self.reservationWin.destroy()
         self.searchTrain()
@@ -742,16 +738,13 @@ class Phase_three:
         expdate = Entry(frame4, textvariable = self.date1, width = 10)
         expdate.pack(side = RIGHT)
 
-        b4=Button(frame5, text ="Submit", command = self.addCardCheck)
+        self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
+
+        b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
         b4.pack(side=LEFT)
 
-        #start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
-        #    if start_date < datetime.now():
-
-
     def addCardCheck(self):
-        self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
-        if self.expDate <= datetime.now():
+        if self.expDate < datetime.now():
             messagebox.showerror("Error, your card is expired.")
 
         server = self.Connect()
@@ -762,28 +755,21 @@ class Phase_three:
         results = cursor.fetchall()
         if len(results) != 0:
             messagebox.showerror("Error", "Card number already in use")
-            return
-        elif self.expDate == "" or self.name.get() == "" or self.num.get() == "" or self.CVVnum.get() == "":
+        elif self.expDate.get() == "" or self.cardName.get() == "" or self.cardNumber.get() == "" or self.cvv.get() == "":
             messagebox.showerror("Error", "Expiration Date, Name, Number, and CVV must be filled")
-            return
-        elif len(self.num.get()) != 10:
+        elif len(self.cardNumber.get()) != 10:
             messagebox.showerror("Error", "Card Number must be 10 digits")
-            return
-        elif len(self.CVVnum.get()) != 3:
+        elif len(self.cvv.get()) != 3:
             messagebox.showerror("Error", "CVV must be 3 digits")
-            return
-
-        server = self.Connect()
-        cursor = server.cursor()
-        query = "INSERT INTO PAYMENT_INFO(Card_Number, CVV, Exp_Date, Name_on_card, Username) VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.expDate, self.name.get(), self.username.get())
-        cursor.execute(query)
-        result = cursor.fetchall()
-
-        server.commit()
-        cursor.close()
-        server.close()
-        self.paymentIWin.destroy()
-        self.makeReservation()
+        elif expDate < datetime.now():
+            messagebox.showerror("Error", "Card has already expired")
+        else:
+            server = self.Connect()
+            cursor = server.cursor()
+            query = "INSERT INTO PAYMENT_INFO(Card_Number, CVV, Exp_Date, Name_on_card, Username) \
+            VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
+            cursor.execute(query)
+            self.switchToConfirm1()
 
     def deleteCard(self):
         self.reservationWin.withdraw()
@@ -794,7 +780,7 @@ class Phase_three:
         frame.pack(side=TOP)
         frame2 = Frame(self.paymentIWin2)
         frame2.pack(side=BOTTOM)
-        cardNum = Label(frame, text = "Card Number")
+        cardNum= Label(frame, text = "Card Number")
         cardNum.pack(side=LEFT)
 
         server = self.Connect()
@@ -805,38 +791,35 @@ class Phase_three:
 
         self.cardNum = StringVar()
         self.cardNum.set(results[0])
-        option=OptionMenu(frame, self.cardNum, results[0], * results)
+        option=OptionMenu(frame, self.cardNum, results[0], *results)
         option.pack(side=RIGHT)
-
-        b1=Button(frame2, text ="Submit", command = self.deleteCardCheck)
-        b1.pack(side=BOTTOM)
-
-    def deleteCardCheck(self):
-        server = self.Connect()
-        cursor = server.cursor()
-        cursor.execute("SELECT * FROM PAYMENT_INFO WHERE Card_Number ='%s'" % (self.cardNum.get()))
-        results1 = cursor.fetchall()
-
-
-        #query to check whether card is being used in current non-canncelled reservation to delete
-
-        for row in results1:
-            self.endDate = row[2]
-            endDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
-            if endDate > datetime.now():
-                messagebox.showerror("Error", "Card is being used for existing reservation")
-
-        cursor.execute("DELETE FROM PAYMENT_INFO WHERE Card_Number='%s'" % (self.cardChoice.get()))
 
         query2 = "DELETE FROM PAYMENT_INFO WHERE Card_Number = '%s'" % (self.cardNum.get())
         cursor.execute(query2)
 
-        server.commit()
-        cursor.close()
-        server.close()
+        b1=Button(frame2, text ="Submit", command = self.switchToMakeReservation2)
+        b1.pack(side=BOTTOM)
+
+    def switchToMakeReservation(self):
+        self.paymentIWin.destroy()
+        self.makeReservation()
+    def switchToMakeReservation2(self):
         self.paymentIWin2.destroy()
         self.makeReservation()
 
+    def deleteCardCheck(self):
+        server = self.Connect()
+        cursor = server.cursor()
+        cursor.execute("SELECT * FROM PAYMENT_INFO WHERE Card_Number ='%s'" % (self.cardChoice.get()))
+        results = cursor.fetchall()
+        for row in results:
+            self.endDate = row[2]
+            endDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
+            if endDate > datetime.now():
+                messagebox.showerror("Error", "Card is being used for existing reservation")
+        cursor = server.cursor()
+        cursor.execute("DELETE FROM PAYMENT_INFORMATION WHERE Card_Number='%s'" % (self.cardChoice.get()))
+        self.switchToConfirm2()
 
     def switchToConfirm1(self):
         self.paymentIWin.withdraw()
@@ -884,6 +867,8 @@ class Phase_three:
         frame = Frame(self.confirm)
         frame.pack()
 
+
+
         label1 = Label(frame, text = "Reservation ID:")
         label1.grid(row = 0, column = 0,sticky=E)
         e1 = Label(frame, text = self.newReservationID, width = 10)
@@ -908,8 +893,8 @@ class Phase_three:
     def updateReservation(self):
         self.primaryWindow.destroy()
         self.updateWin = Toplevel()
-        self.updateWin.title("Update Reservation"
-)
+        self.updateWin.title("Update Reservation")
+
         frame = Frame(self.updateWin)
         frame.pack()
         self.resID = IntVar()
@@ -926,6 +911,7 @@ class Phase_three:
         self.updateWin.destroy()
         self.primaryWindow = Toplevel()
         self.mainMenu()
+
 
 #####################table info, new dept date, change fee, updated cost,#################
     def updateReservation2(self):
@@ -1057,8 +1043,6 @@ class Phase_three:
 
         l2 = Label(frame3, text = "Updated Train Ticket")
         l2.grid(row = 1, column = 1, sticky = E)
-
-
 
         tree2 = self.updateTree3(frame4)
 
@@ -1472,7 +1456,6 @@ class Phase_three:
         report = []
         server = self.Connect()
         cursor = server.cursor()
-
         query1 ="SELECT Train_Number FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (secondMonth)
         cursor.execute(query1)
         result1 = cursor.fetchall()
