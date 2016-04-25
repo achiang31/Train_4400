@@ -5,6 +5,7 @@ from tkinter import messagebox
 from tkinter.ttk import *
 import pymysql
 import calendar
+from datetime import datetime
 from datetime import *
 from math import *
 
@@ -12,6 +13,8 @@ class Phase_three:
     def __init__(self,primaryWin):
         self.primaryWin = primaryWin
         self.Login()
+
+        self.totalCost = 0
 
         self.newUserWindow = Toplevel()
         #self.Register()
@@ -196,7 +199,7 @@ class Phase_three:
         self.newUserWindow.deiconify()
         self.Register()
         #self.primaryWin.withdraw()
-
+        
     def switchToLogin(self):
         self.newUserWindow.withdraw()
         self.primaryWin.deiconify()
@@ -248,29 +251,28 @@ class Phase_three:
         if self.registeredPass.get() != self.registeredPassConfirm.get():
             messagebox.showerror("Error", "Passwords must match")
             return
-
+               
         db = self.Connect()
         cursor = db.cursor()
         query1 = "SELECT * FROM USER \
                WHERE USER.Username = '%s'" % (self.registeredUser.get())
 
         cursor.execute(query1)
-        result1 = cursor.fetchall()
-
-
+        result1 = cursor.fetchall()        
+       
         if len(result1) != 0:
             messagebox.showerror("Error", "Username already in use")
             return
-
+        
         querypatch = "INSERT INTO USER(Username, Password) VALUES ('%s' , '%s')" % (self.registeredUser.get(), self.registeredPass.get())
-        cursor.execute(querypatch)
+        cursor.execute(querypatch)       
         result3 = cursor.fetchall()
-
+        
         query2 = "INSERT INTO CUSTOMER(Username, Email) \
             VALUES ('%s', '%s')" % (self.registeredUser.get(), self.registerEmail.get())
         cursor.execute(query2)
         result2 = cursor.fetchall()
-
+        
         cursor.close()
         db.commit()
         db.close()
@@ -298,12 +300,14 @@ class Phase_three:
         b2.grid(row = 2, column = 1)
 
     def writeToDB(self):
-        if self.emailaddress.get()[-4:] == ".edu":
-            server = self.Connect()
-            cursor = server.cursor()
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "UPDATE CUSTOMER SET Email = '%s' WHERE Username = '%s'" % (self.emailaddress.get(),self.username.get())
+        cursor.execute(query)
+        if self.emailaddress.get()[-4:] == ".edu":           
             query = "UPDATE CUSTOMER SET Is_student = 1 WHERE Username = '%s'" % (self.username.get())
             cursor.execute(query)
-            result = cursor.fetchall()
+            
         self.schoolInfoWin.destroy()
         self.primaryWindow = Toplevel()
         self.mainMenu()
@@ -421,10 +425,10 @@ class Phase_three:
         b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
     def selected(self):
-        pass
-        #self.v.get represents the radio button # chosen
-        #if value of self.v.get = 5 then train on row 3 was selected - pull that row from the departure Info
-        #query to finalize that as reservation in the DB under that res ID
+        if self.v.get() %2 == 0:
+            self.value  = (floor(self.v.get()/2)) -1
+        else:
+            self.value  = (floor(self.v.get()/2))
 
     def departureInfo(self):
         start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
@@ -454,8 +458,6 @@ class Phase_three:
             cursor.execute(query)
             results = cursor.fetchall()
 
-           # print(results)
-
             departTime = []
             arriveTime = []
 
@@ -471,7 +473,7 @@ class Phase_three:
                         self.duration.append((pair1[2],pair1[0],pair2[0],pair2[0] - pair1[0],pair1[3],pair1[4], pair1[1], pair2[1]))
                         # 0: Train_Number, 1: Departure_Time, 2: Arrival_Time, 3: Duration, 4: First_Class_Price, 5: Second_Class_Price, 6: chosenCity, 7: chosenArrv
 
-            print(self.duration)
+           
             l1 = Label(frame,text = "Train(Train Number)").grid(row = 0, column = 0)
             l2 = Label(frame,text = "Time(self.Duration)").grid(row = 0, column = 2)
             l3 = Label(frame,text = "1st Class Price").grid(row = 0, column = 4)
@@ -482,7 +484,7 @@ class Phase_three:
             c = 2
             self.v = IntVar()
             for result in self.duration:
-                print(result)
+                
                 Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
                 Label(frame, text = str(result[1]) + "-" + str(result[2]) + "\n" + str(result[3]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
                 Radiobutton(frame, text = str(result[4]), variable = self.v, value = b, command = self.selected).grid(row = a, column = 4, sticky = "ew")
@@ -529,43 +531,16 @@ class Phase_three:
 
         passName= Label(frame3,text ="Passenger Name")
         passName.pack(side=LEFT)
-        self.name = StringVar()
-        nameEnt = Entry(frame3, textvariable = self.name, width = 10)
+        self.name2 = StringVar()
+        nameEnt = Entry(frame3, textvariable = self.name2, width = 10)
         nameEnt.pack(side = RIGHT)
 
-        temp = floor(self.v.get())
-        self.trainChosen = self.duration[temp][0]
         if self.v.get() % 2 == 0:
             self.classChosen = 2
         else:
             self.classChosen = 1
-        self.depart = self.duration[temp][6]
-        self.arrive = self.duration[temp][7]
-
-
-
-        server = self.Connect()
-        cursor = server.cursor()
-        query = "SELECT MAX(ReservationID) FROM RESERVES"
-        cursor.execute(query)
-        maxID = cursor.fetchall()
-        self.newReservationID = maxID[0][0] + 1;
-
-        #query = "DELETE FROM CUSTOMER WHERE Username='anushkagupta'"
-        #cursor.execute(query)
-
-        query = "INSERT INTO RESERVATION(ReservationID, Is_cancelled, Username, Card_Number) VALUES ('%d', 0, '%s', 0000000000000000)" % (self.newReservationID, self.username.get())
-        cursor.execute(query)
-
-        query = "INSERT INTO RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) VALUES ('%d', '%d', '%d', '%Y-%m-%d', '', 0, '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), self.depart, self.arrive, self.price.get())
-        cursor.execute(query)
-
-        query = "UPDATE RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags, self.name, self.newReservationID)
-        cursor.execute(query)
-
-        server.commit()
-        cursor.close()
-        server.close()
+            
+        
 
         b1=Button(frame4, text ="Back", command = self.switchToDepartureInfo)
         b1.pack(side=LEFT)
@@ -576,6 +551,12 @@ class Phase_three:
         self.passengerInfoWin.destroy()
         self.departureWin.deiconify()
 
+    def select2(self):
+        if self.w.get() %2 == 0:
+            self.value  = (floor(self.w.get()/9)) -1
+        else:
+            self.value  = (floor(self.w.get()/9))
+            
     def makeReservation(self):
         self.passengerInfoWin.withdraw()
         self.reservationWin = Toplevel()
@@ -598,68 +579,91 @@ class Phase_three:
         l7 = Label(frame,text = "# of baggages").grid(row = 1, column = 6)
         l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
         l9 = Label(frame,text = "Remove").grid(row = 1, column = 8)
-
+        price = 0
+        #print("bags" + self.bags.get())
         if self.bags.get() < 3:
             bagPrice = 0
         else:
             extraBags = self.bags.get() - 2
             bagPrice = extraBags * 30
-
-        results = []
-        departInfo = floor(self.v.get())
-        firstHalf = self.duration.get()[departInfo]
-        self.price = self.selected.get() + bagPrice
-        secondHalf = (self.classChosen.get(), self.bags.get(), self.name.get())
-
-        results.append(self.trainChosen.get(), self.duration.get()[3], self.duration.get()[6], self.duration.get()[7], self.classChosen.get(), self.price, self.bags.get(), self.name.get())
-
+        if self.v.get()%2 == 0: #(if even 2nd class)
+            self.chosenClass = 2
+            price = self.duration[self.value][5]
+        else:
+            self.chosenClass = 1            
+            price = self.duration[self.value][4]     
+            
+        results1 = []
+        self.price = price + bagPrice
+        
         server = self.Connect()
         cursor = server.cursor()
-        query = "UPDATE RESERVES SET Total_Cost='%d' WHERE ReservationID='%d'" % (self.price, self.newReservationID.get())
+        query = "SELECT MAX(ReservationID) FROM RESERVES"
         cursor.execute(query)
+        maxID = cursor.fetchall()
+        self.newReservationID = maxID[0][0] + 1;
+
+        server.commit()
+        server.close()
+        cursor.close()
+        self.trainChosen = self.duration[self.value][0]
+        results1.append((self.trainChosen, self.duration[self.value][1], self.duration[self.value][2], self.duration[self.value][3],
+                       self.duration[self.value][6],self.duration[self.value][7],
+                       self.chosenClass, self.price, self.bags.get(), self.name2.get()))
 
         a = 2
         b = 1
         self.w = IntVar()
 
-        for result in results:
+        for result in results1:
                 #configure to display result[2] and result[3] in one box as newline (like in departureInfo())
             Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 0, sticky = "ew")
-            Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
-            Label(frame, text = str(result[2]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
-            Label(frame, text = str(result[3]), anchor = "w").grid(row = a, column = 3, sticky = "ew")
-            Label(frame, text = str(result[4]), anchor = "w").grid(row = a, column = 4, sticky = "ew")
-            Label(frame, text = str(result[5]), anchor = "w").grid(row = a, column = 5, sticky = "ew")
-            Label(frame, text = str(result[6]), anchor = "w").grid(row = a, column = 6, sticky = "ew")
-            Label(frame, text = str(result[7]), anchor = "w").grid(row = a, column = 7, sticky = "ew")
-            RadioButton(frame, text = "Remove", varaiable = self.w, value = b).grid(row = a, column = 8)
+            Label(frame, text = str(result[1]) + "-" + str(result[2]) +"\n" + str(result[3]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
+            Label(frame, text = str(result[4]), anchor = "w").grid(row = a, column = 2, sticky = "ew")
+            Label(frame, text = str(result[5]), anchor = "w").grid(row = a, column = 3, sticky = "ew")
+            Label(frame, text = str(result[6]), anchor = "w").grid(row = a, column = 4, sticky = "ew")
+            Label(frame, text = str(result[7]), anchor = "w").grid(row = a, column = 5, sticky = "ew")
+            Label(frame, text = str(result[8]), anchor = "w").grid(row = a, column = 6, sticky = "ew")
+            Label(frame, text = str(result[9]), anchor = "w").grid(row = a, column = 7, sticky = "ew")
+            Radiobutton(frame, text = "Remove", variable = self.w, value = b, command = self.select2).grid(row = a, column = 8,sticky = "ew")
+           
             a = a + 1
             b += 9
 
 
         server = self.Connect()
         cursor = server.cursor()
+        
+
+        query = "SELECT Student_Discount FROM SYSTEM_INFO"
+        cursor.execute(query)
+        res = cursor.fetchall()
+        discount = res[0]
+        print(discount)
+
         query = "SELECT Is_student FROM CUSTOMER WHERE Username = '%s'" % (self.username.get())
         cursor.execute(query)
+        result3 = cursor.fetchall()
+        if result3[0] == 1:
+            self.price = self.price - (self.price*discount/100)
+       
 
         stuDis= Label(frame2,text = "Student Discount Applied.")
         stuDis.grid(row = 0, column = 0)
         totalC= Label(frame2, text = "Total Cost")
         totalC.grid(row = 1, column = 0)
-
-        costEnt = Label(frame2, text = self.price.get(), width = 10)
+        #cost = StringVar()
+        costEnt = Label(frame2, text = self.price, width = 10)
         costEnt.grid(row = 1, column = 1)
 
         useCard= Label(frame2, text = "Use Card")
         useCard.grid(row = 4, column = 0)
 
-##        query = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.username.get())
-##        cursor.execute(query)
-##        results = cursor.fetchall()
+        query = "SELECT Card_Number FROM PAYMENT_INFO WHERE Username = '%s'" % (self.username.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
 
-        #self.card.set(results[0])
         self.card = IntVar()
-        results = ["0", "1", "2", "3"]
         option=OptionMenu(frame2, self.card, results[0], *results)
         option.grid(row = 4, column = 1)
 
@@ -737,27 +741,26 @@ class Phase_three:
         Cvv = Entry(frame3, textvariable = self.CVVnum, width = 10)
         Cvv.pack(side = RIGHT)
 
-        self.date = StringVar()
-        if self.date < datetime.now():
-            messagebox.showerror("Error, your card is expired.")
-
-        expdate = Entry(frame4, textvariable = self.date, width = 10)
+        self.date1 = StringVar()
+        expdate = Entry(frame4, textvariable = self.date1, width = 10)
         expdate.pack(side = RIGHT)
 
-        server = self.Connect()
-        curosr = server.cursor()
-        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.date.get(), self.name.get(), self.username.get())
-        cursor.execute(query)
-
-        server.commit()
-        cursor.close()
-        server.close()
+        self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
+        
+        
+##        server = self.Connect()
+##        curosr = server.cursor()
+##        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), date1, self.name.get(), self.username.get())
+##        cursor.execute(query)
 
         b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
         b4.pack(side=LEFT)
 
     def addCardCheck(self):
-        expDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
+        if self.expDate < datetime.now():
+            messagebox.showerror("Error, your card is expired.")
+            
+        
         server = self.Connect()
         cursor = server.cursor()
         query = "SELECT * FROM PAYMENT_INFORMATION \
@@ -781,11 +784,6 @@ class Phase_three:
             VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
             print(query)
             cursor.execute(query)
-
-            server.commit()
-            cursor.close()
-            server.close()
-
             self.switchToConfirm1()
 
     def deleteCard(self):
@@ -852,6 +850,21 @@ class Phase_three:
         self.mainMenu()
 
     def confirmation(self):
+        server = self.Connect()
+        cursor = server.cursor()
+        
+        query1 = "INSERT INTO RESERVATION(ReservationID, Is_cancelled, Username, Card_Number) VALUES ('%d', 0, '%s', '%d')" % (self.newReservationID, self.username.get(),self.card.get())
+        cursor.execute(query1)
+
+        query2 = "INSERT INTO RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) VALUES ('%d', '%d', '%d', '%Y-%m-%d', '', 0, '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), self.depart, self.arrive, self.price.get())
+        cursor.execute(query2)
+
+        query3 = "UPDATE RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags, self.name, self.newReservationID)
+        cursor.execute(query3)
+
+        query = "UPDATE RESERVES SET Total_Cost='%d' WHERE ReservationID='%d' AND Train_Number = '%d'" % (self.price, self.newReservationID, self.trainChosen.get())
+        cursor.execute(query)
+
         self.reservationWin.destroy()
         self.confirm = Toplevel()
         self.confirm.title("Confirmation")
@@ -927,43 +940,42 @@ class Phase_three:
 
         l0 = Label(frame,text = "Select").grid(row = 1, column = 0)
         l1 = Label(frame,text = "Train(Train Number)").grid(row = 1, column = 1)
-        l2 = Label(frame,text = "Time(Duration)").grid(row = 1, column = 2)
-        l3 = Label(frame,text = "Departs From").grid(row = 1, column = 3)
-        l4 = Label(frame,text = "Arrives At").grid(row = 1, column = 4)
-        l5 = Label(frame,text = "Class").grid(row = 1, column = 5)
-        l6 = Label(frame,text = "Price").grid(row = 1, column =6)
-        l7 = Label(frame,text = "# of baggages").grid(row = 1, column = 7)
-        l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 8)
+        #l2 = Label(frame,text = "Time(Duration)").grid(row = 1, column = 2)
+        l3 = Label(frame,text = "Departs From").grid(row = 1, column = 2)
+        l4 = Label(frame,text = "Arrives At").grid(row = 1, column = 3)
+        l5 = Label(frame,text = "Class").grid(row = 1, column = 4)
+        l6 = Label(frame,text = "Price").grid(row = 1, column =5)
+        l7 = Label(frame,text = "# of baggages").grid(row = 1, column = 6)
+        l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
 
         server = self.Connect()
         cursor = server.cursor()
-        #query = "SELECT * FROM RESERVES WHERE ReservationID = '%s'" % (self.resID.get())
-        #cursor.execute(query)
-        #results = cursor.fetchall()
+        query = "SELECT * FROM RESERVES WHERE ReservationID = '%s'" % (self.resID.get())
+        cursor.execute(query)
+        self.results = cursor.fetchall()  
 
         a = 2
         b = 1
-        results = [("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d"),("d","d","d","d","d","d","d","d")]
         self.w = IntVar()
-        for result in results:
+        print(self.results)
+        for result in self.results:
             Radiobutton(frame, variable = self.w, value = b, command = self.select2).grid(row = a, column = 0)
-            Label(frame, text = str(result[0]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
-            l11 = Label(frame, text = str(result[1]), anchor = "w")
-            l11.grid(row = a, column = 2, sticky = "ew")
-            l12 = Label(frame, text = str(result[2]), anchor = "w")
-            l12.grid(row = a, column = 3, sticky = "ew")
-            l13 = Label(frame, text = str(result[3]), anchor = "w")
-            l13.grid(row = a, column = 4, sticky = "ew")
-            l14 = Label(frame, text = str(result[4]), anchor = "w")
-            l14.grid(row = a, column = 5, sticky = "ew")
-            l15 =Label(frame, text = str(result[5]), anchor = "w")
-            l15.grid(row = a, column = 6, sticky = "ew")
-            l16 = Label(frame, text = str(result[6]), anchor = "w")
-            l16.grid(row = a, column = 7, sticky = "ew")
-            l17 = Label(frame, text = str(result[7]), anchor = "w")
-            l17.grid(row = a, column = 8, sticky = "ew")
+            Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
+            
+            l12 = Label(frame, text = str(result[6]), anchor = "w")
+            l12.grid(row = a, column = 2, sticky = "ew")
+            l13 = Label(frame, text = str(result[7]), anchor = "w")
+            l13.grid(row = a, column = 3, sticky = "ew")
+            l14 = Label(frame, text = str(result[2]), anchor = "w")
+            l14.grid(row = a, column = 4, sticky = "ew")
+            l15 =Label(frame, text = str(result[8]), anchor = "w")
+            l15.grid(row = a, column = 5, sticky = "ew")
+            l16 = Label(frame, text = str(result[5]), anchor = "w")
+            l16.grid(row = a, column = 6, sticky = "ew")
+            l17 = Label(frame, text = str(result[4]), anchor = "w")
+            l17.grid(row = a, column = 7, sticky = "ew")
             a = a + 1
-            b += 9
+            b += 8
 
         b1 = Button(frame2, text = "Back", command = self.switchUpdateReservation)
         b1.pack(side = LEFT)
@@ -983,9 +995,8 @@ class Phase_three:
         tree=Treeview(frame)
         tree.grid(row = 2, column = 0)
         tree["show"] = "headings"
-        tree["columns"]=("train","time","dept", "arrv", "class", "pr", "bag", "name")
+        tree["columns"]=("train","dept", "arrv", "class", "pr", "bag", "name")
         tree.heading("train", text= "Train (Train Number)")
-        tree.heading("time", text= "Time (Duration)")
         tree.heading("dept", text= "Departs From")
         tree.heading("arrv", text= "Arrives At")
         tree.heading("class", text= "Class")
@@ -998,9 +1009,8 @@ class Phase_three:
         tree=Treeview(frame)
         tree.grid(row = 4, column = 0, sticky = E)
         tree["show"] = "headings"
-        tree["columns"]=("train","time","dept", "arrv", "class", "pr", "bag", "name")
+        tree["columns"]=("train","dept", "arrv", "class", "pr", "bag", "name")
         tree.heading("train", text= "Train (Train Number)")
-        tree.heading("time", text= "Time (Duration)")
         tree.heading("dept", text= "Departs From")
         tree.heading("arrv", text= "Arrives At")
         tree.heading("class", text= "Class")
@@ -1025,11 +1035,17 @@ class Phase_three:
         frame5 = Frame(self.updateWin3)
         frame5.pack()
 
+        updateIndex = floor(self.w.get()/8)
+        print(self.results)
+        updateTuple = self.results[updateIndex]
+        print(updateTuple)
+        
         l1 = Label(frame, text = "Current Train Ticket")
         l1.grid(row = 1, column = 1, sticky = E)
 
+        i = 0
         tree = self.updateTree2(frame2)
-
+        tree.insert('', i, text='', values=(updateTuple[1], updateTuple[6],updateTuple[7], updateTuple[2], updateTuple[8], updateTuple[5],updateTuple[4]))        
         newdepDate= Label(frame3,text ="New Departure Date")
         newdepDate.grid(row = 0, column = 0, sticky = E)
         self.date = StringVar()
@@ -1041,7 +1057,10 @@ class Phase_three:
         l2 = Label(frame3, text = "Updated Train Ticket")
         l2.grid(row = 1, column = 1, sticky = E)
 
+        
+
         tree2 = self.updateTree3(frame4)
+        
 
         changeFee = Label(frame5,text ="Change Fee")
         changeFee.grid(row = 0, column = 0, sticky = E)
@@ -1053,9 +1072,10 @@ class Phase_three:
         e3 = Entry(frame5, textvariable = self.value, width = 10)
         e3.grid(row = 1, column = 1)
 
+       
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d'" % (e1)
+        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d' WH" % (e1)
         cursor.execute(query1)
         query2 = "SELECT Change_fee FROM SYSTEM_INFO"
         cursor.execute(query2)
@@ -1081,14 +1101,12 @@ class Phase_three:
 
         l1 = Label(frame, text = "Reservation ID")
         l1.grid(row = 0, column = 0, sticky = E)
-        self.resCancelID = StringVar()
-        e1 = Entry(frame, textvariable = self.resCancelID, width = 10)
+        e1 = Entry(frame, width = 10)
         e1.grid(row = 0, column = 1)
         b1 = Button(frame, text = "Search", command = self.cancelRes2)
         b1.grid(row = 0, column = 2, sticky = E)
         b2 = Button(frame, text = "Back", command = self.switchToMain)
         b2.grid(row = 1, column = 1, sticky = E)
-
     def switchToMain(self):
         self.cancelWin.destroy()
         self.primaryWindow = Toplevel()
@@ -1125,55 +1143,29 @@ class Phase_three:
 
         l1= Label(frame2,text ="Total Cost of Reservation")
         l1.grid(row = 1, column = 0, sticky = E)
-        e1= Label(frame2,text = self.price.get(), width = 10)
+        self.cost = StringVar()
+        e1= Entry(frame2,textvariable = self.cost, width = 10)
         e1.grid(row = 1, column = 1, sticky = EW)
 
-        self.cancelDate = date.today()
         l2 = Label(frame2, text = "Date of Cancellation")
         l2.grid(row = 2, column = 0, sticky = E)
-        e2= Label(frame2,text = self.cancelDate.get(), width = 10)
+        self.date = StringVar()
+        e2= Entry(frame2,textvariable = self.date, width = 10)
         e2.grid(row = 2, column = 1, sticky = EW)
-
-        server = self.Connect()
-        cursor = server.cursor()
-        query = "SELECT Is_cancelled, MIN(Departure_Date) FROM RESERVATION, RESERVES WHERE ReservationID = '%d'" % (self.resCancelID.get())
-        cursor.execute(query)
-        results = cursor.fetchall()
-
-        if self.cancelDate < (results[1] - datetime.timedelta(days=7)):
-            self.refund = self.price.get() * 0.8 - 50
-        elif self.cancelDate > (results[1] - datetime.timedelta(days=7)) and self.cancelDate < (results[1] + datetime.timedelta(days=1)):
-            self.refuned = self.price.get() * 0.5 - 50
-        elif self.cancelDate > (results[1] - datetime.timedelta(days=1)):
-            self.refund = 0
-            print("Cannot cancel reservation within a day of departure date")
-            return
-
-        if self.refund < 0:
-            self.refund = 0
-
-        self.price = self.price.get() - self.refund.get()
 
         l3 = Label(frame2, text = "Amount to be Refunded")
         l3.grid(row = 3, column = 0, sticky = E)
-        e2= Label(frame2,text = self.refund().get(), width = 10)
+        self.amount = StringVar()
+        e2= Entry(frame2,textvariable = self.amount, width = 10)
         e2.grid(row = 3, column = 1, sticky = EW)
 
         b2=Button(frame3, text ="Back", command = self.switchCancelRes1)
         b2.grid(row =4, column = 0, sticky = E)
-
-        if results[0] == 1:
-            print("Reservation already cancelled, cannot cancel again")
-            return
-        else:
-            queryCancel = "UPDATE RESERVATION SET Is_cancelled = 1 WHERE ReservationID = '%d'" % (self.resCancelID.get())
-            b3=Button(frame3, text ="Submit", command = self.switchTC)
-            b3.grid(row =4, column = 1, sticky = E)
-
+        b3=Button(frame3, text ="Submit", command = self.switchTC)
+        b3.grid(row =4, column = 1, sticky = E)
     def switchCancelRes1(self):
         self.cancelWin2.destroy()
         self.cancelRes()
-
     def switchTC(self):
         self.cancelWin2.destroy()
         self.confirmation()
@@ -1251,46 +1243,22 @@ class Phase_three:
         self.trainNo = StringVar()
         l1 = Label(frame, text = "Train Number")
         l1.grid(row = 0, column = 0, sticky = W)
-        e1 = Entry(frame, textvariable = self.trainNo, width = 20)
+        e1 = Entry(frame, text = self.trainNo, width = 20)
         e1.grid(row = 0, column = 1)
 
         l2 = Label(frame, text = "Rating")
         l2.grid(row = 1, column = 0, sticky = W)
-        self.rating = IntVar()
+        self.rating = StringVar()
         choices = ["Very Good", "Good", "Neutral", "Bad", "Very Bad"]
         self.rating.set(choices[0])
-        option = OptionMenu(frame, self.rating, choices[0], *choices)
+        option=OptionMenu(frame, self.rating, choices[0], *choices)
         option.grid(row = 1, column = 1)
 
         self.comment = StringVar()
         l3 = Label(frame, text = "Comment")
         l3.grid(row = 2, column = 0, sticky = W)
-        e3 = Entry(frame, textvariable = self.comment, width = 20)
+        e3 = Entry(frame, text = self.comment, width = 20)
         e3.grid(row = 2, column = 1)
-
-        if self.trainNo == "" or self.rating == ""
-            print ("Train Number and Rating cannot be left blank.")
-            return
-
-        if self.rating.get() == choices[0]:
-            self.rating.set(5)
-        elif self.rating.get() == choices[1]:
-            self.rating.set(4)
-        elif self.rating.get() == choices[2]:
-            self.rating.set(3)
-        elif self.rating.get() == choices[3]:
-            self.rating.set(2)
-        elif self.rating.get() == choices[4]:
-            self.rating.set(1)
-
-        server = self.Connect()
-        cursor = server.cursor()
-        queryFrom = "SELECT MAX(Review_Number) FROM REVIEW"
-        cursor.execute(queryFrom)
-        result = cursor.fetchall()
-
-        query = "INSERT INTO REVIEW(Review_Number, Comment, Rating, Username, Train_Number) VALUES ('%d', '%s' '%d', '%s', '%d')" % (result[0] + 1, self.comment.get(), self.rating.get(), self.username.get(), self.trainNo.get())
-
 
         b1=Button(frame, text ="Submit", command = self.mainBack)
         b1.grid(row = 3, column = 1)
@@ -1317,7 +1285,6 @@ class Phase_three:
 
     def viewRevenueRep(self):
 
-        #to store in tree somehow
 
         #Month          -    Revenue
         #thirdMoth      -    $result1
@@ -1331,10 +1298,10 @@ class Phase_three:
         frame = Frame(self.viewRevenueReport)
         frame.pack()
 
-        currMonth = int(datetime.datetime.now().strftime("%m"))
-        firstMonth = datetime.date(2016, currMonth - 1, 1)
-        secondMonth = datetime.date(2016, currMonth - 2, 1)
-        thirdMonth = datetime.date(2016, currMonth - 3, 1)
+        currMonth = now.month
+        firstMonth = datetime.date(2016, now.month - 1, 1)
+        secondMonth = datetime.date(2016, now.month - 2, 1)
+        thirdMonth = datetime.date(2016, now.month - 3, 1)
         #>>> datetime.datetime.strptime('24052010', "%d%m%Y").date() ??????
 
 
@@ -1372,18 +1339,7 @@ class Phase_three:
         return tree
 
     def viewpopRR(self):
-        #to store in tree somehow
-
-        #Month  -       Route   -       Reservations
-        #thirdMonth     results1[0][0]    results1[0][1]
-        #               results1[1][0]    results1[1][1]
-        #               results1[2][0]    results1[2][2]
-        #secondMonth    results2[0][0]    results2[0][1]
-        #               results2[1][0]    results2[1][1]
-        #               results2[2][0]    results2[2][2]
-        #firstMonth     results3[0][0]    results3[0][1]
-        #               results3[1][0]    results3[1][1]
-        #               results3[2][0]    results3[2][2]
+        #Month  -   Route   -   Reservations
 
         self.primaryWindow.withdraw()
         self.viewpopRRWin = Toplevel()
@@ -1392,49 +1348,20 @@ class Phase_three:
         frame.pack()
 
 
-        currMonth = int(datetime.datetime.now().strftime("%m"))
-        firstMonth = currMonth - 1
-        secondMonth = currMonth - 2
-        thirdMonth = currMonth - 3
+        currMonth = now.month
+        firstMonth = now.month - 1
+        secondMonth = now.month - 2
+        thirdMonth = now.month - 3
 
         server = self.Connect()
         cursor = server.cursor()
-        queryMonth1 = "CREATE VIEW Month1 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
+        queryMonth1 = "CREATE VIEW Month1 (Reservations) AS SELECT ReservationID FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
         cursor.execute(queryMonth1)
-        queryPerTrain1 = "CREATE VIEW PerTrain1(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month1 GROUP BY Month1.TNumber"
-        cursor.execute(queryPerTrain1)
-        queryUltimate1 = "SELECT * FROM PerTrain1 WHERE Num = MAX(Num)"
-        queryPenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
-        queryAntepenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
-        cursor.execute(queryUltimate1)
-        cursor.execute(queryPenUltimate1)
-        cursor.execute(queryAntepenUltimate1)
-        results1 = cursor.fetchall()
+        queryPerTrain1 = "CREATE VIEW PerTrain1 AS SELECT COUNT(DISTINCT Reservations) FROM Month1, RESERVES GROUP BY RESERVES.Train_Number"
 
-        queryMonth2 = "CREATE VIEW Month2 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, secondMonth, firstMonth)
-        cursor.execute(queryMonth2)
-        queryPerTrain2 = "CREATE VIEW PerTrain2(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month2 GROUP BY Month2.TNumber"
-        cursor.execute(queryPerTrain2)
-        queryUltimate2 = "SELECT * FROM PerTrain2 WHERE Num = MAX(Num)"
-        queryPenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2)"
-        queryAntepenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2))"
-        cursor.execute(queryUltimate2)
-        cursor.execute(queryPenUltimate2)
-        cursor.execute(queryAntepenUltimate2)
-        results2 = cursor.fetchall()
-
-        queryMonth3 = "CREATE VIEW Month3 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, secondMonth, firstMonth)
-        cursor.execute(queryMonth3)
-        queryPerTrain3 = "CREATE VIEW PerTrain3(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month3 GROUP BY Month3.TNumber"
-        cursor.execute(queryPerTrain3)
-        queryUltimate3 = "SELECT * FROM PerTrain3 WHERE Num = MAX(Num)"
-        queryPenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3)"
-        queryAntepenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3))"
-        cursor.execute(queryUltimate3)
-        cursor.execute(queryPenUltimate3)
-        cursor.execute(queryAntepenUltimate3)
-        results3 = cursor.fetchall()
-
+        queryUltimate1 = "SELECT MAX(Num) FROM PerTrain1"
+        queryPenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
+        queryAntepenultimate1 = "SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
 
         tree = self.viewTree3(frame)
 
