@@ -8,12 +8,11 @@ import calendar
 from datetime import *
 from math import *
 import time
-
 class Phase_three:
     def __init__(self,primaryWin):
         self.primaryWin = primaryWin
         self.Login()
-
+        self.results1 = []
         self.newUserWindow = Toplevel()
         #self.Register()
         self.newUserWindow.title("New User Registration")
@@ -584,7 +583,7 @@ class Phase_three:
             self.chosenClass = 1
             price = self.duration[self.value][4]
 
-        self.results1 = []
+        
         self.price = price + bagPrice
 
         server = self.Connect()
@@ -619,7 +618,8 @@ class Phase_three:
             b += 9
         server = self.Connect()
         cursor = server.cursor()
-
+        print("results")
+        print(self.results1)
 
         query = "SELECT Student_Discount FROM SYSTEM_INFO"
         cursor.execute(query)
@@ -734,12 +734,6 @@ class Phase_three:
 
         self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
 
-
-##        server = self.Connect()
-##        curosr = server.cursor()
-##        query = "INSERT INTO PAYMENT_INFO VALUES ('%d', '%d', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), date1, self.name.get(), self.username.get())
-##        cursor.execute(query)
-
         b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
         b4.pack(side=LEFT)
 
@@ -840,23 +834,20 @@ class Phase_three:
         server = self.Connect()
         cursor = server.cursor()
         #self.CARD = int(self.card.get())
-        print(type(self.newReservationID))
-        print(type(self.username.get()))
-        print(type(self.card.get()))
-
+        
+        
         query1 = "INSERT INTO RESERVATION(ReservationID, Is_cancelled, Username, Card_Number) VALUES ('%d', 0, '%s', '%d')" % (self.newReservationID, self.username.get(),self.card.get())
         cursor.execute(query1)
 
-        print(self.results1)
-        query2 = "INSERT INTO RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From,\
-            Arrives_At, Total_Cost) VALUES ('%d', '%d', '%d', '%s', 0, '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), self.results1[4], self.results1[5], self.results1[7])
-        cursor.execute(query2)
+        for res in self.results1:
+            print("res")
+            print(res)
+            query2 = "INSERT INTO RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) VALUES ('%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), res[9],res[6], res[4], self.results1[5], res[7])
+            cursor.execute(query2)
 
-        query3 = "UPDATE RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) SET Number_of_Bags='%d', Passenger_Name='%s' WHERE ReservationID='%d'" % (self.bags, self.name, self.newReservationID)
-        cursor.execute(query3)
-
-        query = "UPDATE RESERVES SET Total_Cost='%d' WHERE ReservationID='%d' AND Train_Number = '%d'" % (self.price, self.newReservationID, self.trainChosen.get())
-        cursor.execute(query)
+        #self.results1=self.results1[0]
+        
+        
 
         self.reservationWin.destroy()
         self.confirm = Toplevel()
@@ -903,21 +894,6 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
-##    def updateTree(self, frame):
-##        tree=Treeview(frame)
-##        tree.pack()
-##        tree["show"] = "headings"
-##        tree["columns"]=("select","train","time","dept", "arrv", "class", "pr", "bag", "name")
-##        tree.heading("select", text= "Select")
-##        tree.heading("train", text= "Train (Train Number)")
-##        tree.heading("time", text= "Time (Duration)")
-##        tree.heading("dept", text= "Departs From")
-##        tree.heading("arrv", text= "Arrives At")
-##        tree.heading("class", text= "Class")
-##        tree.heading("pr", text= "Price")
-##        tree.heading("bag", text= "# of Baggages")
-##        tree.heading("name", text= "Passenger Name")
-##        return tree
     def select2(self):
         print(self.w.get())
 #####################table info, new dept date, change fee, updated cost,#################
