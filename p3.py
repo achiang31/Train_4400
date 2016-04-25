@@ -266,10 +266,15 @@ class Phase_three:
         querypatch = "INSERT INTO USER(Username, Password) VALUES ('%s' , '%s')" % (self.registeredUser.get(), self.registeredPass.get())
         cursor.execute(querypatch)
 
-        query2 = "INSERT INTO CUSTOMER(Username, Email) \
-            VALUES ('%s', '%s')" % (self.registeredUser.get(), self.registerEmail.get())
+        query2 = "INSERT INTO CUSTOMER(Username, Email, Is_student) \
+            VALUES ('%s', '%s', '%d')" % (self.registeredUser.get(), self.registerEmail.get(), 0)
         cursor.execute(query2)
         result2 = cursor.fetchall()
+
+        server.commit()
+        cursor.close()
+        server.close()
+
         self.switchToLogin()
 
     def schoolInfo(self):
