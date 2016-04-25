@@ -107,8 +107,7 @@ class Phase_three:
 
     def Connect(self):
         try:
-            db = pymysql.connect(host="https://academic-mysql.cc.gatech.edu/phpmyadmin", passwd="dwet2rPC", user="cs4400_Team_48",db="cs4400_Team_48")
-            print("connected")
+            db = pymysql.connect(host="academic-mysql.cc.gatech.edu",  user="cs4400_Team_48", passwd="dwet2rPC",db="cs4400_Team_48")
             return db
         except:
             messagebox.showerror("Error", "Check Internet Connection")
@@ -196,10 +195,11 @@ class Phase_three:
             b10.grid(row = 2, column = 0, columnspan = 2, sticky = EW)
 
     def switchToRegister(self):
-        self.Register()
-        self.primaryWin.destroy()
+        self.primaryWin.withdraw()
         self.newUserWindow.deiconify()
-
+        self.Register()
+        #self.primaryWin.withdraw()
+        
     def switchToLogin(self):
         self.newUserWindow.withdraw()
         self.primaryWin.deiconify()
@@ -211,9 +211,9 @@ class Phase_three:
 
     def Register(self):
         self.newUserWindow.title("New User Registration")
-        frame = Frame(self.newUserWindow)
+        frame=Frame(self.newUserWindow)
         frame.pack()
-        frame2 = Frame(self.newUserWindow)
+        frame2=Frame(self.newUserWindow)
         frame2.pack(side = BOTTOM)
 
         label1 = Label(frame,text = "Username", justify = LEFT)
@@ -251,30 +251,32 @@ class Phase_three:
         if self.registeredPass.get() != self.registeredPassConfirm.get():
             messagebox.showerror("Error", "Passwords must match")
             return
+               
+        db = self.Connect()
+        cursor = db.cursor()
+        query1 = "SELECT * FROM USER \
+               WHERE USER.Username = '%s'" % (self.registeredUser.get())
 
-        server = self.Connect()
-        cursor = server.cursor()
-        query1 = "SELECT * FROM CUSTOMER, MANAGER \
-               WHERE CUSTOMER.Username = '%s' OR MANAGER.Username = '%s'" % (self.registeredUser.get(), self.registeredUser.get())
         cursor.execute(query1)
         result1 = cursor.fetchall()
-        cursor.execute(query1)
+        
+       
         if len(result1) != 0:
             messagebox.showerror("Error", "Username already in use")
             return
-
+        
         querypatch = "INSERT INTO USER(Username, Password) VALUES ('%s' , '%s')" % (self.registeredUser.get(), self.registeredPass.get())
-        cursor.execute(querypatch)
-
-        query2 = "INSERT INTO CUSTOMER(Username, Email, Is_student) \
-            VALUES ('%s', '%s', '%d')" % (self.registeredUser.get(), self.registerEmail.get(), 0)
+        cursor.execute(querypatch)       
+        result3 = cursor.fetchall()
+        
+        query2 = "INSERT INTO CUSTOMER(Username, Email) \
+            VALUES ('%s', '%s')" % (self.registeredUser.get(), self.registerEmail.get())
         cursor.execute(query2)
         result2 = cursor.fetchall()
-
-        server.commit()
+        
         cursor.close()
-        server.close()
-
+        db.commit()
+        db.close()
         self.switchToLogin()
 
     def schoolInfo(self):
