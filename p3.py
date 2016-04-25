@@ -662,7 +662,7 @@ class Phase_three:
         results = cursor.fetchall()
 
         self.card = IntVar()
-        option=OptionMenu(frame2, self.card, results[0], *results)
+        option=OptionMenu(frame2, self.card, results[0], * results)
         option.grid(row = 4, column = 1)
 
         b5=Button(frame2, text ="Delete Card", command = self.deleteCard)
@@ -870,8 +870,8 @@ class Phase_three:
         frame = Frame(self.confirm)
         frame.pack()
 
-        label1 = Label(frame, text="Reservation ID:")
         label1.grid(row = 0, column = 0,sticky=E)
+        label1 = Label(frame, text="Reservation ID:")
         e1 = Entry(frame, text = "Some ID # goes here", width = 10)
         e1.grid(row = 0, column = 1)
         label3 = Label(frame, text="Thank you so much for your purchase! Please save the reservation ID for your records.")
@@ -1287,7 +1287,7 @@ class Phase_three:
         e3 = Entry(frame, textvariable = self.comment, width = 20)
         e3.grid(row = 2, column = 1)
 
-        if self.trainNo == "" or self.rating == ""
+        if self.trainNo == "" or self.rating == "":
             print ("Train Number and Rating cannot be left blank.")
             return
 
