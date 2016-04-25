@@ -908,8 +908,8 @@ class Phase_three:
     def updateReservation(self):
         self.primaryWindow.destroy()
         self.updateWin = Toplevel()
-        self.updateWin.title("Update Reservation")
-
+        self.updateWin.title("Update Reservation"
+)
         frame = Frame(self.updateWin)
         frame.pack()
         self.resID = IntVar()
