@@ -14,8 +14,6 @@ class Phase_three:
         self.primaryWin = primaryWin
         self.Login()
 
-        self.totalCost = 0
-
         self.newUserWindow = Toplevel()
         #self.Register()
         self.newUserWindow.title("New User Registration")
@@ -649,8 +647,13 @@ class Phase_three:
         stuDis.grid(row = 0, column = 0)
         totalC= Label(frame2, text = "Total Cost")
         totalC.grid(row = 1, column = 0)
-        cost = StringVar()
-        costEnt = Entry(frame2, textvariable = cost, width = 10)
+
+
+        self.totalCost = #calculate the total cost of the reservation here using # bags, 1st/2nd class
+        queryTCost = INSERT INTO RESERVES(Total_Cost) VALUES (#insert the total cost here)
+
+
+        costEnt = Label(frame2, text = self.totalCost, width = 10)
         costEnt.grid(row = 1, column = 1)
 
         useCard= Label(frame2, text = "Use Card")
@@ -1084,12 +1087,14 @@ class Phase_three:
 
         l1 = Label(frame, text = "Reservation ID")
         l1.grid(row = 0, column = 0, sticky = E)
-        e1 = Entry(frame, width = 10)
+        self.resCancelID = StringVar()
+        e1 = Entry(frame, textvariable = self.resCancelID, width = 10)
         e1.grid(row = 0, column = 1)
         b1 = Button(frame, text = "Search", command = self.cancelRes2)
         b1.grid(row = 0, column = 2, sticky = E)
         b2 = Button(frame, text = "Back", command = self.switchToMain)
         b2.grid(row = 1, column = 1, sticky = E)
+
     def switchToMain(self):
         self.cancelWin.destroy()
         self.primaryWindow = Toplevel()
@@ -1126,20 +1131,19 @@ class Phase_three:
 
         l1= Label(frame2,text ="Total Cost of Reservation")
         l1.grid(row = 1, column = 0, sticky = E)
-        self.cost = StringVar()
-        e1= Entry(frame2,textvariable = self.cost, width = 10)
+        e1= Label(frame2,text = self.totalCost.get(), width = 10)
         e1.grid(row = 1, column = 1, sticky = EW)
 
         l2 = Label(frame2, text = "Date of Cancellation")
         l2.grid(row = 2, column = 0, sticky = E)
-        self.date = StringVar()
-        e2= Entry(frame2,textvariable = self.date, width = 10)
+        e2= Label(frame2,text = self.date.get(), width = 10)
         e2.grid(row = 2, column = 1, sticky = EW)
+
+        self.refund = #insert algorithim here after total cost is calculated
 
         l3 = Label(frame2, text = "Amount to be Refunded")
         l3.grid(row = 3, column = 0, sticky = E)
-        self.amount = StringVar()
-        e2= Entry(frame2,textvariable = self.amount, width = 10)
+        e2= Label(frame2,text = self.refund(), width = 10)
         e2.grid(row = 3, column = 1, sticky = EW)
 
         b2=Button(frame3, text ="Back", command = self.switchCancelRes1)
