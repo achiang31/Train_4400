@@ -424,6 +424,7 @@ class Phase_three:
 
         b=Button(frame3, text ="Find Trains", command = self.departureInfo)
         b.pack(side=RIGHT)
+
     def selected(self):
         if self.v.get() %2 == 0:
             self.value  = (floor(self.v.get()/2)) -1
@@ -718,39 +719,48 @@ class Phase_three:
         expdate = Entry(frame4, textvariable = self.date1, width = 10)
         expdate.pack(side = RIGHT)
 
-        self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
-
-        b4=Button(frame5, text ="Submit", command = self.switchToMakeReservation)
+        b4=Button(frame5, text ="Submit", command = self.addCardCheck)
         b4.pack(side=LEFT)
 
+        #start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
+        #    if start_date < datetime.now():
+
+
     def addCardCheck(self):
+        self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
         if self.expDate < datetime.now():
             messagebox.showerror("Error, your card is expired.")
 
-
         server = self.Connect()
         cursor = server.cursor()
-        query = "SELECT * FROM PAYMENT_INFORMATION \
-               WHERE Card_Number = '%s'" % (self.cardNumber.get())
+        query = "SELECT * FROM PAYMENT_INFO \
+               WHERE Card_Number = '%s'" % (self.num.get())
         cursor.execute(query)
         results = cursor.fetchall()
         if len(results) != 0:
             messagebox.showerror("Error", "Card number already in use")
-        elif self.expDate.get() == "" or self.cardName.get() == "" or self.cardNumber.get() == "" or self.cvv.get() == "":
+            return
+        elif self.expDate == "" or self.name.get() == "" or self.num.get() == "" or self.CVVnum.get() == "":
             messagebox.showerror("Error", "Expiration Date, Name, Number, and CVV must be filled")
-        elif len(self.cardNumber.get()) != 10:
+            return
+        elif len(self.num.get()) != 10:
             messagebox.showerror("Error", "Card Number must be 10 digits")
-        elif len(self.cvv.get()) != 3:
+            return
+        elif len(self.CVVnum.get()) != 3:
             messagebox.showerror("Error", "CVV must be 3 digits")
-        elif expDate < datetime.now():
-            messagebox.showerror("Error", "Card has already expired")
-        else:
-            server = self.Connect()
-            cursor = server.cursor()
-            query = "INSERT INTO PAYMENT_INFORMATION(Card_Number, Name, Exp_Date, CVV, Username) \
-            VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
-            cursor.execute(query)
-            self.switchToConfirm1()
+            return
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "INSERT INTO PAYMENT_INFO(Card_Number, CVV, Exp_Date, Name_on_card, Username) VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.num.get(), self.CVVnum.get(), self.expDate, self.name.get(), self.username.get())
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        server.commit()
+        cursor.close()
+        server.close()
+        self.paymentIWin.destroy()
+        self.makeReservation()
 
     def deleteCard(self):
         self.reservationWin.withdraw()
@@ -778,7 +788,7 @@ class Phase_three:
         query2 = "DELETE FROM PAYMENT_INFO WHERE Card_Number = '%s'" % (self.cardNum.get())
         cursor.execute(query2)
 
-        b1=Button(frame2, text ="Submit", command = self.switchToMakeReservation2)
+        b1=Button(frame2, text ="Submit", command = self.deleteCardCheck())
         b1.pack(side=BOTTOM)
 
     def switchToMakeReservation(self):
@@ -799,7 +809,7 @@ class Phase_three:
             if endDate > datetime.now():
                 messagebox.showerror("Error", "Card is being used for existing reservation")
         cursor = server.cursor()
-        cursor.execute("DELETE FROM PAYMENT_INFORMATION WHERE Card_Number='%s'" % (self.cardChoice.get()))
+        cursor.execute("DELETE FROM PAYMENT_INFO WHERE Card_Number='%s'" % (self.cardChoice.get()))
         self.switchToConfirm2()
 
     def switchToConfirm1(self):
@@ -840,8 +850,6 @@ class Phase_three:
 
         frame = Frame(self.confirm)
         frame.pack()
-
-
 
         label1 = Label(frame, text = "Reservation ID:")
         label1.grid(row = 0, column = 0,sticky=E)
