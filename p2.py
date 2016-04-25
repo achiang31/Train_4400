@@ -150,7 +150,6 @@ class Phase_three:
         result2 = cursor.fetchall()
 
         if len(result1) != 0:
-            print("Customer")
             self.custOrManag = "customer"
             for row in result1:
                 self.name = row[0]
@@ -583,7 +582,7 @@ class Phase_three:
             self.chosenClass = 1
             price = self.duration[self.value][4]
 
-        
+
         self.price = price + bagPrice
 
         server = self.Connect()
@@ -763,7 +762,6 @@ class Phase_three:
             cursor = server.cursor()
             query = "INSERT INTO PAYMENT_INFORMATION(Card_Number, Name, Exp_Date, CVV, Username) \
             VALUES ('%s', '%s', '%s', '%s', '%s')" % (self.cardNumber.get(), self.cardName.get(), self.expDate.get(),self.cvv.get(), self.name)
-            print(query)
             cursor.execute(query)
             self.switchToConfirm1()
 
@@ -834,20 +832,16 @@ class Phase_three:
         server = self.Connect()
         cursor = server.cursor()
         #self.CARD = int(self.card.get())
-        
-        
+
+
         query1 = "INSERT INTO RESERVATION(ReservationID, Is_cancelled, Username, Card_Number) VALUES ('%d', 0, '%s', '%d')" % (self.newReservationID, self.username.get(),self.card.get())
         cursor.execute(query1)
 
-        for res in self.results1:
-            print("res")
-            print(res)
-            query2 = "INSERT INTO RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) VALUES ('%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), res[9],res[6], res[4], self.results1[5], res[7])
-            cursor.execute(query2)
 
-        #self.results1=self.results1[0]
-        
-        
+        for res in self.results1:
+            query2 = "INSERT INTO RESERVES(ReservationID, Train_Number, Class, Departure_Date, Passenger_Name, Number_of_Bags, Departs_From, Arrives_At, Total_Cost) \
+                VALUES ('%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%f')" % (self.newReservationID, self.trainChosen, self.classChosen, self.date.get(), res[9], res[6], res[4], res[5], res[7])
+            cursor.execute(query2)
 
         self.reservationWin.destroy()
         self.confirm = Toplevel()
