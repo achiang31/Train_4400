@@ -1,17 +1,11 @@
 #Arthi Nithi, Anjani Agrawal, Alan Chiang, Alaap Murali
 
-#changed passengerInfo()
-#makeReservation()
-#select2()
-#SQL timedate, AS month, GROUP BY month
-
-
 from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import *
 import pymysql
 import calendar
-from datetime import *
+import datetime
 from math import *
 import time
 class Phase_three:
@@ -804,31 +798,29 @@ class Phase_three:
         results = cursor.fetchall()
 
         self.cardNum = StringVar()
-        self.cardNum.set(results[0])
+        self.cardNum.set(results[0][0])
+
         option=OptionMenu(frame, self.cardNum, results[0], * results)
         option.pack(side=RIGHT)
 
         b1=Button(frame2, text ="Submit", command = self.deleteCardCheck)
         b1.pack(side=BOTTOM)
 
+        self.cardNum = int(self.cardNum.get()[1:11])
+
     def deleteCardCheck(self):
         server = self.Connect()
         cursor = server.cursor()
-        cursor.execute("SELECT * FROM PAYMENT_INFO WHERE Card_Number ='%s'" % (self.cardNum.get()))
-        results1 = cursor.fetchall()
-
-
-        #query to check whether card is being used in current non-canncelled reservation to delete
-
-        for row in results1:
-            self.endDate = row[2]
-            endDate = datetime.strptime(self.expDate.get(), '%Y/%m/%d')
-            if endDate > datetime.now():
+        query1 = "SELECT Is_cancelled, Departure_Date FROM RESERVATION NATURAL JOIN RESERVES WHERE Card_Number ='%s'" % (self.cardNum)
+        cursor.execute(query1)
+        results = cursor.fetchall()
+        for row in results:
+            self.departDate = row[1]
+            if self.departDate >= datetime.today() and row[0] == 0:
                 messagebox.showerror("Error", "Card is being used for existing reservation")
+                return
 
-        cursor.execute("DELETE FROM PAYMENT_INFO WHERE Card_Number='%s'" % (self.cardChoice.get()))
-
-        query2 = "DELETE FROM PAYMENT_INFO WHERE Card_Number = '%s'" % (self.cardNum.get())
+        query2 = "DELETE FROM PAYMENT_INFO WHERE Card_Number = '%s'" % (self.cardNum)
         cursor.execute(query2)
 
         server.commit()
@@ -836,7 +828,6 @@ class Phase_three:
         server.close()
         self.paymentIWin2.destroy()
         self.makeReservation()
-
 
     def switchToConfirm1(self):
         self.paymentIWin.withdraw()
@@ -854,7 +845,6 @@ class Phase_three:
     def select2(self):
         self.index = floor(self.w.get()/9)
         self.results1.remove(self.results1[self.index])
-        print(self.results1)
         self.reservationWin.destroy()
         self.makeReservation()
 
@@ -867,7 +857,6 @@ class Phase_three:
         cursor.execute(query)
         maxID = cursor.fetchall()
         self.newReservationID = maxID[0][0] + 1;
-
 
         query1 = "INSERT INTO RESERVATION(ReservationID, Is_cancelled, Username, Card_Number) VALUES ('%d', 0, '%s', '%d')" % (self.newReservationID, self.username.get(),self.card.get())
         cursor.execute(query1)
@@ -927,6 +916,8 @@ class Phase_three:
         self.primaryWindow = Toplevel()
         self.mainMenu()
 
+    def update1(self):
+        self.index = floor(self.w.get()/8)
 #####################table info, new dept date, change fee, updated cost,#################
     def updateReservation2(self):
         self.updateWin.withdraw()
@@ -959,7 +950,7 @@ class Phase_three:
         self.w = IntVar()
         print(self.results)
         for result in self.results:
-            Radiobutton(frame, variable = self.w, value = b, command = self.select2).grid(row = a, column = 0)
+            Radiobutton(frame, variable = self.w, value = b, command = self.update1).grid(row = a, column = 0)
             Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
 
             l12 = Label(frame, text = str(result[6]), anchor = "w")
@@ -1049,10 +1040,10 @@ class Phase_three:
         tree.insert('', i, text='', values=(updateTuple[1], updateTuple[6],updateTuple[7], updateTuple[2], updateTuple[8], updateTuple[5],updateTuple[4]))
         newdepDate= Label(frame3,text ="New Departure Date")
         newdepDate.grid(row = 0, column = 0, sticky = E)
-        self.date = StringVar()
+        self.date = StringVar() ## assume YYYY-MM-DD
         e1= Entry(frame3,textvariable = self.date, width = 10)
         e1.grid(row = 0, column = 1, sticky = EW)
-        b1 = Button(frame3, text = "Search avaibility", command = self.trainSchedule)
+        b1 = Button(frame3, text = "Search availability", command = self.trainSchedule)
         b1.grid(row = 0, column = 2, sticky = EW)
 
         l2 = Label(frame3, text = "Updated Train Ticket")
@@ -1073,24 +1064,30 @@ class Phase_three:
         e3 = Entry(frame5, textvariable = self.value, width = 10)
         e3.grid(row = 1, column = 1)
 
-
+        self.updatedDate = datetime.strptime(self.date.get(), '%Y-%m-%d')
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%Y-%m-%d' WH" % (e1)
-        cursor.execute(query1)
         query2 = "SELECT Change_fee FROM SYSTEM_INFO"
         cursor.execute(query2)
-        results = cursor.fetchall()
+        changefee = cursor.fetchall()
+        change_fee = changefee[0]
+        query3 = "SELECT Total_Cost FROM RESERVES WHERE ReservationID='%d' AND Train_Number='%d'" % (self.resID.get(), result1[self.index])
+        cursor.execute(query3)
+        totalcost = cursor.fetchall()
+        total_cost = totalcost[0]
+        self.total_cost = total_cost + change_fee
 
         b2=Button(frame5, text ="Back", command = self.switchUpdateReservation2)
         b2.grid(row =2, column = 0, sticky = E)
-        b3=Button(frame5, text ="Submit", command = self.switchTOConfirmation)
+        b3=Button(frame5, text ="Submit", command = self.submit)
         b3.grid(row =2, column = 1, sticky = E)
 
 
-    def switchTOConfirmation(self):
+    def submit(self):
         self.updateWin3.destroy()
-        self.confirmation()
+        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%s', RESERVES.Total_Cost = '%d' WHERE ReservationID='%d' AND Train_Number='%d'" % (self.updatedDate, self.total_cost, self.resID.get(), self.results1[self.index])
+        cursor.execute(query1)
+        self.mainMenu()
 
 ################## reservation id search, table/ total cost, date, amount to be refunded#######################
     def cancelRes(self):
@@ -1160,6 +1157,8 @@ class Phase_three:
         query = "SELECT Is_cancelled, MIN(Departure_Date) FROM RESERVATION, RESERVES WHERE ReservationID = '%d'" % (self.resCancelID.get())
         cursor.execute(query)
         results = cursor.fetchall()
+
+        #fix the dates here
 
         if self.cancelDate < (results[1] - datetime.timedelta(days=7)):
             self.refund = self.price * 0.8 - 50
@@ -1341,9 +1340,9 @@ class Phase_three:
         #to store in tree somehow
 
         #Month          -    Revenue
-        #thirdMoth      -    $result1
-        #secondMonth    -    $result2
-        #thirdMonth     -    $result3
+        #backThreeShow  -    $ result1[0][0]
+        #backTwoShow   -    $ result2[0][0]
+        #backOneShow   -    $ result3[0][0]
 
         self.primaryWindow.withdraw()
         self.viewRevenueReport = Toplevel()
@@ -1352,63 +1351,102 @@ class Phase_three:
         frame = Frame(self.viewRevenueReport)
         frame.pack()
 
-
-
-        currMonth = int(datetime.datetime.now().strftime("%m"))
-        firstMonth = datetime.date(2016, currMonth - 1, 1)
-        firstMonth = str(firstMonth).split('-')[1]
-        firstMonthInt = int(firstMonth)
-        firstmonthname = calendar.month_name[firstMonthInt]
-        print(firstMonth)
-        print(firstmonthname)
-        secondMonth = datetime.date(2016, currMonth - 2, 1)
-        secondMonth = str(secondMonth).split('-')[1]
-        secondMonthInt = int(secondMonth)
-        secondmonthname = calendar.month_name[secondMonthInt]
-        print(secondMonth)
-        print(secondmonthname)
-        thirdMonth = datetime.date(2016, currMonth - 3, 1)
-        thirdMonth = str(thirdMonth).split('-')[1]
-        thirdMonthInt = int(thirdMonth)
-        thirdmonthname = calendar.month_name[thirdMonthInt]
-        print(thirdMonth)
-        print(thirdmonthname)
-        months = [thirdmonthname, secondmonthname, firstmonthname]
-        #>>> datetime.datetime.strptime('24052010', "%d%m%Y").date() ??????
-
-
+        current = datetime.datetime.now().strftime("%Y-%m-01")
+        backOne = (datetime.datetime.now() - datetime.timedelta(30)).strftime("%Y-%m-01")
+        backTwo = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%Y-%m-01")
+        backThree = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%Y-%m-01")
+        backOneShow = (datetime.datetime.now() - datetime.timedelta(30)).strftime("%m")
+        backTwoShow = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%m")
+        backThreeShow = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%m")
+        #the Show variables should be converted from numerics to Names via condidtionals, grunt work
 
         server = self.Connect()
         cursor = server.cursor()
-        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Month(Departure_Date) Like \'%-" + firstMonth \
-        + "-%'"
-        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Month(Departure_Date) LIKE \'%-" + secondMonth \
-        + "-%'"
-        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (thirdMonth)
-#       query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%%%%Y-%%%%m-%%%%d' AND '%%%%Y-%%%%m-%%%%d'" % (secondMonth, firstMonth)
-#       query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%%%%Y-%%%%m-%%%%d' AND '%%%%Y-%%%%m-%%%%d'" % (firstMonth, currMonth)
+        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backThree, backTwo)
+        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backTwo, backOne)
+        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backOne, current)
         cursor.execute(query1)
         result1 = cursor.fetchall()
-        print("result1:\n")
-        print(result1)
         cursor.execute(query2)
         result2 = cursor.fetchall()
-        print("result2:\n")
-        print(result2)
         cursor.execute(query3)
         result3 = cursor.fetchall()
-        print("result3:\n")
+        print(result1)
+        print(result2)
         print(result3)
-        prices = [result1, result2, result3]
 
 
         tree = self.viewTree2(frame)
-        i = 0
-        for i in range(0,3):
-            tree.insert('', i, text='', values=(months[i], prices[i]))
-
         b1 = Button(frame, text = "Back", command = self.switchMain)
         b1.pack(side = BOTTOM)
+
+
+
+
+#         self.primaryWindow.withdraw()
+#         self.viewRevenueReport = Toplevel()
+#         self.viewRevenueReport.title("View Revenue Report")
+
+#         frame = Frame(self.viewRevenueReport)
+#         frame.pack()
+
+
+
+#         currMonth = int(datetime.datetime.now().strftime("%m"))
+#         firstMonth = datetime.date(2016, currMonth - 1, 1)
+#         firstMonth = str(firstMonth).split('-')[1]
+#         firstMonthInt = int(firstMonth)
+#         firstmonthname = calendar.month_name[firstMonthInt]
+#         print(firstMonth)
+#         print(firstmonthname)
+#         secondMonth = datetime.date(2016, currMonth - 2, 1)
+#         secondMonth = str(secondMonth).split('-')[1]
+#         secondMonthInt = int(secondMonth)
+#         secondmonthname = calendar.month_name[secondMonthInt]
+#         print(secondMonth)
+#         print(secondmonthname)
+#         thirdMonth = datetime.date(2016, currMonth - 3, 1)
+#         thirdMonth = str(thirdMonth).split('-')[1]
+#         thirdMonthInt = int(thirdMonth)
+#         thirdmonthname = calendar.month_name[thirdMonthInt]
+#         print(thirdMonth)
+#         print(thirdmonthname)
+#         months = [thirdmonthname, secondmonthname, firstmonthname]
+#         #>>> datetime.datetime.strptime('24052010', "%d%m%Y").date() ??????
+
+
+
+#         server = self.Connect()
+#         cursor = server.cursor()
+#         query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Month(Departure_Date) Like \'%-" + firstMonth \
+#         + "-%'"
+#         query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Month(Departure_Date) LIKE \'%-" + secondMonth \
+#         + "-%'"
+#         query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (thirdMonth)
+# #       query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%%%%Y-%%%%m-%%%%d' AND '%%%%Y-%%%%m-%%%%d'" % (secondMonth, firstMonth)
+# #       query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date BETWEEN '%%%%Y-%%%%m-%%%%d' AND '%%%%Y-%%%%m-%%%%d'" % (firstMonth, currMonth)
+#         cursor.execute(query1)
+#         result1 = cursor.fetchall()
+#         print("result1:\n")
+#         print(result1)
+#         cursor.execute(query2)
+#         result2 = cursor.fetchall()
+#         print("result2:\n")
+#         print(result2)
+#         cursor.execute(query3)
+#         result3 = cursor.fetchall()
+#         print("result3:\n")
+#         print(result3)
+#         prices = [result1, result2, result3]
+
+
+#         tree = self.viewTree2(frame)
+#         i = 0
+#         for i in range(0,3):
+#             tree.insert('', i, text='', values=(months[i], prices[i]))
+
+#         b1 = Button(frame, text = "Back", command = self.switchMain)
+#         b1.pack(side = BOTTOM)
 
     def switchMain(self):
         self.viewRevenueReport.destroy()
@@ -1439,6 +1477,7 @@ class Phase_three:
         #               results3[1][0]    results3[1][1]
         #               results3[2][0]    results3[2][2]
 
+
         self.primaryWindow.withdraw()
         self.viewpopRRWin = Toplevel()
         self.viewpopRRWin.title("View Popular Route Report")
@@ -1446,92 +1485,154 @@ class Phase_three:
         frame.pack()
 
 
-        currMonth = int(datetime.datetime.now().strftime("%m"))
-        firstMonth = datetime.date(2016, currMonth - 1, 1)
-        firstMonth = str(firstMonth).split('-')[1]
-        firstMonthInt = int(firstMonth)
-        firstmonthname = calendar.month_name[firstMonthInt]
- #       print(firstMonth)
-#        print(firstmonthname)
-        secondMonth = datetime.date(2016, currMonth - 2, 1)
-        secondMonth = str(secondMonth).split('-')[1]
-        secondMonthInt = int(secondMonth)
-        print(secondMonth)
-        secondmonthname = calendar.month_name[secondMonthInt]
-#        print(secondMonth)
-#        print(secondmonthname)
-        thirdMonth = datetime.date(2016, currMonth - 3, 1)
-        thirdMonth = str(thirdMonth).split('-')[1]
-        thirdMonthInt = int(thirdMonth)
-        thirdmonthname = calendar.month_name[thirdMonthInt]
-        print(thirdMonth)
-#        print(thirdmonthname)
-        months = [thirdmonthname, secondmonthname, firstmonthname]
+        current = datetime.datetime.now().strftime("%Y-%m-01")
+        backOne = (datetime.datetime.now() - datetime.timedelta(30)).strftime("%Y-%m-01")
+        backTwo = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%Y-%m-01")
+        backThree = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%Y-%m-01")
+        backOneShow = (datetime.datetime.now() - datetime.timedelta(30)).strftime("%m")
+        backTwoShow = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%m")
+        backThreeShow = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%m")
+        #the Show variables should be converted from numerics to Names via condidtionals, grunt work
+        SELECT Route, MAX(Num) FROM PerTrain1
 
 
-        report = []
+
         server = self.Connect()
         cursor = server.cursor()
+        queryMonth1 = "CREATE VIEW Month1 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date > '%s' AND Departure_Date < '%s'" % (0, backThree, backTwo)
+        cursor.execute(queryMonth1)
+        queryPerTrain1 = "CREATE VIEW PerTrain1(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month1 GROUP BY Month1.TNumber"
+        cursor.execute(queryPerTrain1)
+        queryUltimate1 = "SELECT * FROM PerTrain1 WHERE Num = MAX(Num)"
+        queryPenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
+        queryAntepenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
+        cursor.execute(queryUltimate1)
+        cursor.execute(queryPenUltimate1)
+        cursor.execute(queryAntepenUltimate1)
+        results1 = cursor.fetchall()
 
-        query1 ="SELECT Train_Number FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (secondMonth)
-        cursor.execute(query1)
-        result1 = cursor.fetchall()
-        print(result1)
-        query2 ="SELECT Train_Number FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (secondMonth) \
-        + "GROUP BY Train_Number"
-        cursor.execute(query2)
-        result2 = cursor.fetchall()
-#        print(result2)
-        query3 ="SELECT Train_Number, COUNT(*) FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (firstMonth) \
-        + "GROUP BY Train_Number ORDER BY COUNT(*) desc limit 3"
-        cursor.execute(query3)
-        result3 = cursor.fetchall()
+        queryMonth2 = "CREATE VIEW Month2 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date > '%s' AND Departure_Date < '%s'" % (0, backTwo, backOne)
+        cursor.execute(queryMonth2)
+        queryPerTrain2 = "CREATE VIEW PerTrain2(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month2 GROUP BY Month2.TNumber"
+        cursor.execute(queryPerTrain2)
+        queryUltimate2 = "SELECT * FROM PerTrain2 WHERE Num = MAX(Num)"
+        queryPenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2)"
+        queryAntepenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2))"
+        cursor.execute(queryUltimate2)
+        cursor.execute(queryPenUltimate2)
+        cursor.execute(queryAntepenUltimate2)
+        results2 = cursor.fetchall()
 
-
-
-##        server = self.Connect()
-##        cursor = server.cursor()
-##        queryMonth1 = "CREATE VIEW Month1 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
-##        cursor.execute(queryMonth1)
-##        queryPerTrain1 = "CREATE VIEW PerTrain1(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month1 GROUP BY Month1.TNumber"
-##        cursor.execute(queryPerTrain1)
-##        queryUltimate1 = "SELECT * FROM PerTrain1 WHERE Num = MAX(Num)"
-##        queryPenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
-##        queryAntepenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
-##        cursor.execute(queryUltimate1)
-##        cursor.execute(queryPenUltimate1)
-##        cursor.execute(queryAntepenUltimate1)
-##        results1 = cursor.fetchall()
-##
-##        queryMonth2 = "CREATE VIEW Month2 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, secondMonth, firstMonth)
-##        cursor.execute(queryMonth2)
-##        queryPerTrain2 = "CREATE VIEW PerTrain2(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month2 GROUP BY Month2.TNumber"
-##        cursor.execute(queryPerTrain2)
-##        queryUltimate2 = "SELECT * FROM PerTrain2 WHERE Num = MAX(Num)"
-##        queryPenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2)"
-##        queryAntepenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2))"
-##        cursor.execute(queryUltimate2)
-##        cursor.execute(queryPenUltimate2)
-##        cursor.execute(queryAntepenUltimate2)
-##        results2 = cursor.fetchall()
-##
-##        queryMonth3 = "CREATE VIEW Month3 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, secondMonth, firstMonth)
-##        cursor.execute(queryMonth3)
-##        queryPerTrain3 = "CREATE VIEW PerTrain3(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month3 GROUP BY Month3.TNumber"
-##        cursor.execute(queryPerTrain3)
-##        queryUltimate3 = "SELECT * FROM PerTrain3 WHERE Num = MAX(Num)"
-##        queryPenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3)"
-##        queryAntepenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3))"
-##        cursor.execute(queryUltimate3)
-##        cursor.execute(queryPenUltimate3)
-##        cursor.execute(queryAntepenUltimate3)
-##        results3 = cursor.fetchall()
-
+        queryMonth3 = "CREATE VIEW Month3 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date > '%s' AND Departure_Date < '%s'" % (0, backOne, current)
+        cursor.execute(queryMonth3)
+        queryPerTrain3 = "CREATE VIEW PerTrain3(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month3 GROUP BY Month3.TNumber"
+        cursor.execute(queryPerTrain3)
+        queryUltimate3 = "SELECT * FROM PerTrain3 WHERE Num = MAX(Num)"
+        queryPenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3)"
+        queryAntepenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3))"
+        cursor.execute(queryUltimate3)
+        cursor.execute(queryPenUltimate3)
+        cursor.execute(queryAntepenUltimate3)
+        results3 = cursor.fetchall()
 
         tree = self.viewTree3(frame)
 
         b1 = Button(frame, text = "Back", command = self.swtMain)
         b1.pack(side = BOTTOM)
+
+#         self.primaryWindow.withdraw()
+#         self.viewpopRRWin = Toplevel()
+#         self.viewpopRRWin.title("View Popular Route Report")
+#         frame = Frame(self.viewpopRRWin)
+#         frame.pack()
+
+
+#         currMonth = int(datetime.datetime.now().strftime("%m"))
+#         firstMonth = datetime.date(2016, currMonth - 1, 1)
+#         firstMonth = str(firstMonth).split('-')[1]
+#         firstMonthInt = int(firstMonth)
+#         firstmonthname = calendar.month_name[firstMonthInt]
+#  #       print(firstMonth)
+# #        print(firstmonthname)
+#         secondMonth = datetime.date(2016, currMonth - 2, 1)
+#         secondMonth = str(secondMonth).split('-')[1]
+#         secondMonthInt = int(secondMonth)
+#         print(secondMonth)
+#         secondmonthname = calendar.month_name[secondMonthInt]
+# #        print(secondMonth)
+# #        print(secondmonthname)
+#         thirdMonth = datetime.date(2016, currMonth - 3, 1)
+#         thirdMonth = str(thirdMonth).split('-')[1]
+#         thirdMonthInt = int(thirdMonth)
+#         thirdmonthname = calendar.month_name[thirdMonthInt]
+#         print(thirdMonth)
+# #        print(thirdmonthname)
+#         months = [thirdmonthname, secondmonthname, firstmonthname]
+
+
+#         report = []
+#         server = self.Connect()
+#         cursor = server.cursor()
+
+#         query1 ="SELECT Train_Number FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (secondMonth)
+#         cursor.execute(query1)
+#         result1 = cursor.fetchall()
+#         print(result1)
+#         query2 ="SELECT Train_Number FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (secondMonth) \
+#         + "GROUP BY Train_Number"
+#         cursor.execute(query2)
+#         result2 = cursor.fetchall()
+# #        print(result2)
+#         query3 ="SELECT Train_Number, COUNT(*) FROM RESERVES WHERE Month(Departure_Date) LIKE '%s'" % (firstMonth) \
+#         + "GROUP BY Train_Number ORDER BY COUNT(*) desc limit 3"
+#         cursor.execute(query3)
+#         result3 = cursor.fetchall()
+
+
+
+# ##        server = self.Connect()
+# ##        cursor = server.cursor()
+# ##        queryMonth1 = "CREATE VIEW Month1 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, thirdMonth, secondMonth)
+# ##        cursor.execute(queryMonth1)
+# ##        queryPerTrain1 = "CREATE VIEW PerTrain1(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month1 GROUP BY Month1.TNumber"
+# ##        cursor.execute(queryPerTrain1)
+# ##        queryUltimate1 = "SELECT * FROM PerTrain1 WHERE Num = MAX(Num)"
+# ##        queryPenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1)"
+# ##        queryAntepenultimate1 = "SELECT * FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1 WHERE Num < (SELECT MAX(Num) FROM PerTrain1))"
+# ##        cursor.execute(queryUltimate1)
+# ##        cursor.execute(queryPenUltimate1)
+# ##        cursor.execute(queryAntepenUltimate1)
+# ##        results1 = cursor.fetchall()
+# ##
+# ##        queryMonth2 = "CREATE VIEW Month2 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, secondMonth, firstMonth)
+# ##        cursor.execute(queryMonth2)
+# ##        queryPerTrain2 = "CREATE VIEW PerTrain2(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month2 GROUP BY Month2.TNumber"
+# ##        cursor.execute(queryPerTrain2)
+# ##        queryUltimate2 = "SELECT * FROM PerTrain2 WHERE Num = MAX(Num)"
+# ##        queryPenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2)"
+# ##        queryAntepenultimate2 = "SELECT * FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2 WHERE Num < (SELECT MAX(Num) FROM PerTrain2))"
+# ##        cursor.execute(queryUltimate2)
+# ##        cursor.execute(queryPenUltimate2)
+# ##        cursor.execute(queryAntepenUltimate2)
+# ##        results2 = cursor.fetchall()
+# ##
+# ##        queryMonth3 = "CREATE VIEW Month3 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date BETWEEN '%Y-%m-%d' AND '%Y-%m-%d'" % (0, secondMonth, firstMonth)
+# ##        cursor.execute(queryMonth3)
+# ##        queryPerTrain3 = "CREATE VIEW PerTrain3(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month3 GROUP BY Month3.TNumber"
+# ##        cursor.execute(queryPerTrain3)
+# ##        queryUltimate3 = "SELECT * FROM PerTrain3 WHERE Num = MAX(Num)"
+# ##        queryPenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3)"
+# ##        queryAntepenultimate3 = "SELECT * FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3 WHERE Num < (SELECT MAX(Num) FROM PerTrain3))"
+# ##        cursor.execute(queryUltimate3)
+# ##        cursor.execute(queryPenUltimate3)
+# ##        cursor.execute(queryAntepenUltimate3)
+# ##        results3 = cursor.fetchall()
+
+
+#         tree = self.viewTree3(frame)
+
+#         b1 = Button(frame, text = "Back", command = self.swtMain)
+#         b1.pack(side = BOTTOM)
 
     def swtMain(self):
         self.viewpopRRWin.destroy()
