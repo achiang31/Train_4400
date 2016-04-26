@@ -188,7 +188,7 @@ class Phase_three:
             b8.grid(row = 0, column = 0, columnspan = 2, sticky = EW)
             b9 = Button(buttonsFrame, text ="View popular route report", command = self.viewpopRR)
             b9.grid(row = 1, column = 0, columnspan = 2, sticky = EW)
-            b10=Button(buttonsFrame, text ="Log out")#, command = s
+            b10=Button(buttonsFrame, text ="Log out", command = self.logout)
             b10.grid(row = 2, column = 0, columnspan = 2, sticky = EW)
 
     def switchToRegister(self):
@@ -1348,10 +1348,81 @@ class Phase_three:
         backTwo = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%Y-%m-01")
         backThree = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%Y-%m-01")
 
-        #the Show variables should be converted from numerics to Names via condidtionals, grunt work
         if backOne == "01":
             backOneShow = "January"
+        if backOne == "02":
+            backOneShow = "February"
+        if backOne == "03":
+            backOneShow = "March"
+        if backOne == "04":
+            backOneShow = "April"
+        if backOne == "05":
+            backOneShow = "May"
+        if backOne == "06":
+            backOneShow = "June"
+        if backOne == "07":
+            backOneShow = "July"
+        if backOne == "08":
+            backOneShow = "August"
+        if backOne == "09":
+            backOneShow = "September"
+        if backOne == "10":
+            backOneShow = "October"
+        if backOne == "11":
+            backOneShow = "November"
+        if backOne == "12":
+            backOneShow = "December"
 
+
+        if backTwo == "01":
+            backTwoShow = "January"
+        if backTwo == "02":
+            backTwoShow = "February"
+        if backTwo == "03":
+            backTwoShow = "March"
+        if backTwo == "04":
+            backTwoShow = "April"
+        if backTwo == "05":
+            backTwoShow = "May"
+        if backTwo == "06":
+            backTwoShow = "June"
+        if backTwo == "07":
+            backTwoShow = "July"
+        if backTwo == "08":
+            backTwoShow = "August"
+        if backTwo == "09":
+            backTwoShow = "September"
+        if backTwo == "10":
+            backTwoShow = "October"
+        if backTwo == "11":
+            backTwoShow = "November"
+        if backTwo == "12":
+            backTwoShow = "December"
+
+        if backThree == "01":
+            backThreeShow = "January"
+        if backThree == "02":
+            backThreeShow = "February"
+        if backThree == "03":
+            backThreeShow = "March"
+        if backThree == "04":
+            backThreeShow = "April"
+        if backThree == "05":
+            backThreeShow = "May"
+        if backThree == "06":
+            backThreeShow = "June"
+        if backThree == "07":
+            backThreeShow = "July"
+        if backThree == "08":
+            backThreeShow = "August"
+        if backThree == "09":
+            backThreeShow = "September"
+        if backThree == "10":
+            backThreeShow = "October"
+        if backThree == "11":
+            backThreeShow = "November"
+        if backThree == "12":
+            bakcThreeShow = "December"
 
         server = self.Connect()
         cursor = server.cursor()
@@ -1415,37 +1486,135 @@ class Phase_three:
         backOne = (datetime.datetime.now() - datetime.timedelta(30)).strftime("%Y-%m-01")
         backTwo = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%Y-%m-01")
         backThree = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%Y-%m-01")
-        backOneShow = (datetime.datetime.now() - datetime.timedelta(30)).strftime("%m")
-        backTwoShow = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%m")
-        backThreeShow = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%m")
-        #the Show variables should be converted from numerics to Names via condidtionals, grunt work
+
+        if backOne == "01":
+            backOneShow = "January"
+        if backOne == "02":
+            backOneShow = "February"
+        if backOne == "03":
+            backOneShow = "March"
+        if backOne == "04":
+            backOneShow = "April"
+        if backOne == "05":
+            backOneShow = "May"
+        if backOne == "06":
+            backOneShow = "June"
+        if backOne == "07":
+            backOneShow = "July"
+        if backOne == "08":
+            backOneShow = "August"
+        if backOne == "09":
+            backOneShow = "September"
+        if backOne == "10":
+            backOneShow = "October"
+        if backOne == "11":
+            backOneShow = "November"
+        if backOne == "12":
+            backOneShow = "December"
+
+
+        if backTwo == "01":
+            backTwoShow = "January"
+        if backTwo == "02":
+            backTwoShow = "February"
+        if backTwo == "03":
+            backTwoShow = "March"
+        if backTwo == "04":
+            backTwoShow = "April"
+        if backTwo == "05":
+            backTwoShow = "May"
+        if backTwo == "06":
+            backTwoShow = "June"
+        if backTwo == "07":
+            backTwoShow = "July"
+        if backTwo == "08":
+            backTwoShow = "August"
+        if backTwo == "09":
+            backTwoShow = "September"
+        if backTwo == "10":
+            backTwoShow = "October"
+        if backTwo == "11":
+            backTwoShow = "November"
+        if backTwo == "12":
+            backTwoShow = "December"
+
+        if backThree == "01":
+            backThreeShow = "January"
+        if backThree == "02":
+            backThreeShow = "February"
+        if backThree == "03":
+            backThreeShow = "March"
+        if backThree == "04":
+            backThreeShow = "April"
+        if backThree == "05":
+            backThreeShow = "May"
+        if backThree == "06":
+            backThreeShow = "June"
+        if backThree == "07":
+            backThreeShow = "July"
+        if backThree == "08":
+            backThreeShow = "August"
+        if backThree == "09":
+            backThreeShow = "September"
+        if backThree == "10":
+            backThreeShow = "October"
+        if backThree == "11":
+            backThreeShow = "November"
+        if backThree == "12":
+            bakcThreeShow = "December"
 
         server = self.Connect()
         cursor = server.cursor()
-
         queryMonth1 = "CREATE VIEW Month1 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date > '%s' AND Departure_Date < '%s'" % (0, backThree, backTwo)
         cursor.execute(queryMonth1)
-        queryPerTrain1 = "CREATE VIEW PerTrain1(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month1 GROUP BY Month1.TNumber"
+        queryHere1 = "SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month1 GROUP BY TNumber"
+        cursor.execute(queryHere1)
+        tempResults1 = cursor.fetchall()
+        queryPerTrain1 = "CREATE TABLE PerTrain1(Route INT(10), Num INT(10))"
         cursor.execute(queryPerTrain1)
-        queryUltimate1 = "SELECT a.* FROM PerTrain1 a LEFT OUTER JOIN PerTrain1 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+        for result in tempResults1:
+            self.TNumber = result[0]
+            self.countReservations = result[1]
+            queryFillTrain1 = "INSERT INTO PerTrain1(Route, Num) VALUES ('%d', '%d')" % (self.TNumber, self.countReservations)
+            cursor.execute(queryFillTrain1)
+            server.commit()
+        queryUltimate1 = "SELECT * FROM PerTrain1"
         cursor.execute(queryUltimate1)
-        results1 = cursor.fetchall()
+        preResults11 = cursor.fetchall()
+        maxNum11 = 0
+        maxTup11 = (0,0)
+        for result in preResults11:
+            if result[1] > maxNum11:
+                maxNum11 = result[1]
+                maxTup11 = (result[0], result[1])
+        results1 = []
+        results1.append(maxTup11)
         if len(results1) < 3:
-            queryNext = "DELETE FROM PerTrain1 t1 JOIN (SELECT MAX(Num) AS max_num FROM PerTrain1) 3 WHERE t1.Num  = t2.max_num"
+            queryNext = "DELETE FROM PerTrain1 ORDER BY Num DESC LIMIT 1"
             cursor.execute(queryNext)
-            queryPenultimate1 = "SELECT a.* FROM PerTrain1 a LEFT OUTER JOIN PerTrain1 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+            queryPenultimate1 = "SELECT * FROM PerTrain1"
             cursor.execute(queryPenultimate1)
-            results12 = cursor.fetchall()
-            for result in results12:
-                results1.append(result)
+            preResults12 = cursor.fetchall()
+            maxNum12 = 0
+            maxTup12 = (0,0)
+            for result in preResults12:
+                if result[1] > maxNum12:
+                    maxNum12 = result[1]
+                    maxTup12 = (result[0], result[1])
+            results1.append(maxTup12)
             if len(results1) < 3:
-                queryNext = "DELETE FROM PerTrain1 t1 JOIN (SELECT MAX(Num) AS max_num FROM PerTrain1) t2 WHERE t1.Num  = t2.max_num"
+                queryNext = "DELETE FROM PerTrain1 ORDER BY Num DESC LIMIT 1"
                 cursor.execute(queryNext)
-                queryAntepenultimate1 = "SELECT a.* FROM PerTrain1 a LEFT OUTER JOIN PerTrain1 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+                queryAntepenultimate1 = "SELECT * FROM PerTrain1"
                 cursor.execute(queryAntepenultimate1)
-                results13 = cursor.fetchall()
-                for result in results13:
-                    results1.append(result)
+                preResults13 = cursor.fetchall()
+                maxNum13 = 0
+                maxTup13 = (0,0)
+                for result in preResults13:
+                    if result[1] > maxNum13:
+                        maxNum13 = result[1]
+                        maxTup13 = (result[0], result[1])
+                results1.append(maxTup13)
                 #insert table stuff here;  results1[0][0] = route num, results[0][1] = max # of reservations, etc, up to results1[2][1]
             else:
                 pass
@@ -1456,73 +1625,135 @@ class Phase_three:
 
         queryMonth2 = "CREATE VIEW Month2 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date > '%s' AND Departure_Date < '%s'" % (0, backTwo, backOne)
         cursor.execute(queryMonth2)
-        queryPerTrain2 = "CREATE VIEW PerTrain2(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month2 GROUP BY Month2.TNumber"
+        queryHere2 = "SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month2 GROUP BY TNumber"
+        cursor.execute(queryHere2)
+        tempResults2 = cursor.fetchall()
+        queryPerTrain2 = "CREATE TABLE PerTrain2(Route INT(10), Num INT(10))"
         cursor.execute(queryPerTrain2)
-        queryUltimate2 = "SELECT a.* FROM PerTrain2 a LEFT OUTER JOIN PerTrain2 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+        for result in tempResults2:
+            self.TNumber = result[0]
+            self.countReservations = result[1]
+            queryFillTrain2 = "INSERT INTO PerTrain2(Route, Num) VALUES ('%d', '%d')" % (self.TNumber, self.countReservations)
+            cursor.execute(queryFillTrain2)
+            server.commit()
+        queryUltimate2 = "SELECT * FROM PerTrain2"
         cursor.execute(queryUltimate2)
-        results2 = cursor.fetchall()
+        preResults21 = cursor.fetchall()
+        maxNum21 = 0
+        maxTup21 = (0,0)
+        for result in preResults21:
+            if result[1] > maxNum21:
+                maxNum21 = result[1]
+                maxTup21 = (result[0], result[1])
+        results2 = []
+        results2.append(maxTup21)
         if len(results2) < 3:
-            queryNext = "DELETE FROM PerTrain2 t1 JOIN (SELECT MAX(Num) AS max_num FROM PerTrain2) t2 WHERE t1.Num  = t2.max_num"
+            queryNext = "DELETE FROM PerTrain2 ORDER BY Num DESC LIMIT 1"
             cursor.execute(queryNext)
-            queryPenultimate2 = "SELECT a.* FROM PerTrain2 a LEFT OUTER JOIN PerTrain2 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+            queryPenultimate2 = "SELECT * FROM PerTrain2"
             cursor.execute(queryPenultimate2)
-            results22 = cursor.fetchall()
-            for result in results22:
-                results2.append(result)
+            preResults22 = cursor.fetchall()
+            maxNum22 = 0
+            maxTup22 = (0,0)
+            for result in preResults22:
+                if result[1] > maxNum22:
+                    maxNum22 = result[1]
+                    maxTup22 = (result[0], result[1])
+            results2.append(maxTup22)
             if len(results2) < 3:
-                queryNext = "DELETE FROM PerTrain2 t1 JOIN (SELECT MAX(Num) AS max_num FROM PerTrain2) t2 WHERE t1.Num  = t2.max_num"
+                queryNext = "DELETE FROM PerTrain2 ORDER BY Num DESC LIMIT 1"
                 cursor.execute(queryNext)
-                queryAntepenultimate2 = "SELECT a.* FROM PerTrain2 a LEFT OUTER JOIN PerTrain2 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+                queryAntepenultimate2 = "SELECT * FROM PerTrain2"
                 cursor.execute(queryAntepenultimate2)
-                results23 = cursor.fetchall()
-                for result in results23:
-                    results2.append(result)
-                #insert table stuff here;  results2[0][0] = route num, results[0][1] = max # of reservations, etc, up to results2[2][1]
+                preResults23 = cursor.fetchall()
+                maxNum23 = 0
+                maxTup23 = (0,0)
+                for result in preResults23:
+                    if result[1] > maxNum13:
+                        maxNum23 = result[1]
+                        maxTup23 = (result[0], result[1])
+                results2.append(maxTup23)
+                #insert table stuff here;  results2[0][0] = route num, results2[0][1] = max # of reservations, etc, up to results2[2][1]
             else:
                 pass
-                #insert table stuff here;  results2[0][0] = route num, results[0][1] = max # of reservations, etc, up to results2[2][1]
+                #insert table stuff here;  results2[0][0] = route num, results2[0][1] = max # of reservations, etc, up to results2[2][1]
         else:
             pass
-            #insert table stuff here;  results2[0][0] = route num, results[0][1] = max # of reservations, etc, up to results2[2][1]
+            #insert table stuff here;  results2[0][0] = route num, results2[0][1] = max # of reservations, etc, up to results2[2][1]
 
         queryMonth3 = "CREATE VIEW Month3 (Reservations, TNumber) AS SELECT ReservationID, Train_Number FROM RESERVATION NATURAL JOIN RESERVES WHERE Is_cancelled = '%d' AND Departure_Date > '%s' AND Departure_Date < '%s'" % (0, backOne, current)
         cursor.execute(queryMonth3)
-        queryPerTrain3 = "CREATE VIEW PerTrain3(Route, Num) AS SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month3 GROUP BY Month3.TNumber"
+        queryHere3 = "SELECT TNumber, COUNT(DISTINCT Reservations) FROM Month3 GROUP BY TNumber"
+        cursor.execute(queryHere3)
+        tempResults3 = cursor.fetchall()
+        queryPerTrain3 = "CREATE TABLE PerTrain3(Route INT(10), Num INT(10))"
         cursor.execute(queryPerTrain3)
-        queryUltimate3 = "SELECT a.* FROM PerTrain3 a LEFT OUTER JOIN PerTrain3 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+        for result in tempResults3:
+            self.TNumber = result[0]
+            self.countReservations = result[1]
+            queryFillTrain3 = "INSERT INTO PerTrain3(Route, Num) VALUES ('%d', '%d')" % (self.TNumber, self.countReservations)
+            cursor.execute(queryFillTrain3)
+            server.commit()
+        queryUltimate3 = "SELECT * FROM PerTrain3"
         cursor.execute(queryUltimate3)
-        results3 = cursor.fetchall()
+        preResults31 = cursor.fetchall()
+        maxNum31 = 0
+        maxTup31 = (0,0)
+        for result in preResults31:
+            if result[1] > maxNum31:
+                maxNum31 = result[1]
+                maxTup31 = (result[0], result[1])
+        results3 = []
+        results3.append(maxTup31)
         if len(results3) < 3:
-            queryNext = "DELETE FROM PerTrain3 t1 JOIN (SELECT MAX(Num) AS max_num FROM PerTrain3) t2 WHERE t1.Num  = t2.max_num"
+            queryNext = "DELETE FROM PerTrain3 ORDER BY Num DESC LIMIT 1"
             cursor.execute(queryNext)
-            queryPenultimate3 = "SELECT a.* FROM PerTrain3 a LEFT OUTER JOIN PerTrain3 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+            queryPenultimate3 = "SELECT * FROM PerTrain3"
             cursor.execute(queryPenultimate3)
-            results32 = cursor.fetchall()
-            for result in results32:
-                results3.append(result)
+            preResults32 = cursor.fetchall()
+            maxNum32 = 0
+            maxTup32 = (0,0)
+            for result in preResults32:
+                if result[1] > maxNum32:
+                    maxNum32 = result[1]
+                    maxTup32 = (result[0], result[1])
+            results3.append(maxTup32)
             if len(results3) < 3:
-                queryNext = "DELETE FROM PerTrain3 t1 JOIN (SELECT MAX(Num) AS max_num FROM PerTrain3) t2 WHERE t1.Num  = t2.max_num"
+                queryNext = "DELETE FROM PerTrain3 ORDER BY Num DESC LIMIT 1"
                 cursor.execute(queryNext)
-                queryAntepenultimate3 = "SELECT a.* FROM PerTrain3 a LEFT OUTER JOIN PerTrain3 b ON a.Route = b.Route AND a.Num < b.Num WHERE b.Route IS NULL;"
+                queryAntepenultimate3 = "SELECT * FROM PerTrain3"
                 cursor.execute(queryAntepenultimate3)
-                results33 = cursor.fetchall()
-                for result in results33:
-                    results3.append(result)
-                #insert table stuff here;  results3[0][0] = route num, results[0][1] = max # of reservations, etc, up to results3[2][1]
+                preResults33 = cursor.fetchall()
+                maxNum33 = 0
+                maxTup33 = (0,0)
+                for result in preResults33:
+                    if result[1] > maxNum13:
+                        maxNum33 = result[1]
+                        maxTup33 = (result[0], result[1])
+                results3.append(maxTup33)
+                #insert table stuff here;  results1[0][0] = route num, results[0][1] = max # of reservations, etc, up to results1[2][1]
             else:
                 pass
-                #insert table stuff here;  results3[0][0] = route num, results[0][1] = max # of reservations, etc, up to results3[2][1]
+                #insert table stuff here;  results1[0][0] = route num, results[0][1] = max # of reservations, etc, up to results1[2][1]
         else:
             pass
-            #insert table stuff here;  results3[0][0] = route num, results[0][1] = max # of reservations, etc, up to results3[2][1]
+            #insert table stuff here;  results1[0][0] = route num, results[0][1] = max # of reservations, etc, up to results1[2][1]
 
         queryDrop11 = "DROP VIEW Month1"
-        queryDrop12 = "DROP VIEW PerTrain1"
+        queryDrop12 = "DROP TABLE PerTrain1"
         queryDrop21 = "DROP VIEW Month2"
-        queryDrop22 = "DROP VIEW PerTrain2"
+        queryDrop22 = "DROP TABLE PerTrain2"
         queryDrop31 = "DROP VIEW Month3"
-        queryDrop32 = "DROP VIEW PerTrain3"
-
+        queryDrop32 = "DROP TABLE PerTrain3"
+        cursor.execute(queryDrop11)
+        cursor.execute(queryDrop12)
+        cursor.execute(queryDrop21)
+        cursor.execute(queryDrop22)
+        cursor.execute(queryDrop31)
+        cursor.execute(queryDrop32)
+        server.commit()
+        cursor.close()
+        server.close()
 
 
         print(results1)
