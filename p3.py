@@ -434,7 +434,7 @@ class Phase_three:
 
     def departureInfo(self):
         start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
-        if start_date < datetime.datetime.now():
+        if start_date < datetime.now():
             messagebox.showerror("Error", "Invalid Date (Either in the past or start > end)")
         else:
             self.findAvailWindow.withdraw()
@@ -745,7 +745,7 @@ class Phase_three:
 
     def addCardCheck(self):
         self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
-        if self.expDate <= datedatetime.now():
+        if self.expDate <= datetime.now():
             messagebox.showerror("Error, your card is expired.")
 
         server = self.Connect()
@@ -816,7 +816,7 @@ class Phase_three:
         results = cursor.fetchall()
         for row in results:
             self.departDate = row[1]
-            if self.departDate >= datetime.now() and row[0] == 0:
+            if self.departDate >= datetime.today() and row[0] == 0:
                 messagebox.showerror("Error", "Card is being used for existing reservation")
                 return
 
@@ -1145,7 +1145,7 @@ class Phase_three:
         e1= Label(frame2,text = self.price, width = 10)
         e1.grid(row = 1, column = 1, sticky = EW)
 
-        self.cancelDate = date.now()
+        self.cancelDate = date.today()
         l2 = Label(frame2, text = "Date of Cancellation")
         l2.grid(row = 2, column = 0, sticky = E)
         e2= Label(frame2,text = self.cancelDate.get(), width = 10)
@@ -1287,8 +1287,13 @@ class Phase_three:
         e3 = Entry(frame, textvariable = self.comment, width = 20)
         e3.grid(row = 2, column = 1)
 
+<<<<<<< HEAD
         b1=Button(frame, text ="Submit", command = self.verifyRev)
         b1.grid(row = 3, column = 1)
+=======
+        if self.trainNo == "" or self.rating == "":
+            return
+>>>>>>> d561fe4e45e40a0b863420163735a3b364c7f0bc
 
 
     def verifyRev(self):
@@ -1351,6 +1356,143 @@ class Phase_three:
         self.viewRevenueReport.title("View Revenue Report")
 
         frame = Frame(self.viewRevenueReport)
+        frame.pack()
+
+        current = datetime.datetime.now().strftime("%Y-%m-01")
+        backOne = (datetime.datetime.now() - datetime.timedelta(30)).strftime("%Y-%m-01")
+        backTwo = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%Y-%m-01")
+        backThree = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%Y-%m-01")
+
+
+        if backOne == "01":
+            backOneShow = "January"
+        if backOne == "02":
+            backOneShow = "February"
+        if backOne == "03":
+            backOneShow = "March"
+        if backOne == "04":
+            backOneShow = "April"
+        if backOne == "05":
+            backOneShow = "May"
+        if backOne == "06":
+            backOneShow = "June"
+        if backOne == "07":
+            backOneShow = "July"
+        if backOne == "08":
+            backOneShow = "August"
+        if backOne == "09":
+            backOneShow = "September"
+        if backOne == "10":
+            backOneShow = "October"
+        if backOne == "11":
+            backOneShow = "November"
+        if backOne == "12":
+            backOneShow = "December"
+
+
+        if backTwo == "01":
+            backTwoShow = "January"
+        if backTwo == "02":
+            backTwoShow = "February"
+        if backTwo == "03":
+            backTwoShow = "March"
+        if backTwo == "04":
+            backTwoShow = "April"
+        if backTwo == "05":
+            backTwoShow = "May"
+        if backTwo == "06":
+            backTwoShow = "June"
+        if backTwo == "07":
+            backTwoShow = "July"
+        if backTwo == "08":
+            backTwoShow = "August"
+        if backTwo == "09":
+            backTwoShow = "September"
+        if backTwo == "10":
+            backTwoShow = "October"
+        if backTwo == "11":
+            backTwoShow = "November"
+        if backTwo == "12":
+            backTwoShow = "December"
+
+        if backThree == "01":
+            backThreeShow = "January"
+        if backThree == "02":
+            backThreeShow = "February"
+        if backThree == "03":
+            backThreeShow = "March"
+        if backThree == "04":
+            backThreeShow = "April"
+        if backThree == "05":
+            backThreeShow = "May"
+        if backThree == "06":
+            backThreeShow = "June"
+        if backThree == "07":
+            backThreeShow = "July"
+        if backThree == "08":
+            backThreeShow = "August"
+        if backThree == "09":
+            backThreeShow = "September"
+        if backThree == "10":
+            backThreeShow = "October"
+        if backThree == "11":
+            backThreeShow = "November"
+        if backThree == "12":
+            backThreeShow = "December"
+
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backThree, backTwo)
+        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backTwo, backOne)
+        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backOne, current)
+        cursor.execute(query1)
+        result1 = cursor.fetchall()
+        cursor.execute(query2)
+        result2 = cursor.fetchall()
+        cursor.execute(query3)
+        result3 = cursor.fetchall()
+
+        tree = self.viewTree2(frame)
+        tree.insert('', 0, text='', values=(backThreeShow, result1[0][0]))
+        tree.insert('', 1, text='', values=(backTwoShow, result2[0][0]))
+        tree.insert('', 2, text='', values=(backOneShow, result3[0][0]))
+
+        b1 = Button(frame, text = "Back", command = self.switchMain)
+        b1.pack(side = BOTTOM)
+
+    def switchMain(self):
+        self.viewRevenueReport.destroy()
+        self.primaryWindow = Toplevel()
+        self.mainMenu()
+
+    def viewTree3(self, frame):
+        tree=Treeview(frame)
+        tree.pack()
+        tree["show"] = "headings"
+        tree["columns"]=("mon","num","rsv")
+        tree.heading("mon", text= "Month")
+        tree.heading("num", text= "Train number")
+        tree.heading("rsv", text= "#of Reservations")
+        return tree
+
+    def viewpopRR(self):
+        #to store in tree somehow
+
+        #Month  -               Route   -      Reservations
+        #backThreeShow      results1[0][0]    results1[0][1]
+        #                   results1[1][0]    results1[1][1]
+        #                   results1[2][0]    results1[2][1]
+        #backTwoShow        results2[0][0]    results2[0][1]
+        #                   results2[1][0]    results2[1][1]
+        #                   results2[2][0]    results2[2][1]
+        #backOneShow        results3[0][0]    results3[0][1]
+        #                   results3[1][0]    results3[1][1]
+        #                   results3[2][0]    results3[2][1]
+
+        self.primaryWindow.withdraw()
+        self.viewpopRRWin = Toplevel()
+        self.viewpopRRWin.title("View Popular Route Report")
+        frame = Frame(self.viewpopRRWin)
         frame.pack()
 
         current = datetime.datetime.now().strftime("%Y-%m-01")
@@ -1439,142 +1581,6 @@ class Phase_three:
         if backThreeM == "11":
             backThreeShow = "November"
         if backThreeM == "12":
-            backThreeShow = "December"
-
-        server = self.Connect()
-        cursor = server.cursor()
-        query1 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backThree, backTwo)
-        query2 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backTwo, backOne)
-        query3 = "SELECT SUM(Total_Cost) FROM RESERVES WHERE Departure_Date > '%s' AND Departure_Date < '%s'" % (backOne, current)
-        cursor.execute(query1)
-        result1 = cursor.fetchall()
-        cursor.execute(query2)
-        result2 = cursor.fetchall()
-        cursor.execute(query3)
-        result3 = cursor.fetchall()
-
-        tree = self.viewTree2(frame)
-        tree.insert('', 0, text='', values=(backThreeShow, result1[0][0]))
-        tree.insert('', 1, text='', values=(backTwoShow, result2[0][0]))
-        tree.insert('', 2, text='', values=(backOneShow, result3[0][0]))
-
-        b1 = Button(frame, text = "Back", command = self.switchMain)
-        b1.pack(side = BOTTOM)
-
-    def switchMain(self):
-        self.viewRevenueReport.destroy()
-        self.primaryWindow = Toplevel()
-        self.mainMenu()
-
-    def viewTree3(self, frame):
-        tree=Treeview(frame)
-        tree.pack()
-        tree["show"] = "headings"
-        tree["columns"]=("mon","num","rsv")
-        tree.heading("mon", text= "Month")
-        tree.heading("num", text= "Train number")
-        tree.heading("rsv", text= "#of Reservations")
-        return tree
-
-    def viewpopRR(self):
-        #to store in tree somehow
-
-        #Month  -               Route   -      Reservations
-        #backThreeShow      results1[0][0]    results1[0][1]
-        #                   results1[1][0]    results1[1][1]
-        #                   results1[2][0]    results1[2][1]
-        #backTwoShow        results2[0][0]    results2[0][1]
-        #                   results2[1][0]    results2[1][1]
-        #                   results2[2][0]    results2[2][1]
-        #backOneShow        results3[0][0]    results3[0][1]
-        #                   results3[1][0]    results3[1][1]
-        #                   results3[2][0]    results3[2][1]
-
-        self.primaryWindow.withdraw()
-        self.viewpopRRWin = Toplevel()
-        self.viewpopRRWin.title("View Popular Route Report")
-        frame = Frame(self.viewpopRRWin)
-        frame.pack()
-
-        current = datetime.datetime.now().strftime("%Y-%m-01")
-        backOne = (datetime.datetime.now() - datetime.timedelta(30)).strftime("%Y-%m-01")
-        backTwo = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%Y-%m-01")
-        backThree = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%Y-%m-01")
-
-        if backOne == "01":
-            backOneShow = "January"
-        if backOne == "02":
-            backOneShow = "February"
-        if backOne == "03":
-            backOneShow = "March"
-        if backOne == "04":
-            backOneShow = "April"
-        if backOne == "05":
-            backOneShow = "May"
-        if backOne == "06":
-            backOneShow = "June"
-        if backOne == "07":
-            backOneShow = "July"
-        if backOne == "08":
-            backOneShow = "August"
-        if backOne == "09":
-            backOneShow = "September"
-        if backOne == "10":
-            backOneShow = "October"
-        if backOne == "11":
-            backOneShow = "November"
-        if backOne == "12":
-            backOneShow = "December"
-
-
-        if backTwo == "01":
-            backTwoShow = "January"
-        if backTwo == "02":
-            backTwoShow = "February"
-        if backTwo == "03":
-            backTwoShow = "March"
-        if backTwo == "04":
-            backTwoShow = "April"
-        if backTwo == "05":
-            backTwoShow = "May"
-        if backTwo == "06":
-            backTwoShow = "June"
-        if backTwo == "07":
-            backTwoShow = "July"
-        if backTwo == "08":
-            backTwoShow = "August"
-        if backTwo == "09":
-            backTwoShow = "September"
-        if backTwo == "10":
-            backTwoShow = "October"
-        if backTwo == "11":
-            backTwoShow = "November"
-        if backTwo == "12":
-            backTwoShow = "December"
-
-        if backThree == "01":
-            backThreeShow = "January"
-        if backThree == "02":
-            backThreeShow = "February"
-        if backThree == "03":
-            backThreeShow = "March"
-        if backThree == "04":
-            backThreeShow = "April"
-        if backThree == "05":
-            backThreeShow = "May"
-        if backThree == "06":
-            backThreeShow = "June"
-        if backThree == "07":
-            backThreeShow = "July"
-        if backThree == "08":
-            backThreeShow = "August"
-        if backThree == "09":
-            backThreeShow = "September"
-        if backThree == "10":
-            backThreeShow = "October"
-        if backThree == "11":
-            backThreeShow = "November"
-        if backThree == "12":
             bakcThreeShow = "December"
 
         server = self.Connect()
@@ -1769,10 +1775,17 @@ class Phase_three:
         cursor.close()
         server.close()
 
+        tree = self.viewTree3(frame)
+        tree.insert('', 0, text='', values=(backThreeShow, results1[0][0], results1[0][1]))
+        tree.insert('', 1, text='', values=(backThreeShow, results1[1][0], results1[1][1]))
+        tree.insert('', 2, text='', values=(backThreeShow, results1[2][0], results1[2][1]))
+        tree.insert('', 3, text='', values=(backTwoShow, results2[0][0], results2[0][1]))
+        tree.insert('', 4, text='', values=(backTwoShow, results2[1][0], results2[1][1]))
+        tree.insert('', 5, text='', values=(backTwoShow, results2[2][0], results2[2][1]))
+        tree.insert('', 6, text='', values=(backOneShow, results3[0][0], results3[0][1]))
+        tree.insert('', 7, text='', values=(backOneShow, results3[1][0], results3[1][1]))
+        tree.insert('', 8, text='', values=(backOneShow, results3[2][0], results3[2][1]))
 
-        print(results1)
-        print(results2)
-        print(results3)
 
     def swtMain(self):
         self.viewpopRRWin.destroy()
