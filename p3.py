@@ -164,7 +164,7 @@ class Phase_three:
             messagebox.showerror("Error", "Invalid username or password")
 
     def mainMenu(self):
-        self.primaryWindow.deiconify()
+        self.primaryWindow = Toplevel()
         self.primaryWindow.title("Choose Functionality ")
         buttonsFrame = Frame(self.primaryWindow)
         buttonsFrame.pack()
@@ -916,7 +916,7 @@ class Phase_three:
         self.mainMenu()
 
     def update1(self):
-        self.index = floor(self.w.get()/8)
+        self.index = floor(self.w.get()/9)
 #####################table info, new dept date, change fee, updated cost,#################
     def updateReservation2(self):
         self.updateWin.withdraw()
@@ -930,13 +930,13 @@ class Phase_three:
 
         l0 = Label(frame,text = "Select").grid(row = 1, column = 0)
         l1 = Label(frame,text = "Train(Train Number)").grid(row = 1, column = 1)
-        #l2 = Label(frame,text = "Time(Duration)").grid(row = 1, column = 2)
-        l3 = Label(frame,text = "Departs From").grid(row = 1, column = 2)
-        l4 = Label(frame,text = "Arrives At").grid(row = 1, column = 3)
-        l5 = Label(frame,text = "Class").grid(row = 1, column = 4)
-        l6 = Label(frame,text = "Price").grid(row = 1, column =5)
-        l7 = Label(frame,text = "# of baggages").grid(row = 1, column = 6)
-        l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 7)
+        l2 = Label(frame,text = "Date").grid(row = 1, column = 2)
+        l3 = Label(frame,text = "Departs From").grid(row = 1, column = 3)
+        l4 = Label(frame,text = "Arrives At").grid(row = 1, column = 4)
+        l5 = Label(frame,text = "Class").grid(row = 1, column = 5)
+        l6 = Label(frame,text = "Price").grid(row = 1, column =6)
+        l7 = Label(frame,text = "# of baggages").grid(row = 1, column = 7)
+        l8 = Label(frame,text = "Passenger Name").grid(row = 1, column = 8)
 
         server = self.Connect()
         cursor = server.cursor()
@@ -952,20 +952,22 @@ class Phase_three:
             Radiobutton(frame, variable = self.w, value = b, command = self.update1).grid(row = a, column = 0)
             Label(frame, text = str(result[1]), anchor = "w").grid(row = a, column = 1, sticky = "ew")
 
+            l11 = Label(frame, text = str(result[3]), anchor = "w")
+            l11.grid(row = a, column = 2, sticky = "ew")
             l12 = Label(frame, text = str(result[6]), anchor = "w")
-            l12.grid(row = a, column = 2, sticky = "ew")
+            l12.grid(row = a, column = 3, sticky = "ew")
             l13 = Label(frame, text = str(result[7]), anchor = "w")
-            l13.grid(row = a, column = 3, sticky = "ew")
+            l13.grid(row = a, column = 4, sticky = "ew")
             l14 = Label(frame, text = str(result[2]), anchor = "w")
-            l14.grid(row = a, column = 4, sticky = "ew")
+            l14.grid(row = a, column = 5, sticky = "ew")
             l15 =Label(frame, text = str(result[8]), anchor = "w")
-            l15.grid(row = a, column = 5, sticky = "ew")
+            l15.grid(row = a, column = 6, sticky = "ew")
             l16 = Label(frame, text = str(result[5]), anchor = "w")
-            l16.grid(row = a, column = 6, sticky = "ew")
+            l16.grid(row = a, column = 7, sticky = "ew")
             l17 = Label(frame, text = str(result[4]), anchor = "w")
-            l17.grid(row = a, column = 7, sticky = "ew")
+            l17.grid(row = a, column = 8, sticky = "ew")
             a = a + 1
-            b += 8
+            b += 9
 
         b1 = Button(frame2, text = "Back", command = self.switchUpdateReservation)
         b1.pack(side = LEFT)
@@ -985,9 +987,9 @@ class Phase_three:
         tree=Treeview(frame)
         tree.grid(row = 2, column = 0)
         tree["show"] = "headings"
-        tree["columns"]=("train","time","dept", "arrv", "class", "pr", "bag", "name")
+        tree["columns"]=("train","date", "dept", "arrv", "class", "pr", "bag", "name")
         tree.heading("train", text= "Train (Train Number)")
-        tree.heading("time", text= "Time (Duration)")
+        tree.heading("date", text = "Date")
         tree.heading("dept", text= "Departs From")
         tree.heading("arrv", text= "Arrives At")
         tree.heading("class", text= "Class")
@@ -1000,7 +1002,7 @@ class Phase_three:
         tree=Treeview(frame)
         tree.grid(row = 4, column = 0, sticky = E)
         tree["show"] = "headings"
-        tree["columns"]=("train","dept", "arrv", "class", "pr", "bag", "name")
+        tree["columns"]=("train", "dept", "arrv", "class", "pr", "bag", "name")
         tree.heading("train", text= "Train (Train Number)")
         tree.heading("dept", text= "Departs From")
         tree.heading("arrv", text= "Arrives At")
@@ -1009,6 +1011,10 @@ class Phase_three:
         tree.heading("bag", text= "# of Baggages")
         tree.heading("name", text= "Passenger Name")
         return tree
+
+    def updateDepartureDate(self):
+        self.updatedDate = datetime.strptime(self.date.get(), '%Y-%m-%d')
+
 
     def updateReservation3(self):
         self.updateWin2.withdraw()
@@ -1026,55 +1032,60 @@ class Phase_three:
         frame5 = Frame(self.updateWin3)
         frame5.pack()
 
-        updateIndex = floor(self.w.get()/8)
-        print(self.results)
+        updateIndex = floor(self.w.get()/9)
         updateTuple = self.results[updateIndex]
-        print(updateTuple)
 
         l1 = Label(frame, text = "Current Train Ticket")
         l1.grid(row = 1, column = 1, sticky = E)
 
         i = 0
         tree = self.updateTree2(frame2)
-        tree.insert('', i, text='', values=(updateTuple[1], updateTuple[6],updateTuple[7], updateTuple[2], updateTuple[8], updateTuple[5],updateTuple[4]))
+        tree.insert('', i, text='', values=(updateTuple[1], updateTuple[3],updateTuple[6],updateTuple[7], updateTuple[2], updateTuple[8], updateTuple[5],updateTuple[4]))
         newdepDate= Label(frame3,text ="New Departure Date")
         newdepDate.grid(row = 0, column = 0, sticky = E)
         self.date = StringVar() ## assume YYYY-MM-DD
         e1= Entry(frame3,textvariable = self.date, width = 10)
         e1.grid(row = 0, column = 1, sticky = EW)
-        b1 = Button(frame3, text = "Search availability", command = self.trainSchedule)
+        self.updatedDate = updateTuple[3]
+        b1 = Button(frame3, text = "Search availability", command = self.updateDepartureDate)
         b1.grid(row = 0, column = 2, sticky = EW)
+
 
         l2 = Label(frame3, text = "Updated Train Ticket")
         l2.grid(row = 1, column = 1, sticky = E)
 
-
-
+        i = 0
         tree2 = self.updateTree3(frame4)
+        tree2.insert('', i, text='', values=(updateTuple[1],updateTuple[6],updateTuple[7], updateTuple[2], updateTuple[8], updateTuple[5],updateTuple[4]))
 
 
-        changeFee = Label(frame5,text ="Change Fee")
-        changeFee.grid(row = 0, column = 0, sticky = E)
-        self.value = StringVar()
-        e2 = Entry(frame5,textvariable = self.value, width = 10)
-        e2.grid(row = 0, column = 1, sticky = E)
-        updatedCost = Label(frame5,text ="Updated Total Cost")
-        updatedCost.grid(row = 1, column = 0, sticky = E)
-        e3 = Entry(frame5, textvariable = self.value, width = 10)
-        e3.grid(row = 1, column = 1)
 
-        self.updatedDate = datetime.strptime(self.date.get(), '%Y-%m-%d')
         server = self.Connect()
         cursor = server.cursor()
         query2 = "SELECT Change_fee FROM SYSTEM_INFO"
         cursor.execute(query2)
-        changefee = cursor.fetchall()
+        changefee = cursor.fetchone()
         change_fee = changefee[0]
-        query3 = "SELECT Total_Cost FROM RESERVES WHERE ReservationID='%d' AND Train_Number='%d'" % (self.resID.get(), result1[self.index])
+        query4 = "SELECT * FROM RESERVES WHERE ReservationID = '%s'" % (self.resID.get())
+        cursor.execute(query4)
+        self.results = cursor.fetchall()
+        query3 = "SELECT Total_Cost FROM RESERVES WHERE ReservationID='%d' AND Train_Number='%d'" % (self.resID.get(), self.results[self.index][1])
         cursor.execute(query3)
-        totalcost = cursor.fetchall()
-        total_cost = totalcost[0]
-        self.total_cost = total_cost + change_fee
+        totalcost = cursor.fetchone()
+        self.total_cost = totalcost[0]
+        self.total_cost = self.total_cost + change_fee
+        print (type(self.total_cost))
+
+        changeFee = Label(frame5,text ="Change Fee")
+        changeFee.grid(row = 0, column = 0, sticky = E)
+        self.value = StringVar()
+        e2 = Label(frame5,text = change_fee, width = 10)
+        e2.grid(row = 0, column = 1, sticky = E)
+        updatedCost = Label(frame5,text ="Updated Total Cost")
+        updatedCost.grid(row = 1, column = 0, sticky = E)
+        e3 = Label(frame5, text = self.total_cost, width = 10)
+        e3.grid(row = 1, column = 1)
+
 
         b2=Button(frame5, text ="Back", command = self.switchUpdateReservation2)
         b2.grid(row =2, column = 0, sticky = E)
@@ -1084,8 +1095,13 @@ class Phase_three:
 
     def submit(self):
         self.updateWin3.destroy()
-        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%s', RESERVES.Total_Cost = '%d' WHERE ReservationID='%d' AND Train_Number='%d'" % (self.updatedDate, self.total_cost, self.resID.get(), self.results1[self.index])
+        server = self.Connect()
+        cursor = server.cursor()
+        query1 = "UPDATE RESERVES SET RESERVES.Departure_Date = '%s', RESERVES.Total_Cost = '%d' WHERE ReservationID='%d' AND Train_Number='%d'" % (self.updatedDate, self.total_cost, self.resID.get(), self.results[self.index][1])
         cursor.execute(query1)
+        cursor.close()
+        server.commit()
+        server.close()
         self.mainMenu()
 
 ################## reservation id search, table/ total cost, date, amount to be refunded#######################
@@ -1287,17 +1303,11 @@ class Phase_three:
         e3 = Entry(frame, textvariable = self.comment, width = 20)
         e3.grid(row = 2, column = 1)
 
-<<<<<<< HEAD
         b1=Button(frame, text ="Submit", command = self.verifyRev)
         b1.grid(row = 3, column = 1)
-=======
-        if self.trainNo == "" or self.rating == "":
-            return
->>>>>>> d561fe4e45e40a0b863420163735a3b364c7f0bc
 
 
     def verifyRev(self):
-
         if self.trainNo == "":
             messagebox.showerror("Error", "Enter a train number")
         if self.trainNo == "" or self.rating == "":
