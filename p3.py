@@ -433,8 +433,8 @@ class Phase_three:
             self.value  = (floor(self.v.get()/2))
 
     def departureInfo(self):
-        start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
-        if start_date < datetime.now():
+        start_date = datetime.datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
+        if start_date < datetime.datetime.now():
             messagebox.showerror("Error", "Invalid Date (Either in the past or start > end)")
         else:
             self.findAvailWindow.withdraw()
@@ -739,13 +739,9 @@ class Phase_three:
         b4=Button(frame5, text ="Submit", command = self.addCardCheck)
         b4.pack(side=LEFT)
 
-        #start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
-        #    if start_date < datetime.now():
-
-
     def addCardCheck(self):
-        self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
-        if self.expDate <= datetime.now():
+        self.expDate = datetime.datetime.strptime(self.date1.get(), '%Y-%m-%d')
+        if self.expDate <= datetime.datetime.now():
             messagebox.showerror("Error, your card is expired.")
 
         server = self.Connect()
@@ -816,7 +812,7 @@ class Phase_three:
         results = cursor.fetchall()
         for row in results:
             self.departDate = row[1]
-            if self.departDate >= datetime.today() and row[0] == 0:
+            if self.departDate >= datetime.datetime.today() and row[0] == 0:
                 messagebox.showerror("Error", "Card is being used for existing reservation")
                 return
 
@@ -851,7 +847,6 @@ class Phase_three:
     def confirmation(self):
         server = self.Connect()
         cursor = server.cursor()
-        #self.CARD = int(self.card.get())
 
         query = "SELECT MAX(ReservationID) FROM RESERVATION"
         cursor.execute(query)
@@ -1013,7 +1008,7 @@ class Phase_three:
         return tree
 
     def updateDepartureDate(self):
-        self.updatedDate = datetime.strptime(self.date.get(), '%Y-%m-%d')
+        self.updatedDate = datetime.datetime.strptime(self.date.get(), '%Y-%m-%d')
 
 
     def updateReservation3(self):
@@ -1104,7 +1099,6 @@ class Phase_three:
         server.close()
         self.mainMenu()
 
-################## reservation id search, table/ total cost, date, amount to be refunded#######################
     def cancelRes(self):
         self.primaryWindow.withdraw()
         self.cancelWin = Toplevel()
@@ -1115,7 +1109,8 @@ class Phase_three:
 
         l1 = Label(frame, text = "Reservation ID")
         l1.grid(row = 0, column = 0, sticky = E)
-        e1 = Entry(frame, width = 10)
+        self.cancelID = IntVar()
+        e1 = Entry(frame, text = self.cancelID, width = 10)
         e1.grid(row = 0, column = 1)
         b1 = Button(frame, text = "Search", command = self.cancelRes2)
         b1.grid(row = 0, column = 2, sticky = E)
@@ -1131,9 +1126,9 @@ class Phase_three:
         tree=Treeview(frame)
         tree.grid(row = 0, column = 0, sticky = E)
         tree["show"] = "headings"
-        tree["columns"]=("train","time","dept", "arrv", "class", "pr", "bag", "name")
+        tree["columns"]=("train","Date","dept", "arrv", "class", "pr", "bag", "name")
         tree.heading("train", text= "Train (Train Number)")
-        tree.heading("time", text= "Time (Duration)")
+        tree.heading("Date", text= "Date")
         tree.heading("dept", text= "Departs From")
         tree.heading("arrv", text= "Arrives At")
         tree.heading("class", text= "Class")
@@ -1154,64 +1149,90 @@ class Phase_three:
         frame3 = Frame(self.cancelWin2)
         frame3.pack()
 
+        server = self.Connect()
+        cursor = server.cursor()
+        query = "SELECT * FROM RESERVES WHERE ReservationID = '%s'" % (self.cancelID.get())
+        cursor.execute(query)
+        self.results = cursor.fetchall()
+        if len(self.results) == 0:
+            messagebox.showerror("Error", "Reservation already cancelled, cannot cancel again")
+            self.cancelWin2.destroy()
+            self.cancelRes()
+            return
+
+        i = 0
+        self.delPrice = 0
         tree = self.updateTree4(frame)
+        dates = []
+        for res in self.results:
+            tree.insert('', i, text='', values=(res[1], res[3], res[6],res[7], res[2], res[8], res[5],res[4]))
+            self.delPrice += res[8]
+            dates.append(res[3])
+            i += 1
+        self.departDate = min(dates)
 
         l1= Label(frame2,text ="Total Cost of Reservation")
         l1.grid(row = 1, column = 0, sticky = E)
-        e1= Label(frame2,text = self.price, width = 10)
+
+        e1= Label(frame2,text = self.delPrice, width = 10)
         e1.grid(row = 1, column = 1, sticky = EW)
 
-        self.cancelDate = date.today()
+        #self.cancelDate = datetime.today()
+        self.cancelDate = datetime.date.today()
         l2 = Label(frame2, text = "Date of Cancellation")
         l2.grid(row = 2, column = 0, sticky = E)
-        e2= Label(frame2,text = self.cancelDate.get(), width = 10)
+        e2= Label(frame2,text = self.cancelDate, width = 10)
         e2.grid(row = 2, column = 1, sticky = EW)
 
-        server = self.Connect()
-        cursor = server.cursor()
-        query = "SELECT Is_cancelled, MIN(Departure_Date) FROM RESERVATION, RESERVES WHERE ReservationID = '%d'" % (self.resCancelID.get())
-        cursor.execute(query)
-        results = cursor.fetchall()
-
-        #fix the dates here
-
-        if self.cancelDate < (results[1] - datetime.timedelta(days=7)):
-            self.refund = self.price * 0.8 - 50
-        elif self.cancelDate > (results[1] - datetime.timedelta(days=7)) and self.cancelDate < (results[1] + datetime.timedelta(days=1)):
-            self.refuned = self.price * 0.5 - 50
-        elif self.cancelDate > (results[1] - datetime.timedelta(days=1)):
+        if self.cancelDate < (self.departDate - datetime.timedelta(7)):
+            self.refund = float(self.delPrice) * 0.8 - 50.0
+        elif self.cancelDate < (self.departDate - datetime.timedelta(1)) and (self.cancelDate > (self.departDate - datetime.timedelta(7))):
+            self.refund = float(self.delPrice) * 0.5 - 50
+        elif self.cancelDate > (self.departDate - datetime.timedelta(1)):
             self.refund = 0
-            print("Cannot cancel reservation within a day of departure date")
+            messagebox.showerror("Error", "Cannot cancel reservation within a day of departure date")
+            self.cancelWin2.destroy()
+            self.cancelRes()
             return
-
-        if self.refund < 0:
+        elif self.refund < 0:
             self.refund = 0
-
-        self.price = self.price - self.refund.get()
 
         l3 = Label(frame2, text = "Amount to be Refunded")
         l3.grid(row = 3, column = 0, sticky = E)
-        e2= Label(frame2,text = self.refund().get(), width = 10)
+        e2= Label(frame2,text = self.refund, width = 10)
         e2.grid(row = 3, column = 1, sticky = EW)
 
         b2=Button(frame3, text ="Back", command = self.switchCancelRes1)
         b2.grid(row =4, column = 0, sticky = E)
 
-        if results[0] == 1:
-            print("Reservation already cancelled, cannot cancel again")
-            return
-        else:
-            queryCancel = "UPDATE RESERVATION SET Is_cancelled = 1 WHERE ReservationID = '%d'" % (self.resCancelID.get())
-            b3=Button(frame3, text ="Submit", command = self.switchTC)
-            b3.grid(row =4, column = 1, sticky = E)
+        b3=Button(frame3, text ="Submit", command = self.switchTC)
+        b3.grid(row =4, column = 1, sticky = E)
 
     def switchCancelRes1(self):
         self.cancelWin2.destroy()
         self.cancelRes()
 
     def switchTC(self):
+        server = self.Connect()
+        cursor = server.cursor()
+
+        query = "SELECT Is_cancelled, MIN(Departure_Date) FROM RESERVATION, RESERVES WHERE RESERVES.ReservationID = '%d' AND RESERVATION.ReservationID = '%d'" % (self.cancelID.get(), self.cancelID.get())
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        queryCancel = "UPDATE RESERVATION SET Is_cancelled = 1 WHERE ReservationID = '%d'" % (self.cancelID.get())
+        cursor.execute(queryCancel)
+        query = "DELETE FROM RESERVES WHERE RESERVES.ReservationID = '%d'" % (self.cancelID.get())
+        cursor.execute(query)
+
+        cursor.close()
+        server.commit()
+        server.close()
         self.cancelWin2.destroy()
-        self.confirmation()
+        self.primaryWindow.destroy()
+        self.primaryWin.destroy()
+        self.primaryWindow = Toplevel()
+        self.mainMenu()
 
     def viewReview(self):
         self.primaryWindow.withdraw()
