@@ -434,7 +434,7 @@ class Phase_three:
 
     def departureInfo(self):
         start_date = datetime.strptime(self.startDateEntry.get(), '%Y-%m-%d')
-        if start_date < datetime.now():
+        if start_date < datetime.datetime.now():
             messagebox.showerror("Error", "Invalid Date (Either in the past or start > end)")
         else:
             self.findAvailWindow.withdraw()
@@ -745,7 +745,7 @@ class Phase_three:
 
     def addCardCheck(self):
         self.expDate = datetime.strptime(self.date1.get(), '%Y-%m-%d')
-        if self.expDate <= datetime.now():
+        if self.expDate <= datedatetime.now():
             messagebox.showerror("Error, your card is expired.")
 
         server = self.Connect()
@@ -816,7 +816,7 @@ class Phase_three:
         results = cursor.fetchall()
         for row in results:
             self.departDate = row[1]
-            if self.departDate >= datetime.today() and row[0] == 0:
+            if self.departDate >= datetime.now() and row[0] == 0:
                 messagebox.showerror("Error", "Card is being used for existing reservation")
                 return
 
@@ -897,8 +897,7 @@ class Phase_three:
     def updateReservation(self):
         self.primaryWindow.destroy()
         self.updateWin = Toplevel()
-        self.updateWin.title("Update Reservation"
-)
+        self.updateWin.title("Update Reservation")
         frame = Frame(self.updateWin)
         frame.pack()
         self.resID = IntVar()
@@ -1146,7 +1145,7 @@ class Phase_three:
         e1= Label(frame2,text = self.price, width = 10)
         e1.grid(row = 1, column = 1, sticky = EW)
 
-        self.cancelDate = date.today()
+        self.cancelDate = date.now()
         l2 = Label(frame2, text = "Date of Cancellation")
         l2.grid(row = 2, column = 0, sticky = E)
         e2= Label(frame2,text = self.cancelDate.get(), width = 10)
@@ -1348,81 +1347,88 @@ class Phase_three:
         backTwo = (datetime.datetime.now() - datetime.timedelta(60)).strftime("%Y-%m-01")
         backThree = (datetime.datetime.now() - datetime.timedelta(90)).strftime("%Y-%m-01")
 
-        if backOne == "01":
+        backOneM = backOne[5:7]
+        backTwoM = backTwo[5:7]
+        backThreeM = backThree[5:7]
+        backOneShow = ""
+        backTwoShow = ""
+        backThreeShow = ""
+
+        if backOneM == "01":
             backOneShow = "January"
-        if backOne == "02":
+        if backOneM == "02":
             backOneShow = "February"
-        if backOne == "03":
+        if backOneM == "03":
             backOneShow = "March"
-        if backOne == "04":
+        if backOneM == "04":
             backOneShow = "April"
-        if backOne == "05":
+        if backOneM == "05":
             backOneShow = "May"
-        if backOne == "06":
+        if backOneM == "06":
             backOneShow = "June"
-        if backOne == "07":
+        if backOneM == "07":
             backOneShow = "July"
-        if backOne == "08":
+        if backOneM == "08":
             backOneShow = "August"
-        if backOne == "09":
+        if backOneM == "09":
             backOneShow = "September"
-        if backOne == "10":
+        if backOneM == "10":
             backOneShow = "October"
-        if backOne == "11":
+        if backOneM == "11":
             backOneShow = "November"
-        if backOne == "12":
+        if backOneM == "12":
             backOneShow = "December"
 
 
-        if backTwo == "01":
+        if backTwoM == "01":
             backTwoShow = "January"
-        if backTwo == "02":
+        if backTwoM == "02":
             backTwoShow = "February"
-        if backTwo == "03":
+        if backTwoM == "03":
             backTwoShow = "March"
-        if backTwo == "04":
+        if backTwoM == "04":
             backTwoShow = "April"
-        if backTwo == "05":
+        if backTwoM == "05":
             backTwoShow = "May"
-        if backTwo == "06":
+        if backTwoM == "06":
             backTwoShow = "June"
-        if backTwo == "07":
+        if backTwoM == "07":
             backTwoShow = "July"
-        if backTwo == "08":
+        if backTwoM == "08":
             backTwoShow = "August"
-        if backTwo == "09":
+        if backTwoM == "09":
             backTwoShow = "September"
-        if backTwo == "10":
+        if backTwoM == "10":
             backTwoShow = "October"
-        if backTwo == "11":
+        if backTwoM == "11":
             backTwoShow = "November"
-        if backTwo == "12":
+        if backTwoM == "12":
             backTwoShow = "December"
 
-        if backThree == "01":
+        if backThreeM == "01":
             backThreeShow = "January"
-        if backThree == "02":
+        if backThreeM == "02":
             backThreeShow = "February"
-        if backThree == "03":
+        if backThreeM == "03":
             backThreeShow = "March"
-        if backThree == "04":
+        if backThreeM == "04":
             backThreeShow = "April"
-        if backThree == "05":
+        if backThreeM == "05":
             backThreeShow = "May"
-        if backThree == "06":
+        if backThreeM == "06":
             backThreeShow = "June"
-        if backThree == "07":
+        if backThreeM == "07":
             backThreeShow = "July"
-        if backThree == "08":
+        if backThreeM == "08":
             backThreeShow = "August"
-        if backThree == "09":
+        if backThreeM == "09":
             backThreeShow = "September"
-        if backThree == "10":
+        if backThreeM == "10":
             backThreeShow = "October"
-        if backThree == "11":
+        if backThreeM == "11":
             backThreeShow = "November"
-        if backThree == "12":
-            bakcThreeShow = "December"
+        if backThreeM == "12":
+            backThreeShow = "December"
 
         server = self.Connect()
         cursor = server.cursor()
@@ -1435,9 +1441,6 @@ class Phase_three:
         result2 = cursor.fetchall()
         cursor.execute(query3)
         result3 = cursor.fetchall()
-        print(result1)
-        print(result2)
-        print(result3)
 
         tree = self.viewTree2(frame)
         tree.insert('', 0, text='', values=(backThreeShow, result1[0][0]))
